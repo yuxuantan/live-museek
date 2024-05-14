@@ -1,0 +1,185 @@
+'use client'; // Ensures this component only renders on the client
+
+import { useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+interface Event {
+    id: number;
+    name: string;
+    location: string;
+    realLifeLocation: string;
+    date: string;
+    performer: string;
+    musicGenres: string[];
+    performanceStart: string;
+    performanceEnd: string;
+}
+
+// Example events data from Singapore
+const events: Event[] = [
+    {
+        id: 1,
+        name: 'Rock Night',
+        location: 'Esplanade Concert Hall',
+        realLifeLocation: '1 Esplanade Dr, Singapore 038981',
+        date: '2024-05-14',
+        performer: 'John Doe',
+        musicGenres: ['Rock', 'English'],
+        performanceStart: '20:00',
+        performanceEnd: '23:00'
+    },
+    {
+        id: 2,
+        name: 'Jazz Evening',
+        location: 'Blu Jaz Cafe',
+        realLifeLocation: '11 Bali Ln, Singapore 189848',
+        date: '2024-05-14',
+        performer: 'Jane Smith',
+        musicGenres: ['Jazz', 'English'],
+        performanceStart: '18:00',
+        performanceEnd: '21:00'
+    },
+    {
+        id: 3,
+        name: 'Classical Night',
+        location: 'Victoria Concert Hall',
+        realLifeLocation: '9 Empress Pl, Singapore 179556',
+        date: '2024-05-14',
+        performer: 'Alice Tan',
+        musicGenres: ['Classical'],
+        performanceStart: '19:00',
+        performanceEnd: '22:00'
+    },
+    {
+        id: 4,
+        name: 'Pop Fiesta',
+        location: 'The Star Theatre',
+        realLifeLocation: '1 Vista Exchange Green, Singapore 138617',
+        date: '2024-05-14',
+        performer: 'Bob Lim',
+        musicGenres: ['Pop', 'Top 40s'],
+        performanceStart: '20:00',
+        performanceEnd: '23:00'
+    },
+    {
+        id: 5,
+        name: 'Indie Vibes',
+        location: 'Kult Kafe',
+        realLifeLocation: '11 Upper Wilkie Rd, Singapore 228120',
+        date: '2024-05-14',
+        performer: 'Charlie Wong',
+        musicGenres: ['Indie', 'Mandopop'],
+        performanceStart: '17:00',
+        performanceEnd: '20:00'
+    },
+];
+
+// Dynamic import for the Map component
+const DynamicMap = dynamic(() => import('../components/Map'), {
+    ssr: false,
+});
+
+const containerStyle = {
+    width: '100%',
+    height: '400px',
+};
+
+export default function EventsPage() {
+    const center = useMemo(() => ({ lat: 1.3521, lng: 103.8198 }), []); // Centered on Singapore
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+    const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+    const [selectedTime, setSelectedTime] = useState<string>('All');
+    const [selectedDate, setSelectedDate] = useState<string>('2024-05-14'); // Default date
+
+    const genres = ['Rock', 'Jazz', 'Classical', 'Pop', 'Indie', 'Mandopop', 'Top 40s', 'English'];
+    const times = ['All', 'Morning', 'Afternoon', 'Evening', 'Night'];
+
+    const filterEvents = (event: Event) => {
+        const isGenreMatch = selectedGenres.length === 0 || selectedGenres.some(genre => event.musicGenres.includes(genre));
+        const isTimeMatch = selectedTime === 'All' || (
+            (selectedTime === 'Morning' && event.performanceStart >= '06:00' && event.performanceStart < '12:00') ||
+            (selectedTime === 'Afternoon' && event.performanceStart >= '12:00' && event.performanceStart < '18:00') ||
+            (selectedTime === 'Evening' && event.performanceStart >= '18:00' && event.performanceStart < '21:00') ||
+            (selectedTime === 'Night' && event.performanceStart >= '21:00')
+        );
+        const isDateMatch = selectedDate === '' || event.date === selectedDate;
+        return isGenreMatch && isTimeMatch && isDateMatch;
+    };
+
+    const filteredEvents = events.filter(filterEvents);
+
+    const handleGenreChange = (genre: string) => {
+        setSelectedGenres(prev =>
+            prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
+        );
+    };
+
+    const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedTime(event.target.value);
+    };
+
+    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedDate(event.target.value);
+    };
+
+    return (
+        <div>
+            <h1 className="text-2xl font-bold mb-4">Events</h1>
+            <div className="mb-4">
+                <h2 className="text-lg font-semibold">Filter by Genre</h2>
+                <div className="flex flex-wrap">
+                    {genres.map(genre => (
+                        <label key={genre} className="mr-4 mb-2">
+                            <input
+                                type="checkbox"
+                                value={genre}
+                                checked={selectedGenres.includes(genre)}
+                                onChange={() => handleGenreChange(genre)}
+                            />
+                            <span className="ml-2">{genre}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+            <div className="mb-4">
+                <h2 className="text-lg font-semibold">Filter by Time</h2>
+                <select value={selectedTime} onChange={handleTimeChange} className="p-2 border rounded">
+                    {times.map(time => (
+                        <option key={time} value={time}>
+                            {time}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div className="mb-4">
+                <h2 className="text-lg font-semibold">Filter by Date</h2>
+                <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    className="p-2 border rounded"
+                />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-1 space-y-4">
+                    {selectedEvent ? (
+                        <div className="p-4 bg-white rounded-lg shadow">
+                            <h2 className="text-xl font-semibold">{selectedEvent.name} - {selectedEvent.musicGenres.join(', ')}</h2>
+                            <p>Performer: <a href={`/musicians/${selectedEvent.id}`} className="text-blue-500 hover:underline">{selectedEvent.performer}</a></p>
+                            <p>Location: <a href={`https://maps.google.com/?q=${selectedEvent.realLifeLocation}`} target="_blank" className="text-blue-500 hover:underline">{selectedEvent.location}</a></p>
+                            <p>Date: {selectedEvent.date}</p>
+                            <p>Time: {selectedEvent.performanceStart} to {selectedEvent.performanceEnd}</p>
+                        </div>
+                    ) : (
+                        <p>Select an event from the map.</p>
+                    )}
+                </div>
+                <div className="md:col-span-2">
+                    <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
+                        <DynamicMap center={center} events={filteredEvents} containerStyle={containerStyle} onMarkerClick={setSelectedEvent} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

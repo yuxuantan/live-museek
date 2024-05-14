@@ -1,0 +1,88 @@
+'use client'; // Ensures this component only renders on the client
+
+import React, { useState, useEffect } from 'react';
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+
+interface Event {
+  id: number;
+  name: string;
+  location: string;
+  date: string;
+  realLifeLocation: string;
+  performer: string;
+  musicGenres: string[];
+  performanceStart: string;
+  performanceEnd: string;
+}
+
+interface MapProps {
+  center: { lat: number; lng: number };
+  events: Event[];
+  containerStyle: { width: string; height: string };
+  onMarkerClick: (event: Event) => void;
+}
+
+const Map: React.FC<MapProps> = ({ center, events, containerStyle, onMarkerClick }) => {
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: 'AIzaSyASRC3EeCzmTCsE_WjkDcywpCgZzSA395A', // Replace with your API key
+  });
+
+  const [markers, setMarkers] = useState<any[]>([]);
+  const [activeMarker, setActiveMarker] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (isLoaded && window.google) {
+      const geocoder = new window.google.maps.Geocoder();
+
+      const geocodePromises = events.map(event =>
+        new Promise((resolve, reject) => {
+          geocoder.geocode({ address: event.realLifeLocation }, (results, status) => {
+            if (status === 'OK' && results.length > 0) {
+              console.log(`Geocoding successful for: ${event.realLifeLocation}`);
+              resolve({
+                ...event,
+                lat: results[0].geometry.location.lat(),
+                lng: results[0].geometry.location.lng(),
+              });
+            } else {
+              console.error(`Geocode was not successful for the following reason: ${status}`);
+              reject(`Geocode was not successful for the following reason: ${status}`);
+            }
+          });
+        })
+      );
+
+      Promise.all(geocodePromises)
+        .then((results) => {
+          console.log('Geocoding results:', results);
+          setMarkers(results);
+        })
+        .catch(error => console.error('Geocoding error: ', error));
+    }
+  }, [isLoaded, events]);
+
+  if (loadError) return <div>Error loading maps</div>;
+  if (!isLoaded) return <div>Loading Maps</div>;
+
+  return (
+    <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
+      <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
+        {markers.map(marker => (
+          <Marker
+            key={marker.id}
+            position={{ lat: marker.lat, lng: marker.lng }}
+            icon={{
+              url: marker.id === activeMarker ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+            }}
+            onClick={() => {
+              setActiveMarker(marker.id);
+              onMarkerClick(marker);
+            }}
+          />
+        ))}
+      </GoogleMap>
+    </div>
+  );
+};
+
+export default Map;
