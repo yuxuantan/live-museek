@@ -29,7 +29,7 @@ export default function MusicianDetailPage({ params }: { params: { id: string } 
         {musicianEvents.length > 0 ? (
           <ul>
             {musicianEvents.map(event => (
-              <li key={event.id} className="mb-4">
+              <li key={event.eventId} className="mb-4">
                 <div className="p-4 bg-gray-100 rounded-lg shadow">
                   <h3 className="text-lg font-semibold mb-2">{event.name}</h3>
                   <p className="text-gray-700">Date: {event.date}</p>
