@@ -1,94 +1,6 @@
 import { notFound } from 'next/navigation';
 import React from 'react';
-
-interface Musician {
-  id: number;
-  name: string;
-  genre: string;
-  bio: string;
-  socialMedia: {
-    facebook: string;
-    twitter: string;
-    instagram: string;
-  };
-}
-
-interface Event {
-  id: number;
-  name: string;
-  location: string;
-  realLifeLocation: string;
-  date: string;
-  performer: string;
-  musicGenres: string[];
-  performanceStart: string;
-  performanceEnd: string;
-}
-
-// Example musicians data
-const musicians: Musician[] = [
-  { id: 1, name: 'John Doe', genre: 'Rock', bio: 'Rock musician from LA', socialMedia: { facebook: 'https://facebook.com/johndoe', twitter: 'https://twitter.com/johndoe', instagram: 'https://instagram.com/johndoe' } },
-  { id: 2, name: 'Jane Smith', genre: 'Jazz', bio: 'Jazz musician from NY', socialMedia: { facebook: 'https://facebook.com/janesmith', twitter: 'https://twitter.com/janesmith', instagram: 'https://instagram.com/janesmith' } },
-];
-
-// Example events data from Singapore
-const events: Event[] = [
-  {
-    id: 1,
-    name: 'Rock Night',
-    location: 'Esplanade Concert Hall',
-    realLifeLocation: '1 Esplanade Dr, Singapore 038981',
-    date: '2024-05-20',
-    performer: 'John Doe',
-    musicGenres: ['Rock', 'English'],
-    performanceStart: '20:00',
-    performanceEnd: '23:00'
-  },
-  {
-    id: 2,
-    name: 'Jazz Evening',
-    location: 'Blu Jaz Cafe',
-    realLifeLocation: '11 Bali Ln, Singapore 189848',
-    date: '2024-06-15',
-    performer: 'Jane Smith',
-    musicGenres: ['Jazz', 'English'],
-    performanceStart: '18:00',
-    performanceEnd: '21:00'
-  },
-  {
-    id: 3,
-    name: 'Classical Night',
-    location: 'Victoria Concert Hall',
-    realLifeLocation: '9 Empress Pl, Singapore 179556',
-    date: '2024-07-10',
-    performer: 'Alice Tan',
-    musicGenres: ['Classical'],
-    performanceStart: '19:00',
-    performanceEnd: '22:00'
-  },
-  {
-    id: 4,
-    name: 'Pop Fiesta',
-    location: 'The Star Theatre',
-    realLifeLocation: '1 Vista Exchange Green, Singapore 138617',
-    date: '2024-08-05',
-    performer: 'Bob Lim',
-    musicGenres: ['Pop', 'Top 40s'],
-    performanceStart: '20:00',
-    performanceEnd: '23:00'
-  },
-  {
-    id: 5,
-    name: 'Indie Vibes',
-    location: 'Kult Kafe',
-    realLifeLocation: '11 Upper Wilkie Rd, Singapore 228120',
-    date: '2024-09-12',
-    performer: 'Charlie Wong',
-    musicGenres: ['Indie', 'Mandopop'],
-    performanceStart: '17:00',
-    performanceEnd: '20:00'
-  },
-];
+import { musicians, events } from '../../data/data'; // Adjust the import path as needed
 
 export default function MusicianDetailPage({ params }: { params: { id: string } }) {
   const musician = musicians.find(m => m.id === parseInt(params.id));
@@ -97,7 +9,7 @@ export default function MusicianDetailPage({ params }: { params: { id: string } 
     notFound();
   }
 
-  const musicianEvents = events.filter(event => event.performer === musician.name);
+  const musicianEvents = events.filter(event => event.performerId === musician.id);
 
   return (
     <div className="container mx-auto p-6">

@@ -1,85 +1,128 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { Event, musicians } from '../data/data';
 
 interface EventFormProps {
-  onAddEvent: (event: EventData) => void;
+  onAddEvent: (event: Event) => void;
+  onEditEvent: (event: Event) => void;
+  selectedEvent: Event | null;
 }
 
-interface EventData {
-  name: string;
-  location: string;
-  date: string;
-  languages: string[];
-  tags: string[];
-}
+const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, selectedEvent }) => {
+  const [event, setEvent] = useState<Event>({ eventId: 0, name: '', location: '', realLifeLocation: '', date: '', performerId: 0, musicGenres: [], performanceStart: '', performanceEnd: '' });
 
-const EventForm: React.FC<EventFormProps> = ({ onAddEvent }) => {
-  const router = useRouter();
-  const [eventName, setEventName] = useState('');
-  const [eventLocation, setEventLocation] = useState('');
-  const [eventDate, setEventDate] = useState('');
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedLanguage = e.target.value;
-    setSelectedLanguages(prevLanguages => [...prevLanguages, selectedLanguage]);
-  };
-
-  const handleTagChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedTag = e.target.value;
-    setSelectedTags(prevTags => [...prevTags, selectedTag]);
-  };
+  useEffect(() => {
+    if (selectedEvent) {
+      setEvent(selectedEvent);
+    } else {
+      setEvent({ eventId: 0, name: '', location: '', realLifeLocation: '', date: '', performerId: 0, musicGenres: [], performanceStart: '', performanceEnd: '' });
+    }
+  }, [selectedEvent]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const eventData: EventData = {
-      name: eventName,
-      location: eventLocation,
-      date: eventDate,
-      languages: selectedLanguages,
-      tags: selectedTags,
-    };
-    onAddEvent(eventData);
-    router.push('/events');
+    if (selectedEvent) {
+      onEditEvent(event);
+    } else {
+      onAddEvent({ ...event, eventId: Date.now() });
+    }
+    setEvent({ eventId: 0, name: '', location: '', realLifeLocation: '', date: '', performerId: 0, musicGenres: [], performanceStart: '', performanceEnd: '' });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex flex-col">
-        <label htmlFor="eventName" className="font-bold mb-1">Event Name:</label>
-        <input type="text" id="eventName" value={eventName} onChange={e => setEventName(e.target.value)} className="p-2 border border-gray-300 rounded-md"/>
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded bg-white shadow-md">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Name</label>
+        <input
+          type="text"
+          value={event.name}
+          onChange={(e) => setEvent({ ...event, name: e.target.value })}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
       </div>
-      <div className="flex flex-col">
-        <label htmlFor="location" className="font-bold mb-1">Location:</label>
-        <input type="text" id="location" value={eventLocation} onChange={e => setEventLocation(e.target.value)} className="p-2 border border-gray-300 rounded-md"/>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Location</label>
+        <input
+          type="text"
+          value={event.location}
+          onChange={(e) => setEvent({ ...event, location: e.target.value })}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
       </div>
-      <div className="flex flex-col">
-        <label htmlFor="date" className="font-bold mb-1">Date:</label>
-        <input type="date" id="date" value={eventDate} onChange={e => setEventDate(e.target.value)} className="p-2 border border-gray-300 rounded-md"/>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Real-Life Location</label>
+        <input
+          type="text"
+          value={event.realLifeLocation}
+          onChange={(e) => setEvent({ ...event, realLifeLocation: e.target.value })}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
       </div>
-      <div className="flex flex-col">
-        <label htmlFor="languages" className="font-bold mb-1">Song Languages:</label>
-        <select id="languages" onChange={handleLanguageChange} className="p-2 border border-gray-300 rounded-md">
-          <option value="" disabled>Select Language</option>
-          <option value="English">English</option>
-          <option value="Spanish">Spanish</option>
-          <option value="French">French</option>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Date</label>
+        <input
+          type="date"
+          value={event.date}
+          onChange={(e) => setEvent({ ...event, date: e.target.value })}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Performer</label>
+        <select
+          value={event.performerId}
+          onChange={(e) => setEvent({ ...event, performerId: parseInt(e.target.value) })}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        >
+          <option value="" disabled>Select performer</option>
+          {musicians.map((musician) => (
+            <option key={musician.id} value={musician.id}>
+              {musician.name}
+            </option>
+          ))}
         </select>
       </div>
-      <div className="flex flex-col">
-        <label htmlFor="tags" className="font-bold mb-1">Tags:</label>
-        <select id="tags" onChange={handleTagChange} className="p-2 border border-gray-300 rounded-md">
-          <option value="" disabled>Select Tag</option>
-          <option value="Rock">Rock</option>
-          <option value="Jazz">Jazz</option>
-          <option value="Pop">Pop</option>
-        </select>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Music Genres</label>
+        <input
+          type="text"
+          value={event.musicGenres.join(', ')}
+          onChange={(e) => setEvent({ ...event, musicGenres: e.target.value.split(',').map(genre => genre.trim()) })}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
       </div>
-      <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Add Event
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Performance Start</label>
+        <input
+          type="time"
+          value={event.performanceStart}
+          onChange={(e) => setEvent({ ...event, performanceStart: e.target.value })}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Performance End</label>
+        <input
+          type="time"
+          value={event.performanceEnd}
+          onChange={(e) => setEvent({ ...event, performanceEnd: e.target.value })}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        {selectedEvent ? 'Edit Event' : 'Add Event'}
       </button>
     </form>
   );

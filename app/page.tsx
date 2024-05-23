@@ -1,8 +1,101 @@
+import React from 'react';
+
 export default function HomePage() {
-  return (
+  return  (
     <div>
-      <h1>Welcome to Live Music Hub</h1>
-      <p>Discover live music events and musicians near you.</p>
+      {/* Hero Section */}
+      <section className="relative bg-cover bg-center h-screen text-white" style={{ backgroundImage: 'url("/hero-image.jpg")' }}>
+        <div className="absolute inset-0 bg-black opacity-70"></div>
+        <div className="container mx-auto flex flex-col items-center justify-center h-full relative">
+          <h1 className="text-5xl font-bold mb-4">Discover Live Music Like Never Before</h1>
+          <p className="text-lg mb-8">Your ultimate destination to find, explore, and experience live music events near you.</p>
+          <a href="#events" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded">Explore Events</a>
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section className="py-20 bg-gray-100">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6">About Live Music Hub</h2>
+          <p className="text-lg mb-6">Live Music Hub connects music enthusiasts with live performances happening in their area. Whether you're a fan or a musician, our platform provides an easy way to discover and promote live music events.</p>
+          <div className="flex justify-center space-x-4">
+            <div className="w-1/3 bg-white p-6 rounded-lg shadow">
+              <h3 className="text-2xl font-semibold mb-4">For Fans</h3>
+              <p className="text-gray-700">Find live music events by genre, location, and date. Never miss your favorite artists performing near you.</p>
+            </div>
+            <div className="w-1/3 bg-white p-6 rounded-lg shadow">
+              <h3 className="text-2xl font-semibold mb-4">For Musicians</h3>
+              <p className="text-gray-700">Promote your gigs and connect with your audience. Make your performances more accessible and increase your fanbase.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Events Section */}
+      <section id="events" className="py-20">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6">Featured Events</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Example Event */}
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h3 className="text-2xl font-semibold mb-4">Rock Night at Esplanade</h3>
+              <p className="text-gray-700 mb-2">Date: 20th May 2024</p>
+              <p className="text-gray-700 mb-2">Location: Esplanade Concert Hall, Singapore</p>
+              <p className="text-gray-700 mb-2">Genres: Rock, English</p>
+              <a href="#" className="text-blue-500 hover:underline">Learn More</a>
+            </div>
+            {/* Add more events here */}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 bg-gray-100">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6">How It Works</h2>
+          <div className="flex flex-wrap justify-center">
+            <div className="w-full md:w-1/3 p-4">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-2xl font-semibold mb-4">Discover Events</h3>
+                <p className="text-gray-700">Browse through a curated list of live music events happening around you. Filter by genre, location, and date to find your perfect music experience.</p>
+              </div>
+            </div>
+            <div className="w-full md:w-1/3 p-4">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-2xl font-semibold mb-4">Promote Your Gigs</h3>
+                <p className="text-gray-700">Are you a musician? List your gigs on Live Music Hub and reach a broader audience. Let your fans know where and when you are performing next.</p>
+              </div>
+            </div>
+            <div className="w-full md:w-1/3 p-4">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-2xl font-semibold mb-4">Connect with Artists</h3>
+                <p className="text-gray-700">Follow your favorite artists and get notified about their upcoming performances. Engage with the community and never miss a beat.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="py-20">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6">Join Live Music Hub Today</h2>
+          <p className="text-lg mb-8">Sign up now to start discovering amazing live music events and promoting your performances.</p>
+          <a href="#" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded">Get Started</a>
+        </div>
+      </section>
+
+      {/* Footer Section */}
+      <footer className="bg-gray-800 text-white py-6">
+        <div className="container mx-auto text-center">
+          <p className="mb-4">&copy; 2024 Live Music Hub. All rights reserved.</p>
+          <div className="flex justify-center space-x-4">
+            <a href="#" className="hover:text-gray-400">Privacy Policy</a>
+            <a href="#" className="hover:text-gray-400">Terms of Service</a>
+            <a href="#" className="hover:text-gray-400">Contact Us</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

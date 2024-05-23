@@ -2,18 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
-
-interface Event {
-  id: number;
-  name: string;
-  location: string;
-  date: string;
-  realLifeLocation: string;
-  performer: string;
-  musicGenres: string[];
-  performanceStart: string;
-  performanceEnd: string;
-}
+import { Event } from '../data/data'; // Adjust the import path as needed
 
 interface MapProps {
   center: { lat: number; lng: number };
@@ -69,13 +58,13 @@ const Map: React.FC<MapProps> = ({ center, events, containerStyle, onMarkerClick
       <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
         {markers.map(marker => (
           <Marker
-            key={marker.id}
+            key={marker.eventId}
             position={{ lat: marker.lat, lng: marker.lng }}
             icon={{
-              url: marker.id === activeMarker ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+              url: marker.eventId === activeMarker ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
             }}
             onClick={() => {
-              setActiveMarker(marker.id);
+              setActiveMarker(marker.eventId);
               onMarkerClick(marker);
             }}
           />
