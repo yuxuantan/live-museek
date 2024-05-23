@@ -26,7 +26,7 @@ const Map: React.FC<MapProps> = ({ center, events, containerStyle, onMarkerClick
       const geocodePromises = events.map(event =>
         new Promise((resolve, reject) => {
           geocoder.geocode({ address: event.realLifeLocation }, (results, status) => {
-            if (status === 'OK' && results.length > 0) {
+            if (status === 'OK' && results != null && results.length > 0) {
               console.log(`Geocoding successful for: ${event.realLifeLocation}`);
               resolve({
                 ...event,
