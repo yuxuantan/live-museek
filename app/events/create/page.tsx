@@ -30,7 +30,7 @@ const CreateEventPage: React.FC = () => {
     <div className="flex flex-col md:flex-row p-8 space-y-6 md:space-y-0 md:space-x-6">
       <div className="md:w-1/2">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">John Doe's Events</h2>
+          <h2 className="text-xl font-semibold">John Doe&apos;s Events</h2>
           <button
             onClick={handleCreateNewEvent}
             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
