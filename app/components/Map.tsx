@@ -10,10 +10,9 @@ interface MapProps {
   containerStyle: { width: string; height: string };
   onMarkerClick: (event: Event) => void;
 }
-
 const Map: React.FC<MapProps> = ({ center, events, containerStyle, onMarkerClick }) => {
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: 'AIzaSyASRC3EeCzmTCsE_WjkDcywpCgZzSA395A', // Replace with your API key
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '', // Replace with your API key
   });
 
   const [markers, setMarkers] = useState<any[]>([]);
