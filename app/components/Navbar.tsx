@@ -16,7 +16,7 @@ const Navbar = () => {
     const pathname = usePathname();
 
     // Function to apply active styles
-    const isActive = (pathnameToMatch) => pathname === pathnameToMatch ? 'bg-blue-900' : '';
+    const isActive = (pathnameToMatch: string) => pathname === pathnameToMatch ? 'bg-blue-900' : '';
 
     return (
         <nav className="bg-blue-800 text-white shadow-lg">
