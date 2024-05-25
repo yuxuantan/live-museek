@@ -17,7 +17,6 @@ export interface Musician {
     name: string;
     location: string;
     realLifeLocation: string;
-    date: string;
     performerId: number;
     musicGenres: string[];
     performanceStart: string;

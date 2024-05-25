@@ -1,8 +1,10 @@
 'use client'; // Ensures this component only renders on the client
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { events, musicians, Event } from '../data/data'; // Adjust the import path as needed
+// import { events, musicians, Event } from '../data/data'; // Adjust the import path as needed
+import { Event, Musician } from '../types'; 
+import { supabase } from '../lib/supabaseClient'; 
 
 const DynamicMap = dynamic(() => import('../components/Map'), {
   ssr: false,
@@ -15,6 +17,8 @@ const containerStyle = {
 
 export default function EventsPage() {
   const center = useMemo(() => ({ lat: 1.3521, lng: 103.8198 }), []); // Centered on Singapore
+  const [events, setEvents] = useState<Event[]>([]);
+  const [musicians, setMusicians] = useState<Musician[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedTime, setSelectedTime] = useState<string>('All');
@@ -22,6 +26,28 @@ export default function EventsPage() {
 
   const genres = ['Rock', 'Jazz', 'Classical', 'Pop', 'Indie', 'Mandopop', 'Top 40s', 'English'];
   const times = ['All', 'Morning', 'Afternoon', 'Evening', 'Night'];
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const { data, error } = await supabase.from('events').select('*');
+      if (error) {
+        console.error('Error fetching events:', error);
+      } else {
+        setEvents(data);
+      }
+    };
+
+    const fetchMusicians = async () => {
+      const { data, error } = await supabase.from('musicians').select('*');
+      if (error) {
+        console.error('Error fetching musicians:', error);
+      } else {
+        setMusicians(data);
+      }
+    };
+
+    fetchEvents();
+    fetchMusicians();
+  }, []);
 
   const filterEvents = (event: Event) => {
     const isGenreMatch = selectedGenres.length === 0 || selectedGenres.some(genre => event.musicGenres.includes(genre));
@@ -31,7 +57,7 @@ export default function EventsPage() {
       (selectedTime === 'Evening' && event.performanceStart >= '18:00' && event.performanceStart < '21:00') ||
       (selectedTime === 'Night' && event.performanceStart >= '21:00')
     );
-    const isDateMatch = selectedDate === '' || event.date === selectedDate;
+    const isDateMatch = selectedDate === '' || event.performanceStart.substring(0, 10) === selectedDate;
     return isGenreMatch && isTimeMatch && isDateMatch;
   };
 
@@ -93,10 +119,10 @@ export default function EventsPage() {
         <div className="md:col-span-1 space-y-4">
           {selectedEvent ? (
             <div className="p-4 bg-white rounded-lg shadow">
-              <h2 className="text-xl font-semibold">{selectedEvent.name} - {selectedEvent.musicGenres.join(', ')}</h2>
+              <h2 className="text-xl font-semibold">{selectedEvent.name} - {selectedEvent.musicGenres}</h2>
               <p>Performer: <a href={`/musicians/${selectedEvent.performerId}`} className="text-blue-500 hover:underline">{musicians.find(m => m.id === selectedEvent.performerId)?.name}</a></p>
               <p>Location: <a href={`https://maps.google.com/?q=${selectedEvent.realLifeLocation}`} target="_blank" className="text-blue-500 hover:underline">{selectedEvent.location}</a></p>
-              <p>Date: {selectedEvent.date}</p>
+              <p>Date: {selectedEvent.performanceStart.substring(0, 10)}</p>
               <p>Time: {selectedEvent.performanceStart} to {selectedEvent.performanceEnd}</p>
             </div>
           ) : (

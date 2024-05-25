@@ -1,10 +1,25 @@
 'use client'; // Ensures this component only renders on the client
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { musicians } from '../data/data'; // Adjust the import path as needed
+import { supabase } from '../lib/supabaseClient';
+import { Musician } from '../types'; 
 
 export default function MusiciansPage() {
+  const [musicians, setMusicians] = useState<Musician[]>([]);
+  useEffect(() => {
+    const fetchMusicians = async () => {
+      const { data, error } = await supabase.from('musicians').select('*');
+      if (error) {
+        console.error('Error fetching musicians:', error);
+      } else {
+        console.log("fetchMusicians", data)
+        setMusicians(data);
+      }
+    };
+    fetchMusicians();
+  }, []);
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('');
@@ -13,7 +28,7 @@ export default function MusiciansPage() {
   const genres = [...new Set(musicians.map(musician => musician.genre))];
   const languages = [...new Set(musicians.map(musician => musician.language))];
   const locations = [...new Set(musicians.map(musician => musician.location))];
-
+  
   const filteredMusicians = musicians.filter(musician => {
     return (
       (musician.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
