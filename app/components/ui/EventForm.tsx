@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 // TODO: get events from supabase
-import { Event, musicians } from '../../data/data';
-
+// import { Event, musicians } from '../../data/data';
+import { Event } from '../../types';
 interface EventFormProps {
   onAddEvent: (event: Event) => void;
   onEditEvent: (event: Event) => void;
@@ -11,13 +11,13 @@ interface EventFormProps {
 }
 
 const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, selectedEvent }) => {
-  const [event, setEvent] = useState<Event>({ eventId: 0, name: '', location: '', realLifeLocation: '', date: '', performerId: 0, musicGenres: [], performanceStart: '', performanceEnd: '' });
+  const [event, setEvent] = useState<Event>({ eventId: 0, name: '', location: '', realLifeLocation: '', performerId: 0, musicGenres: [], performanceStart: '', performanceEnd: '' });
 
   useEffect(() => {
     if (selectedEvent) {
       setEvent(selectedEvent);
     } else {
-      setEvent({ eventId: 0, name: '', location: '', realLifeLocation: '', date: '', performerId: 0, musicGenres: [], performanceStart: '', performanceEnd: '' });
+      setEvent({ eventId: 0, name: '', location: '', realLifeLocation: '', performerId: 0, musicGenres: [], performanceStart: '', performanceEnd: '' });
     }
   }, [selectedEvent]);
 
@@ -28,7 +28,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, selected
     } else {
       onAddEvent({ ...event, eventId: Date.now() });
     }
-    setEvent({ eventId: 0, name: '', location: '', realLifeLocation: '', date: '', performerId: 0, musicGenres: [], performanceStart: '', performanceEnd: '' });
+    setEvent({ eventId: 0, name: '', location: '', realLifeLocation: '', performerId: 0, musicGenres: [], performanceStart: '', performanceEnd: '' });
   };
 
   return (
@@ -67,13 +67,13 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, selected
         <label className="block text-sm font-medium text-gray-700">Date</label>
         <input
           type="date"
-          value={event.date}
-          onChange={(e) => setEvent({ ...event, date: e.target.value })}
+          value={event.performanceStart}
+          onChange={(e) => setEvent({ ...event, performanceStart: e.target.value })}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           required
         />
       </div>
-      <div>
+      {/* <div>
         <label className="block text-sm font-medium text-gray-700">Performer</label>
         <select
           value={event.performerId}
@@ -88,7 +88,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, selected
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
       <div>
         <label className="block text-sm font-medium text-gray-700">Music Genres</label>
         <input
