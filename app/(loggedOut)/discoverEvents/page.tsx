@@ -3,10 +3,10 @@
 import { useMemo, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 // import { events, musicians, Event } from '../data/data'; // Adjust the import path as needed
-import { Event, Musician } from '../types'; 
-import { supabase } from '../lib/supabaseClient'; 
+import { Event, Musician } from '../../types'; 
+import { supabase } from '../../supabaseClient'; 
 
-const DynamicMap = dynamic(() => import('../components/Map'), {
+const DynamicMap = dynamic(() => import('../../components/ui/Map'), {
   ssr: false,
 });
 

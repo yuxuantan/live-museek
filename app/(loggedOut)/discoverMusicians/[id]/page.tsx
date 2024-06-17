@@ -1,8 +1,8 @@
 'use client';
 // import { notFound } from 'next/navigation';
 import React, {useState, useEffect} from 'react';
-import { supabase } from '../../lib/supabaseClient';
-import { Event, Musician } from '../../types'; 
+import { supabase } from '../../../supabaseClient';
+import { Event, Musician } from '../../../types'; 
 
 export default function MusicianDetailPage({ params }: { params: { id: string } }) {
   const [events, setEvents] = useState<Event[]>([]);

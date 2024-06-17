@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import EventForm from '../../components/EventForm';
+import EventForm from '../../components/ui/EventForm';
 import { events as initialEvents, Event, musicians } from '../../data/data';
 
 const CreateEventPage: React.FC = () => {

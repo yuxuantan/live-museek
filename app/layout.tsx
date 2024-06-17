@@ -1,7 +1,7 @@
 import './globals.css';
-import Navbar from './components/Navbar';
+import Navbar from './components/ui/Navbar';
 import { ReactNode } from 'react';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 
 export const metadata = {
   title: 'Live Music Hub',

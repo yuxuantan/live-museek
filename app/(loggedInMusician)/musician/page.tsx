@@ -1,8 +1,34 @@
 'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../supabaseClient';
+import { useRouter } from 'next/navigation';
+import { User } from '@supabase/supabase-js';
 
 export default function DashboardPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error) {
+        console.error('Error fetching user:', error);
+      } else if (!user) {
+        router.push('/login');
+      } else {
+        setUser(user);
+      }
+      setLoading(false);
+    };
+
+    fetchUser();
+  }, [router]);
+
   const [name, setName] = useState('John Doe');
   const [genre, setGenre] = useState('Rock');
   const [bio, setBio] = useState('Rock musician from LA');
@@ -25,10 +51,11 @@ export default function DashboardPage() {
     console.log({ name, genre, bio, displayImage });
   };
 
+  if (loading) return <div>Loading...</div>;
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 space-y-6 bg-white rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center">Welcome to the Musician Dashboard</h2>
+        <h2 className="text-2xl font-bold text-center">Welcome to the Musician Dashboard {user?.email}</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">

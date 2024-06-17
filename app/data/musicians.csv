@@ -1,6 +1,0 @@
-id,name,genre,language,location,bio,facebook,twitter,instagram
-1,John Doe,Rock,English,LA,"Rock musician from LA",https://facebook.com/johndoe,https://twitter.com/johndoe,https://instagram.com/johndoe
-2,Jane Smith,Jazz,English,NY,"Jazz musician from NY",https://facebook.com/janesmith,https://twitter.com/janesmith,https://instagram.com/janesmith
-3,Alice Tan,Classical,Mandarin,Singapore,"Classical musician from Singapore",https://facebook.com/alicetan,https://twitter.com/alicetan,https://instagram.com/alicetan
-4,Bob Lim,Pop,English,Singapore,"Pop musician from Singapore",https://facebook.com/boblim,https://twitter.com/boblim,https://instagram.com/boblim
-5,Charlie Wong,Indie,Mandarin,Singapore,"Indie musician from Singapore",https://facebook.com/charliewong,https://twitter.com/charliewong,https://instagram.com/charliewong

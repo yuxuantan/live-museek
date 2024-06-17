@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Event, musicians } from '../data/data';
+// TODO: get events from supabase
+import { Event, musicians } from '../../data/data';
 
 interface EventFormProps {
   onAddEvent: (event: Event) => void;

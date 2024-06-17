@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
+
+import { supabase } from '../../supabaseClient';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,17 +12,30 @@ const Login: React.FC = () => {
   const { login } = useAuth();
   const router = useRouter();
 
+  // get all users from supabase but need to await 
+  async function signInWithEmail(inputEmail: string, inputPassword: string) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: inputEmail,
+      password: inputPassword,
+    })
+    return {data, error}
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Implement your authentication logic here
     // Example: const isAuthenticated = await authenticateUser(email, password);
-    const isAuthenticated = email === 'musician@example.com' && password === 'password';
+    // const isAuthenticated = email === 'musician@example.com' && password === 'password';
 
-    if (isAuthenticated) {
-      login();
+    // get the data from the form
+    const {data, error} = await signInWithEmail(email, password)
+    console.log(data)
+    console.log(error)
+    if (data.user) {
+      login(email, password);
       router.push('/musicians/dashboard'); // Redirect to the musician's dashboard
     } else {
-      alert('Invalid email or password');
+      alert(error?.message);
     }
   };
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
-import { Event } from '../data/data'; // Adjust the import path as needed
+import { Event } from '../../data/data'; // Adjust the import path as needed
 
 interface MapProps {
   center: { lat: number; lng: number };

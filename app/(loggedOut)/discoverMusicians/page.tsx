@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { supabase } from '../lib/supabaseClient';
-import { Musician } from '../types'; 
+import { supabase } from '../../supabaseClient';
+import { Musician } from '../../types'; 
 
 export default function MusiciansPage() {
   const [musicians, setMusicians] = useState<Musician[]>([]);
