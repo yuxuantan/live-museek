@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import EventForm from '../../components/ui/EventForm';
-import { events as initialEvents, Event, musicians } from '../../data/data';
-
+import EventForm from '../../../components/ui/EventForm';
+// import { events as initialEvents, Event, musicians } from '../../data/data';
+import { Event, Musician } from '../../../types';
 const CreateEventPage: React.FC = () => {
-  const johnDoeEvents = initialEvents.filter(event => event.performerId === 1); // Filter events for John Doe
+  const johnDoeEvents: Event[] = [];
+  const musicians: Musician[] = [];
+  // const johnDoeEvents = initialEvents.filter(event => event.performerId === 1); // Filter events for John Doe
   const [events, setEvents] = useState<Event[]>(johnDoeEvents);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
@@ -45,7 +47,7 @@ const CreateEventPage: React.FC = () => {
               className={`p-4 bg-white rounded shadow-md hover:bg-gray-100 cursor-pointer ${selectedEvent?.eventId === event.eventId ? 'bg-blue-100' : ''}`}
               onClick={() => handleSelectEvent(event)}
             >
-              <strong>{event.name}</strong> - {event.location} - {event.date}
+              <strong>{event.name}</strong> - {event.location} - {event.performanceStart}
               <br />
               Music Genres: {event.musicGenres.join(', ')}
               <br />
