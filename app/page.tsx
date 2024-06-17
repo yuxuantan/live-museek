@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function HomePage() {
+const HomePage = () => {
   return  (
     <div>
       {/* Hero Section */}
@@ -99,3 +99,4 @@ export default function HomePage() {
     </div>
   );
 }
+export default HomePage;

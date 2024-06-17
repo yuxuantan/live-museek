@@ -15,7 +15,7 @@ const containerStyle = {
   height: '400px',
 };
 
-export default function EventsPage() {
+const EventsPage = () => {
   const center = useMemo(() => ({ lat: 1.3521, lng: 103.8198 }), []); // Centered on Singapore
   const [events, setEvents] = useState<Event[]>([]);
   const [musicians, setMusicians] = useState<Musician[]>([]);
@@ -138,3 +138,4 @@ export default function EventsPage() {
     </div>
   );
 }
+export default EventsPage;

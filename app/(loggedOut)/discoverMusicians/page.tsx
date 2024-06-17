@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { supabase } from '../../supabaseClient';
 import { Musician } from '../../types'; 
 
-export default function MusiciansPage() {
+const MusiciansPage = () => {
   const [musicians, setMusicians] = useState<Musician[]>([]);
   useEffect(() => {
     const fetchMusicians = async () => {
@@ -96,3 +96,5 @@ export default function MusiciansPage() {
     </div>
   );
 }
+
+export default MusiciansPage;

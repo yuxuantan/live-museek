@@ -1,5 +1,5 @@
 import Login from '../../components/ui/Login';
-
-export default function LoginPage() {
+const LoginPage = () => {
   return <Login />;
 }
+export default LoginPage; 

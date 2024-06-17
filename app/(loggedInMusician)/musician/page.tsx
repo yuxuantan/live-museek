@@ -4,7 +4,7 @@ import { supabase } from '../../supabaseClient';
 import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 
-export default function DashboardPage() {
+const DashboardPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -129,3 +129,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+export default DashboardPage;
