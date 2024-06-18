@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import EventForm from '../../../components/ui/EventForm';
-// import { events as initialEvents, Event, musicians } from '../../data/data';
+import withAuth from '../../../components/withAuth';
 import { Event, Musician } from '../../../types';
 const CreateEventPage: React.FC = () => {
   const johnDoeEvents: Event[] = [];
@@ -66,4 +66,4 @@ const CreateEventPage: React.FC = () => {
   );
 };
 
-export default CreateEventPage;
+export default withAuth(CreateEventPage);

@@ -19,7 +19,6 @@ const Navbar = () => {
 
     // Function to apply active styles
     const isActive = (pathnameToMatch: string) => pathname === pathnameToMatch ? 'bg-blue-900' : '';
-
     return (
         <nav className="bg-blue-800 text-white shadow-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,11 +29,15 @@ const Navbar = () => {
                     {user ? (
                         <>
                             <div className="space-x-4">
-                                <Link href="/musicians/dashboard" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/musicians/dashboard')}`}>
+                                <Link href="/musician" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/musicians/dashboard')}`}>
                                     Edit profile
                                 </Link>
-                                <Link href="/events/create" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/events/create')}`}>
+                                <Link href="/musician/edit-events" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/events/create')}`}>
                                     Create events
+                                </Link>
+                                {/* update password */}
+                                <Link href="/update-password" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/account/update-password')}`}>
+                                    Update password
                                 </Link>
                             </div>
                             <button onClick={handleLogout} className="hover:bg-blue-700 px-3 py-2 rounded text-sm font-medium">
@@ -45,10 +48,10 @@ const Navbar = () => {
                         <>
                             <div className="space-x-4">
 
-                                <Link href="/discoverEvents" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/events')}`}>
+                                <Link href="/discover-events" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/events')}`}>
                                     Events
                                 </Link>
-                                <Link href="/discoverMusicians" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/musicians')}`}>
+                                <Link href="/discover-musicians" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/musicians')}`}>
                                     Search Musicians
                                 </Link>
                             </div>

@@ -1,37 +1,13 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient';
-import { useRouter } from 'next/navigation';
-import { User } from '@supabase/supabase-js';
-
+import React, { useState } from 'react';
+import withAuth from '../../components/withAuth';
+import { useAuth } from '../../context/AuthContext';
 const DashboardPage = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-
-      if (error) {
-        console.error('Error fetching user:', error);
-      } else if (!user) {
-        router.push('/login');
-      } else {
-        setUser(user);
-      }
-      setLoading(false);
-    };
-
-    fetchUser();
-  }, [router]);
-
-  const [name, setName] = useState('John Doe');
-  const [genre, setGenre] = useState('Rock');
-  const [bio, setBio] = useState('Rock musician from LA');
+  const { user, musicianProfile, updateMusicianProfile } = useAuth();
+  const [loadedMusicianProfile, setLoadedMusicianProfile] = musicianProfile ? useState(musicianProfile) : useState(null);
+  // const [name, setName] = musicianProfile ? useState(musicianProfile.name) : useState('Fake Name');
+  // const [genre, setGenre] = musicianProfile ? useState(musicianProfile.genre) : useState('Rock');
+  // const [bio, setBio] = musicianProfile ? useState(musicianProfile.bio) : useState('Rock Singer from LA');
   const [displayImage, setDisplayImage] = useState<string | ArrayBuffer | null>('https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250');
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,10 +24,21 @@ const DashboardPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Implement your update logic here
-    console.log({ name, genre, bio, displayImage });
+    updateMusicianProfile({ 
+      id: user?.id, 
+      name: loadedMusicianProfile?.name, 
+      genre: loadedMusicianProfile?.genre, 
+      bio: loadedMusicianProfile?.bio,
+      language: '', 
+      location: '', 
+      facebook: '', 
+      twitter: '', 
+      instagram: ''
+    } as any);
+
+    alert('Profile updated successfully');
   };
 
-  if (loading) return <div>Loading...</div>;
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 space-y-6 bg-white rounded shadow-md w-full max-w-md">
@@ -65,8 +52,8 @@ const DashboardPage = () => {
               id="name"
               name="name"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={loadedMusicianProfile?.name}
+              // onChange={(e) => setName(e.target.value)}
               required
               className="w-full px-3 py-2 border rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
@@ -79,8 +66,8 @@ const DashboardPage = () => {
               id="genre"
               name="genre"
               type="text"
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
+              value={loadedMusicianProfile?.genre}
+              // onChange={(e) => setGenre(e.target.value)}
               required
               className="w-full px-3 py-2 border rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
@@ -92,8 +79,8 @@ const DashboardPage = () => {
             <textarea
               id="bio"
               name="bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
+              value={loadedMusicianProfile?.bio}
+              // onChange={(e) => setBio(e.target.value)}
               required
               className="w-full px-3 py-2 border rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
@@ -117,12 +104,11 @@ const DashboardPage = () => {
             </div>
           )}
           <div>
-            <button
-              type="submit"
-              className="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Save Changes
+            {/* add button which calls updateMusicianProfile with contents from form */}
+            <button type="submit" className="w-full px-3 py-2 text-white bg-blue-500 rounded shadow-sm hover:bg-blue-600">
+              Update Profile
             </button>
+           
           </div>
         </form>
       </div>
@@ -130,4 +116,4 @@ const DashboardPage = () => {
   );
 }
 
-export default DashboardPage;
+export default withAuth(DashboardPage);

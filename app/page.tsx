@@ -7,7 +7,7 @@ const HomePage = () => {
       <section className="relative bg-cover bg-center h-screen text-white" style={{ backgroundImage: 'url("/hero-image.jpg")' }}>
         <div className="absolute inset-0 bg-black opacity-70"></div>
         <div className="container mx-auto flex flex-col items-center justify-center h-full relative">
-          <h1 className="text-5xl font-bold mb-4">Discover Live Music Like Never Before</h1>
+          <h1 className="text-5xl font-bold mb-4">!!Discover Live Music Like Never Before</h1>
           <p className="text-lg mb-8">Your ultimate destination to find, explore, and experience live music events near you.</p>
           <a href="#events" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded">Explore Events</a>
         </div>
