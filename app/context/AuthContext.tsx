@@ -14,6 +14,7 @@ interface AuthContextProps {
   updatePassword: (password: string) => Promise<void>;
   logout: () => Promise<void>;
   error: string | null;
+  loading: boolean | null;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -22,26 +23,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [musicianProfile, setMusicianProfile] = useState<Musician | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadUserData = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user ?? null);
+    console.log('getUserData', user);
+    const { data, error } = await supabase.from('musicians').select().eq('id', user?.id.toString());
+    if (error) setError(error.message);
+    setMusicianProfile(data ? data[0] as Musician : null);
+    console.log('getMusicianProfileData', data);
+    setLoading(false); // Set loading to false after user data has been loaded
+  };
+
 
   useEffect(() => {
-    const getUserData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user ?? null);
-
-      console.log("fetching musician profile id " + user?.id.toString())
-      const { data, error } = await supabase.from('musicians').select().eq('id', user?.id.toString());
-      console.log("fetched musician profile", data? data[0]: null)
-      if (error) setError(error.message);
-      setMusicianProfile(data ? data[0] as Musician : null);
-    };
-
-    getUserData();
-
-
+    console.log('AuthContext mounted')
+    loadUserData();
     const authListener = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => {
       authListener.data.subscription.unsubscribe();
     };
@@ -56,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateMusicianProfile = async (musicianProfile: Musician) => {
     const { data, error } = await supabase.from('musicians').upsert(musicianProfile);
     if (error) throw error;
-    setMusicianProfile(data);
+    setMusicianProfile(musicianProfile);
   }
 
   // const loginWithProvider = async (provider: 'google' | 'facebook') => {
@@ -90,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     // <AuthContext.Provider value={{ user, login, loginWithProvider, signUp, resetPassword, logout, error }}>
-    <AuthContext.Provider value={{ user, musicianProfile, updateMusicianProfile, login, signUp, resetPassword, updatePassword, logout, error }}>
+    <AuthContext.Provider value={{ user, musicianProfile, updateMusicianProfile, login, signUp, resetPassword, updatePassword, logout, error, loading }}>
       {children}
     </AuthContext.Provider>
   );

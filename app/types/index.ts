@@ -1,6 +1,6 @@
 // types/index.ts
 export interface Musician {
-  id: number;
+  id: string;
   name: string;
   genre: string;
   language: string;
@@ -12,12 +12,12 @@ export interface Musician {
 }
 
 export interface Event {
-  eventId: number;
+  eventId: number | null; // null for new events, number for existing events
   name: string;
   location: string;
   realLifeLocation: string;
-  performerId: number;
+  performerId: string;
   musicGenres: string[];
-  performanceStart: string;
-  performanceEnd: string;
+  performanceStart: Date; // datetime 
+  performanceEnd: Date; // datetime 
 }

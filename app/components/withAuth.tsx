@@ -1,20 +1,21 @@
-// src/components/withAuth.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 const withAuth = <P extends object>(Component: React.ComponentType<P>): React.FC<P> => {
   return (props: P) => {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const router = useRouter();
 
-    if (!user) {
-      if (typeof window !== 'undefined') {
+    useEffect(() => {
+      if (!loading && !user) {
         router.replace('/login'); // Redirect to login page if not authenticated
       }
+    }, []);
+
+    if (!user) {
       return null;
     }
-    else if (user && user.id)
 
     return <Component {...props} />;
   };

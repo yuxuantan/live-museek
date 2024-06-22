@@ -15,7 +15,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       await login(email, password);
-      router.push('/musician'); // Redirect to profile page on successful login
+      window.location.href = '/musician'; // Redirect to profile page on successful login + mount auth again
     } catch (error: any) {
       setError(error.message);
     }

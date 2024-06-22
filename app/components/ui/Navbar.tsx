@@ -29,14 +29,14 @@ const Navbar = () => {
                     {user ? (
                         <>
                             <div className="space-x-4">
-                                <Link href="/musician" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/musicians/dashboard')}`}>
+                                <Link href="/musician" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/musician')}`}>
                                     Edit profile
                                 </Link>
-                                <Link href="/musician/edit-events" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/events/create')}`}>
+                                <Link href="/musician/edit-events" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/musician/edit-events')}`}>
                                     Create events
                                 </Link>
                                 {/* update password */}
-                                <Link href="/update-password" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/account/update-password')}`}>
+                                <Link href="/update-password" className={`px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 text-gray-100 ${isActive('/update-password')}`}>
                                     Update password
                                 </Link>
                             </div>
