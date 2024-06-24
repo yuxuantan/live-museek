@@ -8,7 +8,7 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const { login } = useAuth();
+  const { login, loginWithProvider } = useAuth();
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -23,18 +23,18 @@ const Login: React.FC = () => {
 
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
     console.log("Social login with provider", provider);
-    // try {
-    //   await loginWithProvider(provider);
-    //   router.push('/profile'); // Redirect to profile page on successful login
-    // } catch (error) {
-    //   setError(error.message);
-    // }
+    try {
+      await loginWithProvider(provider);
+      // router.push('/profile'); // Redirect to profile page on successful login
+    } catch (error: any) {
+      setError(error.message);
+    }
   };
   
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="card w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Musician Login</h2>
         <form className="space-y-6" onSubmit={handleLogin}>
           <div>

@@ -5,18 +5,8 @@ import { Event } from '../../types';
 import { supabase } from '../../supabaseClient';
 import Select, { MultiValue } from 'react-select';
 
-const genreOptions = [
-  {
-    options: [
-      { value: 'pop', label: 'Pop' },
-      { value: 'classical', label: 'Classical' },
-      { value: 'rock', label: 'Rock' },
-      { value: 'blues', label: 'Blues' },
-      { value: 'jazz', label: 'Jazz' },
-      // Add more genre options here
-    ]
-  }
-];
+import { genreOptions } from '../../constants/genreOptions'; // Import the genre options
+
 
 interface EventFormProps {
   onAddEvent: (event: Event) => void;
@@ -141,7 +131,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded bg-white shadow-md">
+    <form onSubmit={handleSubmit} className="card space-y-4 p-4 border rounded shadow-md">
       <div>
         <label className="block text-sm font-medium text-gray-700">Name</label>
         <input

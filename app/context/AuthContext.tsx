@@ -8,7 +8,7 @@ interface AuthContextProps {
   musicianProfile: Musician | null; 
   updateMusicianProfile: (musicianProfile: Musician) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
-  // loginWithProvider: (provider: 'google' | 'facebook') => Promise<void>;
+  loginWithProvider: (provider: 'google' | 'facebook') => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -60,11 +60,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setMusicianProfile(musicianProfile);
   }
 
-  // const loginWithProvider = async (provider: 'google' | 'facebook') => {
-  //   const { data, error } = await supabase.auth.signInWithOAuth({ provider });
-  //   if (error) throw error;
-  //   setUser(data.session?.user ?? null);
-  // };
+  const loginWithProvider = async (provider: 'google' | 'facebook') => {
+    const { data, error } = await supabase.auth.signInWithOAuth({ provider });
+    if (error) throw error;
+    console.log("loginWithProvider", data)
+    // setUser(data.user ?? null);
+  };
 
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
@@ -91,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     // <AuthContext.Provider value={{ user, login, loginWithProvider, signUp, resetPassword, logout, error }}>
-    <AuthContext.Provider value={{ user, musicianProfile, updateMusicianProfile, login, signUp, resetPassword, updatePassword, logout, error, loading }}>
+    <AuthContext.Provider value={{ user, musicianProfile, updateMusicianProfile, login, loginWithProvider, signUp, resetPassword, updatePassword, logout, error, loading }}>
       {children}
     </AuthContext.Provider>
   );

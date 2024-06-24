@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Open Sans', 'sans-serif'],
+        sans: ['Inter var', 'sans-serif'],
       },
       colors: {
         'brand-blue': '#0056b3',

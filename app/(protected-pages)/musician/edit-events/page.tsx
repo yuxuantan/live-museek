@@ -28,7 +28,6 @@ const CreateEventPage: React.FC = () => {
       setEvents(data);
     }
   };
-
   const [name, setName] = useState('');
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -82,7 +81,7 @@ const CreateEventPage: React.FC = () => {
             <h2 className="text-xl font-semibold">{name}&apos;s Events</h2>
             <button
               onClick={handleCreateNewEvent}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              className="primary-btn px-4 py-2 text-white rounded"
             >
               Create New Event
             </button>
@@ -91,9 +90,10 @@ const CreateEventPage: React.FC = () => {
             {events.map((event) => (
               <li
                 key={event.eventId}
-                className={`p-4 bg-white rounded shadow-md hover:bg-gray-100 cursor-pointer ${
-                  selectedEvent?.eventId === event.eventId ? 'bg-blue-100' : ''
-                }`}
+                className={`p-4 rounded shadow-md cursor-pointer 
+                  ${event.performanceStart < new Date() ? 'bg-gray-600' : 'card hover:bg-gray-300'}
+                  ${selectedEvent?.eventId === event.eventId ? 'bg-gray-300' : ''}`
+                }
                 onClick={() => handleSelectEvent(event)}
               >
                 <strong>{event.name}</strong>
@@ -125,7 +125,7 @@ const CreateEventPage: React.FC = () => {
           </ul>
         </div>
         <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)}>
-          <h1 className="text-2xl font-bold mb-4">{selectedEvent ? 'Edit Event' : 'Create Event'}</h1>
+          <h1 className="card text-2xl font-bold mb-4">{selectedEvent ? 'Edit Event' : 'Create Event'}</h1>
           <EventForm
             onAddEvent={handleAddEvent}
             onEditEvent={handleEditEvent}

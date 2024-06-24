@@ -93,8 +93,8 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 space-y-6 bg-white rounded shadow-md w-full max-w-lg">
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="card p-8 space-y-6 rounded shadow-md w-full max-w-lg">
         <h2 className="text-2xl font-bold text-center">Welcome to the Musician Dashboard {user?.email}</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6 grid grid-cols-2 gap-6">
