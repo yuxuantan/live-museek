@@ -47,11 +47,38 @@ a {
   background-color: var(--color-base);
 }
 
+.primary-btn-inverse {
+  background-color: var(--color-primary-content);
+  color: var(--color-primary);
+  padding: 10px 20px;
+  font: bold;
+  border: 2px solid var(--color-primary);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.primary-btn-inverse:hover {
+  background-color: var(--color-primary);
+  color: var(--color-base-content)
+}
+
 .secondary-btn {
   background-color: var(--color-base);
   color: var(--color-base-content);
 }
+.secondary-btn:hover {
+  background-color: var(--color-primary);
+}
 
+.secondary-btn-inverse {
+  background-color: var(--color-base-content);
+  color: var(--color-base);
+  border: 2px solid var(--color-base);
+}
+.secondary-btn-inverse:hover {
+  /* background-color: var(--color-base); */
+  color: var(--color-primary);
+}
 
 
 a:hover {

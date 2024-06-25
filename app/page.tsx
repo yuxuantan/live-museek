@@ -4,11 +4,11 @@ const HomePage = () => {
   return  (
     <div>
       {/* Hero Section */}
-      <section className="relative bg-cover bg-center h-screen" style={{ backgroundImage: 'url("/hero-image.jpg")' }}>
+      <section className="relative bg-cover bg-center h-screen md:p-24 p-8" style={{ backgroundImage: 'url("/hero-image.jpg")' }}>
         <div className="absolute inset-0 bg-black opacity-90 "></div>
         <div className="container mx-auto flex flex-col items-center justify-center h-full relative">
-          <h1 className="text-5xl font-bold mb-4">Discover Live Music Like Never Before</h1>
-          <p className="text-lg mb-8">Your ultimate destination to find, explore, and experience live music events near you.</p>
+          <h1 className="md:text-5xl text-4xl font-bold text-center mb-4 ">Discover Live Music Like Never Before</h1>
+          <p className="md:text-lg text-md mb-8 text-center">Your ultimate destination to find, explore, and experience live music events near you.</p>
           <a href="#events" className="primary-btn">Explore Events</a>
         </div>
       </section>
@@ -16,14 +16,14 @@ const HomePage = () => {
       {/* About Us Section */}
       <section className="py-20">
         <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">About Live Music Hub</h2>
-          <p className="text-lg mb-6">Live Music Hub connects music enthusiasts with live performances happening in their area. Whether you&apos;re a fan or a musician, our platform provides an easy way to discover and promote live music events.</p>
-          <div className="flex justify-center space-x-4">
-            <div className="card w-1/3 p-6 rounded-lg shadow ">
+          <h2 className="md:text-4xl text-3xl font-bold mb-6">About Live Music Hub</h2>
+          <p className="md:text-lg text-md mb-6">Live Music Hub connects music enthusiasts with live performances happening in their area. Whether you&apos;re a fan or a musician, our platform provides an easy way to discover and promote live music events.</p>
+          <div className="flex md:flex-row flex-col justify-center md:space-x-4 md:space-y-0 space-y-8">
+            <div className="card md:w-1/3 p-6 rounded-lg shadow">
               <h3 className="text-2xl font-semibold mb-4">For Fans</h3>
               <p>Find live music events by genre, location, and date. Never miss your favorite artists performing near you.</p>
             </div>
-            <div className="card w-1/3 p-6 rounded-lg shadow">
+            <div className="card md:w-1/3 p-6 rounded-lg shadow">
               <h3 className="text-2xl font-semibold mb-4">For Musicians</h3>
               <p>Promote your gigs and connect with your audience. Make your performances more accessible and increase your fanbase.</p>
             </div>

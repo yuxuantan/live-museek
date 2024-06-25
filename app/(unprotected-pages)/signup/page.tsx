@@ -22,7 +22,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center mt-16">
       <div className="card w-full max-w-md p-8 space-y-6 rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Signup with email & password</h2>
         <form className="space-y-6" onSubmit={handleSignup}>
@@ -51,13 +51,13 @@ const Login: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded shadow-sm"
             />
           </div>
           <div>
             <button
               type="submit"
-              className="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="secondary-btn w-full px-4 py-2 font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2"
             >
               Create an account
             </button>

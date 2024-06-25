@@ -21,7 +21,7 @@ const ResetPassword: React.FC = () => {
         }
     }
     return (
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center mt-24">
             <div className="card w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
                 <h2 className="text-2xl font-bold text-center">Reset Password</h2>
                 <form className="space-y-6" onSubmit={handleResetPassword}>
@@ -41,7 +41,7 @@ const ResetPassword: React.FC = () => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full px-3 py-2 text-white bg-blue-500 rounded shadow-sm hover:bg-blue-600"
+                        className="primary-btn-inverse w-full px-3 py-2 text-white rounded shadow-sm"
                     >
                         Reset Password
                     </button>

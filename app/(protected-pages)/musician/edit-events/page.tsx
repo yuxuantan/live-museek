@@ -75,7 +75,7 @@ const CreateEventPage: React.FC = () => {
     return <div>Loading...</div>;
   } else {
     return (
-      <div className="flex flex-col md:flex-row p-8 space-y-6 md:space-y-0 md:space-x-6">
+      <div className="flex flex-col md:flex-row p-8 md:space-y-0 md:space-x-6">
         <div className="md:w-1/2">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">{name}&apos;s Events</h2>
@@ -87,41 +87,85 @@ const CreateEventPage: React.FC = () => {
             </button>
           </div>
           <ul className="space-y-4">
-            {events.map((event) => (
-              <li
-                key={event.eventId}
-                className={`p-4 rounded shadow-md cursor-pointer 
-                  ${event.performanceStart < new Date() ? 'bg-gray-600' : 'card hover:bg-gray-300'}
-                  ${selectedEvent?.eventId === event.eventId ? 'bg-gray-300' : ''}`
-                }
-                onClick={() => handleSelectEvent(event)}
-              >
-                <strong>{event.name}</strong>
-                <br />
-                Location: {event.location}
-                <br />
-                {/* print musicGenres as comma separated values */}
-                Music Genres: {event.musicGenres.join(', ')}
-                <br />
-                Performance Start: {event.performanceStart.toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: true,
-                })}
-                <br />
-                Performance End: {event.performanceEnd.toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: true,
-                })}
-              </li>
-            ))}
+            {events
+              .filter((event) => event.performanceStart > new Date())
+              .map((event) => (
+                <li
+                  key={event.eventId}
+                  className={`p-4 rounded shadow-md cursor-pointer card hover:bg-gray-300'}
+                    ${selectedEvent?.eventId === event.eventId ? 'bg-gray-300' : ''}`
+                  }
+                  onClick={() => handleSelectEvent(event)}
+                >
+                  <strong>{event.name}</strong>
+                  <br />
+                  Location: {event.location}
+                  <br />
+                  {/* print musicGenres as comma separated values */}
+                  Music Genres: {event.musicGenres.join(', ')}
+                  <br />
+                  Performance Start: {event.performanceStart.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true,
+                  })}
+                  <br />
+                  Performance End: {event.performanceEnd.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true,
+                  })}
+                </li>
+              ))}
+          </ul>
+        </div>
+        {/* add a divider line at the bottom if below md size */}
+        <div className="block md:border-r md:h-96 border-b border-gray-300 my-8"></div>
+        <div className="md:w-1/2">
+          <h2 className="text-xl font-semibold mb-8">Past Events</h2>
+          <ul className="space-y-4 ">
+            {events
+              .filter((event) => event.performanceStart < new Date())
+              .map((event) => (
+                <li
+                  key={event.eventId}
+                  className={`p-4 rounded shadow-md cursor-pointer bg-gray-500 hover:bg-gray-300'}
+                    ${selectedEvent?.eventId === event.eventId ? 'bg-gray-300' : ''}`
+                  }
+                  onClick={() => handleSelectEvent(event)}
+                >
+                  <strong>{event.name}</strong>
+                  <br />
+                  Location: {event.location}
+                  <br />
+                  {/* print musicGenres as comma separated values */}
+                  Music Genres: {event.musicGenres.join(', ')}
+                  <br />
+                  Performance Start: {event.performanceStart.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true,
+                  })}
+                  <br />
+                  Performance End: {event.performanceEnd.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true,
+                  })}
+                </li>
+              ))}
           </ul>
         </div>
         <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)}>

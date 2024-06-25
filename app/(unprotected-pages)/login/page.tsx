@@ -33,7 +33,7 @@ const Login: React.FC = () => {
   
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center mt-12">
       <div className="card w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Musician Login</h2>
         <form className="space-y-6" onSubmit={handleLogin}>
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="secondary-btn w-full px-4 py-2 font-medium text-white rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Login
             </button>
@@ -77,56 +77,26 @@ const Login: React.FC = () => {
         <div className="flex space-x-2">
           <button
             onClick={() => handleSocialLogin('google')}
-            className="flex items-center justify-center w-full px-4 py-2 font-medium text-white bg-gray-600 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            className="secondary-btn-inverse flex items-center justify-center w-full px-4 py-2 font-medium text-white bg-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           >
             <span className="mr-2">Login with Google</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 12a5 5 0 01-10 0 5 5 0 0110 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6a9 9 0 00-9 9c0 4.97 4.03 9 9 9s9-4.03 9-9a9 9 0 00-9-9zm0 0v4m0 6h4m-4 0a5 5 0 110-10 5 5 0 010 10z"
-              />
-            </svg>
+            <img src="/google.png" className="h-8"/>
+            {/* insert google image from web*/}
+
           </button>
           <button
             onClick={() => handleSocialLogin('facebook')}
-            className="flex items-center justify-center w-full px-4 py-2 font-medium text-white bg-gray-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="secondary-btn-inverse flex items-center justify-center w-full px-4 py-2 font-medium text-white bg-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <span className="mr-2">Login with Facebook</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10c0-5.52-4.48-10-10-10zm3.5 10h-2v6h-3v-6H8.5V9.5h1.5V8h-1.5c0-1 .8-1.8 1.8-1.8h1v1.5h-1c-.3 0-.5.2-.5.5v1h1.5l-.2 1.5h-1.3V16h3l-.2-6z"
-              />
-            </svg>
+            <img src="/facebook.png" className="h-8"/>
           </button>
         </div>
         {/* insert section for reset password */}
         <div className="flex items-center justify-center space-x-2">
           <button
             onClick={() => router.push('/reset-password')}
-            className="text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Forgot your password?
           </button>
@@ -136,7 +106,7 @@ const Login: React.FC = () => {
           <span>Don't have an account?</span>
           <button
             onClick={() => router.push('/signup')}
-            className="text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2"
           >
             Sign Up
           </button>

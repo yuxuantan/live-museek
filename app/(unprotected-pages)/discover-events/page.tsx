@@ -86,7 +86,7 @@ const EventsPage = () => {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Events</h1>
-      <div className="flex flex-row space-x-4">
+      <div className="flex md:flex-row flex-col md:space-x-4">
         <div className="mb-4">
           <label className="block text-sm font-semibold">Music Genre</label>
           <Select
@@ -97,7 +97,6 @@ const EventsPage = () => {
             className="input-box w-80 rounded-md shadow-sm"
           />
         </div>
-
         <div className="mb-4">
           <h2 className="text-sm font-semibold">Performance Start Time</h2>
           <select value={selectedTime} onChange={handleTimeChange} className="input-box mt-1 px-3 py-2 rounded-md shadow-sm">
