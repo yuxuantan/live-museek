@@ -103,7 +103,7 @@ const Login: React.FC = () => {
         </div>
         {/* insert section for sign up */}
         <div className="flex items-center justify-center space-x-2">
-          <span>Don't have an account?</span>
+          <span>Don&apos;t have an account?</span>
           <button
             onClick={() => router.push('/signup')}
             className="text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2"

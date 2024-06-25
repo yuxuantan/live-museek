@@ -78,8 +78,8 @@ const MusicianDetailPage = ({ params }: { params: { id: string } }) => {
         </div>
       </div>
 
-      <div className="flex flex-row mb-6 space-x-6">
-        <div className="card rounded-lg shadow-lg p-6 w-1/2">
+      <div className="flex md:flex-row flex-col mb-6 md:space-x-6 space-y-6">
+        <div className="card rounded-lg shadow-lg p-6 md:w-1/2">
           <h2 className="text-2xl font-semibold mb-4">Upcoming Events</h2>
           {events.filter(event => new Date(event.performanceStart) > new Date()).length > 0 ? (
             <ul>
@@ -99,7 +99,7 @@ const MusicianDetailPage = ({ params }: { params: { id: string } }) => {
             <p className="text-gray-600">No upcoming events found for this musician.</p>
           )}
         </div>
-        <div className="card rounded-lg shadow-lg p-6 w-1/2">
+        <div className="card rounded-lg shadow-lg p-6 md:w-1/2">
           <h2 className="text-2xl font-semibold mb-4">Past Events</h2>
           {events.filter(event => new Date(event.performanceStart) < new Date()).length > 0 ? (
             <ul>
