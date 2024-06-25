@@ -55,4 +55,5 @@ const UpdatePassword: React.FC = () => {
     );
 };
 
+UpdatePassword.displayName = 'UpdatePassword';
 export default withAuth(UpdatePassword);

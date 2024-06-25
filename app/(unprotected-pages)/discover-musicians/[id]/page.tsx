@@ -126,4 +126,5 @@ const MusicianDetailPage = ({ params }: { params: { id: string } }) => {
   );
 }
 
+MusicianDetailPage.displayName='MusicianDetailPage';
 export default MusicianDetailPage;

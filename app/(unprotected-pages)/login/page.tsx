@@ -117,4 +117,5 @@ const Login: React.FC = () => {
   );
 };
 
+Login.displayName = 'Login';
 export default Login;

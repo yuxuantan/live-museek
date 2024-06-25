@@ -44,7 +44,8 @@ a {
 }
 
 .primary-btn:hover {
-  background-color: var(--color-base);
+/* brighter bg color */
+  background-color: rgb(180 108 255);
 }
 
 .primary-btn-inverse {

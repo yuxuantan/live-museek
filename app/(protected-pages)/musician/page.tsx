@@ -244,4 +244,5 @@ const DashboardPage = () => {
   );
 }
 
+DashboardPage.displayName = 'DashboardPage';
 export default withAuth(DashboardPage);

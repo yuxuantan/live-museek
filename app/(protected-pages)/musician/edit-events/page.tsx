@@ -182,5 +182,5 @@ const CreateEventPage: React.FC = () => {
     );
   }
 };
-
+CreateEventPage.displayName = 'CreateEventPage';
 export default withAuth(CreateEventPage);

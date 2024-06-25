@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 
-const Login: React.FC = () => {
+const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -70,4 +70,6 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+SignUp.displayName = 'SignUp';
+
+export default SignUp;

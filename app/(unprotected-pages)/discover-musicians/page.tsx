@@ -99,4 +99,6 @@ const MusiciansPage = () => {
   );
 }
 
+MusiciansPage.displayName = 'MusiciansPage';
+
 export default MusiciansPage;
