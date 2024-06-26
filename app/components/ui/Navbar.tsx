@@ -61,10 +61,10 @@ const Navbar = () => {
                         ) : (
                             <>
                                 <Link href="/discover-events" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/discover-events')}`}>
-                                    Events
+                                    Discover Events
                                 </Link>
                                 <Link href="/discover-musicians" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/discover-musicians')}`}>
-                                    Search Musicians
+                                    Discover Musicians
                                 </Link>
                                 <Link href="/login" className={`px-3 py-2 rounded text-sm font-medium text-gray-300 underline-offset-8 ${isActive('/login')}`}>
                                     Login
@@ -97,10 +97,10 @@ const Navbar = () => {
                         ) : (
                             <>
                                 <Link href="/discover-events" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/discover-events')}`} onClick={() => setIsOpen(false)}>
-                                    Events
+                                    Discover Events
                                 </Link>
                                 <Link href="/discover-musicians" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/discover-musicians')}`} onClick={() => setIsOpen(false)}>
-                                    Search Musicians
+                                    Discover Musicians
                                 </Link>
                                 <Link href="/login" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/login')}`} onClick={() => setIsOpen(false)}>
                                     Login

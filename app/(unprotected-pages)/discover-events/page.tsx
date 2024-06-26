@@ -23,7 +23,7 @@ const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedGenres, setSelectedGenres] = useState<MultiValue<{ value: string, label: string }>>([]);
   const [selectedTime, setSelectedTime] = useState<string>('All');
-  const [selectedDate, setSelectedDate] = useState<string>('2024-05-14'); // Default date
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().substring(0, 10)); // Default date
 
   const times = ['All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight'];
 
@@ -87,6 +87,27 @@ const EventsPage = () => {
     <div>
       <h1 className="text-2xl font-bold mb-4">Events</h1>
       <div className="flex md:flex-row flex-col md:space-x-4">
+        <div className='flex flex-row space-x-4'>
+          <div className="mb-4">
+            <h2 className="text-sm font-semibold">Performance Start Date</h2>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+              className="input-box mt-1 px-3 py-2 rounded-md shadow-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <h2 className="text-sm font-semibold">Performance Start Time</h2>
+            <select value={selectedTime} onChange={handleTimeChange} className="input-box mt-1 px-3 py-2 rounded-md shadow-sm">
+              {times.map(time => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
         <div className="mb-4">
           <label className="block text-sm font-semibold">Music Genre</label>
           <Select
@@ -95,26 +116,6 @@ const EventsPage = () => {
             onChange={handleGenreChange}
             options={genreOptions[0].options}
             className="input-box w-80 rounded-md shadow-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <h2 className="text-sm font-semibold">Performance Start Time</h2>
-          <select value={selectedTime} onChange={handleTimeChange} className="input-box mt-1 px-3 py-2 rounded-md shadow-sm">
-            {times.map(time => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <h2 className="text-sm font-semibold">Performance Start Date</h2>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            className="input-box mt-1 px-3 py-2 rounded-md shadow-sm"
           />
         </div>
       </div>

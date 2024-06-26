@@ -55,26 +55,33 @@ const MusicianDetailPage = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="card rounded-lg shadow-lg p-6 mb-6 grid grid-cols-2 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold mb-4">{musician?.name}</h1>
-          <p className="text-xl text-gray-700 mb-4">Genre: {musician?.genre}</p>
-          <p className="text-lg text-gray-600 mb-4">{musician?.bio}</p>
-          <div className="flex space-x-4">
-            <a href={musician?.facebook} target="_blank" className="text-blue-500 hover:underline">Facebook</a>
-            <a href={musician?.twitter} target="_blank" className="text-blue-500 hover:underline">Twitter</a>
-            <a href={musician?.instagram} target="_blank" className="text-blue-500 hover:underline">Instagram</a>
+      <div className="card rounded-lg shadow-lg p-6 mb-6">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-4">{musician?.name}</h1>
+            <p className="text-xl text-gray-700 mb-4">{musician?.location}</p>
+            <p className="text-gray-700 mb-4">Genre: {musician?.genre}</p>
+
           </div>
+          <div>
+
+            {/* display image */}
+            {profileImage && (
+              <div className="flex justify-center">
+                <img src={profileImage as string} alt="Display" className="w-32 h-32 rounded-full" />
+              </div>
+            )}
+          </div>
+          <p className="text-gray-700 mb-4">{musician?.language}</p>
+          
         </div>
-        <div>
-          {/* display image */}
-          {profileImage && (
-            <div className="flex justify-center">
-              <img src={profileImage as string} alt="Display" className="w-32 h-32 rounded-full" />
-            </div>
-          )}
-          <p className="text-gray-700 mb-4">Language: {musician?.language}</p>
-          <p className="text-gray-700 mb-4">Location: {musician?.location}</p>
+        <p className="text-gray-600 mb-4">{musician?.bio}</p>
+        {/* add line */}
+        <hr className="my-4" />
+        <div className="flex space-x-4 justify-evenly">
+          <a href={musician?.facebook} target="_blank" className="text-blue-500 hover:underline">Facebook</a>
+          <a href={musician?.twitter} target="_blank" className="text-blue-500 hover:underline">Twitter</a>
+          <a href={musician?.instagram} target="_blank" className="text-blue-500 hover:underline">Instagram</a>
         </div>
       </div>
 
@@ -126,5 +133,5 @@ const MusicianDetailPage = ({ params }: { params: { id: string } }) => {
   );
 }
 
-MusicianDetailPage.displayName='MusicianDetailPage';
+MusicianDetailPage.displayName = 'MusicianDetailPage';
 export default MusicianDetailPage;
