@@ -42,13 +42,13 @@ const MusiciansPage = () => {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Musicians</h1>
       <div className="mb-6">
-        <div className="flex md:flex-row flex-col md:space-x-4 space-y-4">
+        <div className="flex lg:flex-row flex-col lg:space-x-4 space-y-4">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search musicians by name..."
-            className="input-box md:w-1/3"
+            className="input-box"
           />
           <select
             value={selectedGenre}

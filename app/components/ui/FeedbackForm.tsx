@@ -1,5 +1,6 @@
-'use client'
-import { useState } from 'react';
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import { supabase } from '../../supabaseClient';
 
 const FeedbackForm = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -7,11 +8,22 @@ const FeedbackForm = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [type, setType] = useState('Feedback');
+  const formRef = useRef<HTMLDivElement | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add your form submission logic here
-    console.log({ name, email, message, type });
+    // submit form contents as json into supabase feedback table with (id, created_at, feedback)
+    const { data, error } = await supabase
+      .from('feedback')
+      .insert({ feedback: { name, email, message, type } });
+
+    if (error) {
+      alert('There is an error submitting feedback. Please report this issue via email to jace@livemuseek.com');
+      return;
+    }
+
+    alert('Feedback received. Thank you for your input!');
+    // reset
     setIsOpen(false);
     setName('');
     setEmail('');
@@ -19,16 +31,45 @@ const FeedbackForm = () => {
     setType('Feedback');
   };
 
+  const handleClickOutside = (event: MouseEvent) => {
+    const targetNode = event.target as Node;
+    if (formRef.current && !formRef.current.contains(targetNode)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('click', handleClickOutside);
+    } else {
+      document.removeEventListener('click', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
     <div className="fixed bottom-4 right-4">
-      <button
-        className="secondary-btn-inverse p-4 rounded-full shadow-lg focus:outline-none"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {isOpen ? 'Close ✖' : 'Feedback 📝'}
-      </button>
+      {!isOpen && (
+        <button
+          className="secondary-btn-inverse p-4 rounded-full shadow-lg focus:outline-none"
+          onClick={() => setIsOpen(true)}
+        >
+          Feedback 📝
+        </button>
+      )}
       {isOpen && (
-        <div className="card border-2 border-purple-600 mt-4 p-4 w-80 bg-white rounded-lg shadow-lg">
+        <div
+          ref={formRef}
+          className="relative card border-2 border-purple-600 mt-4 p-4 w-80 max-h-[calc(100vh-2rem)] overflow-y-auto bg-white rounded-lg shadow-lg"
+        >
+          <button
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+            onClick={() => setIsOpen(false)}
+          >
+            ✖
+          </button>
           <h2 className="text-xl font-bold mb-4">Submit Feedback</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">

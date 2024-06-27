@@ -132,8 +132,8 @@ const EventsPage = () => {
               <h2 className="text-xl font-semibold">{selectedEvent.name} - {selectedEvent.musicGenres.join(', ')}</h2>
               <p>Performer: <a href={`/seek-musicians/${selectedEvent.performerId}`} className="text-blue-500 hover:underline">{musicians.find(m => m.id === selectedEvent.performerId)?.name}</a></p>
               <p>Location: <a href={`https://maps.google.com/?q=${selectedEvent.realLifeLocation}`} target="_blank" className="text-blue-500 hover:underline">{selectedEvent.location}</a></p>
-              <p>Date: {selectedEvent.performanceStart.toISOString().substring(0, 10)}</p>
-              <p>Time: {selectedEvent.performanceStart.toISOString().substring(11,16)} to {selectedEvent.performanceEnd.toISOString().substring(11,16)}</p>
+              <p>Date: {selectedEvent.performanceStart.toLocaleString('en-US').substring(0, 9)}</p>
+                <p>Time: {selectedEvent.performanceStart.toLocaleString('en-US').substring(11,)} to {selectedEvent.performanceEnd.toLocaleString('en-US').substring(11,)}</p>
             </div>
           ) : (
             filteredEvents.map(event => (
@@ -141,8 +141,8 @@ const EventsPage = () => {
                 <h2 className="text-xl font-semibold">{event.name} - {event.musicGenres.join(', ')}</h2>
                 <p>Performer: <a href={`/seek-musicians/${event.performerId}`} className="text-blue-500 hover:underline">{musicians.find(m => m.id === event.performerId)?.name}</a></p>
                 <p>Location: <a href={`https://maps.google.com/?q=${event.realLifeLocation}`} target="_blank" className="text-blue-500 hover:underline">{event.location}</a></p>
-                <p>Date: {event.performanceStart.toISOString().substring(0, 10)}</p>
-                <p>Time: {event.performanceStart.toISOString().substring(11,16)} to {event.performanceEnd.toISOString().substring(11,16)}</p>
+                <p>Date: {event.performanceStart.toLocaleString('en-US').substring(0, 9)}</p>
+                <p>Time: {event.performanceStart.toLocaleString('en-US').substring(11,)} to {event.performanceEnd.toLocaleString('en-US').substring(11,)}</p>
               </div>
             ))
           )}
