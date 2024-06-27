@@ -27,7 +27,7 @@ const Navbar = () => {
                 <div className="flex justify-between h-16 items-center">
                     <Link href="/" className="text-white text-lg font-bold hover:text-gray-300 flex flex-row items-center">
                         <img src="/logo.png" alt="logo" className="h-10 w-10 mr-1" />
-                        Live Music Hub
+                        LiveMuseek
                     </Link>
 
                     <div className="flex md:hidden">
@@ -60,11 +60,11 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link href="/discover-events" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/discover-events')}`}>
-                                    Discover Events
+                                <Link href="/explore-events" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/explore-events')}`}>
+                                    Explore Events
                                 </Link>
-                                <Link href="/discover-musicians" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/discover-musicians')}`}>
-                                    Discover Musicians
+                                <Link href="/seek-musicians" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/seek-musicians')}`}>
+                                    Seek Musicians
                                 </Link>
                                 <Link href="/login" className={`px-3 py-2 rounded text-sm font-medium text-gray-300 underline-offset-8 ${isActive('/login')}`}>
                                     Login
@@ -96,11 +96,11 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link href="/discover-events" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/discover-events')}`} onClick={() => setIsOpen(false)}>
-                                    Discover Events
+                                <Link href="/explore-events" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/explore-events')}`} onClick={() => setIsOpen(false)}>
+                                    Explore Events
                                 </Link>
-                                <Link href="/discover-musicians" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/discover-musicians')}`} onClick={() => setIsOpen(false)}>
-                                    Discover Musicians
+                                <Link href="/seek-musicians" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/seek-musicians')}`} onClick={() => setIsOpen(false)}>
+                                    Seek Musicians
                                 </Link>
                                 <Link href="/login" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/login')}`} onClick={() => setIsOpen(false)}>
                                     Login

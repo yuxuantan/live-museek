@@ -85,7 +85,7 @@ const MusiciansPage = () => {
       <ul>
         {filteredMusicians.map(musician => (
           <li key={musician.id} className="mb-4">
-            <Link href={`/discover-musicians/${musician.id}`} className="hover:underline">
+            <Link href={`/seek-musicians/${musician.id}`} className="hover:underline">
               {musician.name}
             </Link>
             <p className="">{musician.genre} - {musician.language} - {musician.location}</p>

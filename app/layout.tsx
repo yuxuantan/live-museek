@@ -2,9 +2,9 @@ import './globals.css';
 import Navbar from './components/ui/Navbar';
 import { ReactNode } from 'react';
 import { AuthProvider } from './context/AuthContext';
-
+import FeedbackForm from './components/ui/FeedbackForm'
 export const metadata = {
-  title: 'Live Music Hub',
+  title: 'LiveMuseek',
   description: 'Discover live music events and musicians',
 };
 
@@ -15,6 +15,8 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         <AuthProvider>
           <Navbar />
           <main className="">{children}</main>
+          <FeedbackForm />
+
         </AuthProvider>
       </body>
     </html>
