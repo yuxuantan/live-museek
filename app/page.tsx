@@ -9,7 +9,7 @@ const HomePage = () => {
         <div className="container mx-auto flex flex-col items-center justify-center h-full relative">
           <h1 className="md:text-5xl text-4xl font-bold text-center mb-4 ">Discover Live Music Like Never Before</h1>
           <p className="md:text-lg text-md mb-8 text-center">Your ultimate destination to find, explore, and experience live music events near you.</p>
-          <a href="/explore-events" className="primary-btn">Explore Events</a>
+          <a href="/seek-events" className="primary-btn">Seek Events</a>
         </div>
       </section>
 
@@ -56,7 +56,7 @@ const HomePage = () => {
           <div className="flex flex-wrap justify-center">
             <div className="w-full md:w-1/3 p-4">
               <div className="card p-6 rounded-lg shadow">
-                <h3 className="text-2xl font-semibold mb-4">Explore Events</h3>
+                <h3 className="text-2xl font-semibold mb-4">Seek Events</h3>
                 <p className="text-gray-700">Browse through a curated list of live music events happening around you. Filter by genre, location, and date to find your perfect music experience.</p>
               </div>
             </div>

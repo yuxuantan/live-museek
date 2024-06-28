@@ -60,8 +60,8 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link href="/explore-events" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/explore-events')}`}>
-                                    Explore Events
+                                <Link href="/seek-events" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/seek-events')}`}>
+                                    Seek Events
                                 </Link>
                                 <Link href="/seek-musicians" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/seek-musicians')}`}>
                                     Seek Musicians
@@ -96,8 +96,8 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <Link href="/explore-events" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/explore-events')}`} onClick={() => setIsOpen(false)}>
-                                    Explore Events
+                                <Link href="/seek-events" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/seek-events')}`} onClick={() => setIsOpen(false)}>
+                                    Seek Events
                                 </Link>
                                 <Link href="/seek-musicians" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/seek-musicians')}`} onClick={() => setIsOpen(false)}>
                                     Seek Musicians
