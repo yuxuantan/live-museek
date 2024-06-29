@@ -23,7 +23,7 @@ const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedGenres, setSelectedGenres] = useState<MultiValue<{ value: string, label: string }>>([]);
   const [selectedTime, setSelectedTime] = useState<string>('All');
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().substring(0, 10)); // Default date
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleString('en-US')); // Default date
 
   const times = ['All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight'];
 
@@ -127,27 +127,16 @@ const EventsPage = () => {
           </div>
         </div>
         <div className="md:col-span-1 space-y-4">
-          {selectedEvent ? (
-            <div className="card p-4 rounded-lg shadow">
-              <h2 className="text-xl font-semibold">{selectedEvent.name} - {selectedEvent.musicGenres.join(', ')}</h2>
-              <p>Performer: <a href={`/seek-musicians/${selectedEvent.performerId}`} className="text-blue-500 hover:underline">{musicians.find(m => m.id === selectedEvent.performerId)?.name}</a></p>
-              <p>Location: <a href={`https://maps.google.com/?q=${selectedEvent.realLifeLocation}`} target="_blank" className="text-blue-500 hover:underline">{selectedEvent.location}</a></p>
-              <p>Date: {selectedEvent.performanceStart.toLocaleString('en-US').substring(0, 9)}</p>
-                <p>Time: {selectedEvent.performanceStart.toLocaleString('en-US').substring(11,)} to {selectedEvent.performanceEnd.toLocaleString('en-US').substring(11,)}</p>
+          {filteredEvents.map(event => (
+            <div key={event.eventId} className={`p-4 rounded-lg shadow ${selectedEvent && selectedEvent.eventId === event.eventId ? 'bg-green-800' : 'card'}`}>
+              <h2 className="text-xl font-semibold">{event.name} - {event.musicGenres.join(', ')}</h2>
+              <p>Performer: <a href={`/seek-musicians/${event.performerId}`} className="text-blue-500 hover:underline">{musicians.find(m => m.id === event.performerId)?.name}</a></p>
+              <p>Location: <a href={`https://maps.google.com/?q=${event.realLifeLocation}`} target="_blank" className="text-blue-500 hover:underline">{event.location}</a></p>
+              <p>Date: {event.performanceStart.toLocaleString('en-US').substring(0, 9)}</p>
+              <p>Time: {event.performanceStart.toLocaleString('en-US').substring(11,)} to {event.performanceEnd.toLocaleString('en-US').substring(11,)}</p>
             </div>
-          ) : (
-            filteredEvents.map(event => (
-              <div key={event.eventId} className="card p-4 rounded-lg shadow">
-                <h2 className="text-xl font-semibold">{event.name} - {event.musicGenres.join(', ')}</h2>
-                <p>Performer: <a href={`/seek-musicians/${event.performerId}`} className="text-blue-500 hover:underline">{musicians.find(m => m.id === event.performerId)?.name}</a></p>
-                <p>Location: <a href={`https://maps.google.com/?q=${event.realLifeLocation}`} target="_blank" className="text-blue-500 hover:underline">{event.location}</a></p>
-                <p>Date: {event.performanceStart.toLocaleString('en-US').substring(0, 9)}</p>
-                <p>Time: {event.performanceStart.toLocaleString('en-US').substring(11,)} to {event.performanceEnd.toLocaleString('en-US').substring(11,)}</p>
-              </div>
-            ))
-          )}
+          ))}
         </div>
-
       </div>
     </div>
   );

@@ -53,6 +53,7 @@ const Map: React.FC<MapProps> = ({ center, events, containerStyle, onMarkerClick
   if (!isLoaded) return <div>Loading Maps</div>;
 
   return (
+
     <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
       <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
         {markers.map(marker => (
@@ -63,10 +64,15 @@ const Map: React.FC<MapProps> = ({ center, events, containerStyle, onMarkerClick
               url: marker.eventId === activeMarker ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
             }}
             onClick={() => {
-              setActiveMarker(marker.eventId);
+              if (marker.eventId === activeMarker) {
+                setActiveMarker(null); // Make it inactive
+              } else {
+                setActiveMarker(marker.eventId);
+              }
               onMarkerClick(marker);
             }}
           />
+
         ))}
       </GoogleMap>
     </div>
