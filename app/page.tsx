@@ -32,7 +32,7 @@ const HomePage = () => {
       <section className="py-20">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Subscribe to Our Newsletter</h2>
-          <p className="text-lg mb-8">Stay up-to-date with the latest live music events that you won't want to miss! Sign up now and receive personalized event recommendations tailored to your preferences. We promise not to spam you!</p>
+          <p className="text-lg mb-8">Stay up-to-date with the latest live music events that you won&apos;t want to miss! Sign up now and receive personalized event recommendations tailored to your preferences. We promise not to spam you!</p>
           <form onSubmit={handleSubmit}>
             <div className="flex justify-center">
               <input
