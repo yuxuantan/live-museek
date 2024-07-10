@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { Event } from '../../types';
 import { supabase } from '../../supabaseClient';
 import Select, { MultiValue } from 'react-select';
@@ -22,11 +22,23 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
     value: string;
     label: string;
   }> | null>(null);
+  const [selectedPerformers, setSelectedPerformers] = useState<MultiValue<{
+    value: string;
+    label: string;
+  }> | null>(null);
+
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleChangeGenre = (selectedGenres: MultiValue<{ value: string; label: string }>) => {
     setSelectedGenres(selectedGenres);
     setEvent({ ...event, musicGenres: selectedGenres.map((genre) => genre.value) });
+  };
+
+  // TODO: load all performers from supabase db
+  const performerOptions: { value: string; label: string }[] = [{value: "performer1", label: "performer1"}, {value: "performer2", label: "performer2"}];
+  const handleChangePerformers = (selectedPerformers: MultiValue<{ value: string; label: string }>) => {
+    // TODO: handle change performers
+    console.log("handle change placeholder")
   };
 
   useEffect(() => {
@@ -46,6 +58,9 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
       setEvent({ ...event, performanceStart: tomorrow, performanceEnd: tomorrowEnd });
     }
   }, [selectedEvent]);
+
+
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,7 +148,19 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
   return (
     <form onSubmit={handleSubmit} className="card space-y-4 p-4 border rounded shadow-md">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Name</label>
+        <label className="block text-sm font-medium text-gray-700">Performer</label>
+        <Select
+          isMulti
+          value={selectedPerformers}
+          onChange={handleChangePerformers}
+          options={performerOptions}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Event Name</label>
         <input
           type="text"
           value={event.name}
@@ -143,7 +170,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Location</label>
+        <label className="block text-sm font-medium text-gray-700">Location display name</label>
         <input
           type="text"
           value={event.location}
@@ -153,7 +180,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Real-Life Location</label>
+        <label className="block text-sm font-medium text-gray-700">Google map location name or address</label>
         <input
           type="text"
           value={event.realLifeLocation}

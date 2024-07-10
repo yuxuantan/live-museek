@@ -55,7 +55,7 @@ const Map: React.FC<MapProps> = ({ center, events, containerStyle, onMarkerClick
   return (
 
     <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
-      <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={12}>
+      <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={13}>
         {markers.map(marker => (
           <Marker
             key={marker.eventId}

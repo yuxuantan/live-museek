@@ -1,11 +1,26 @@
+'use client';
 import React from 'react';
 
 const HomePage = () => {
+  const [email, setEmail] = React.useState('');
+  // Handle email input change
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
+  // Handle form submission
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // Send email to backend
+    console.log(email);
+    setEmail('');
+  };
+
   return  (
     <div>
+
       {/* Hero Section */}
-      <section className="relative bg-cover bg-center h-screen md:p-24 p-8" style={{ backgroundImage: 'url("/hero-image.jpg")' }}>
-        <div className="absolute inset-0 bg-black opacity-90 "></div>
+      <section className="relative bg-cover bg-center h-screen md:p-24 p-8 hero-section" style={{ backgroundImage: 'url("/hero-image.jpg")' }}>
+        <div className="absolute inset-0 bg-black opacity-90 hero-overlay"></div>
         <div className="container mx-auto flex flex-col items-center justify-center h-full relative">
           <h1 className="md:text-5xl text-4xl font-bold text-center mb-4 ">Discover Live Music Like Never Before</h1>
           <p className="md:text-lg text-md mb-8 text-center">Your ultimate destination to find, explore, and experience live music events near you.</p>
@@ -13,6 +28,35 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Email Subscription Section */}
+      <section className="py-20">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6">Subscribe to Our Newsletter</h2>
+          <p className="text-lg mb-8">Stay up-to-date with the latest live music events that you won't want to miss! Sign up now and receive personalized event recommendations tailored to your preferences. We promise not to spam you!</p>
+          <form onSubmit={handleSubmit}>
+            <div className="flex justify-center">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none text-black"
+                value={email}
+                onChange={handleEmailChange}
+              />
+              <button
+                type="submit"
+                className="primary-btn text-white px-4 py-2 rounded-r-lg"
+              >
+                Subscribe
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+      {/* line */}
+      <div className="container mx-auto text-center">
+        <hr className="border-1 border-gray-300"/>
+      </div>
+      
       {/* About Us Section */}
       <section className="py-20">
         <div className="container mx-auto text-center">
@@ -30,6 +74,11 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      
+      {/* line */}
+      <div className="container mx-auto text-center">
+        <hr className="border-1 border-gray-300"/>
+      </div>
 
       {/* Featured Events Section */}
       <section id="events" className="py-20">
@@ -48,6 +97,11 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* line */}
+      <div className="container mx-auto text-center">
+        <hr className="border-1 border-gray-300"/>
+      </div>
 
       {/* How It Works Section */}
       <section className="py-20">
@@ -75,7 +129,10 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
+          {/* line */}
+          <div className="container mx-auto text-center">
+        <hr className="border-1 border-gray-300"/>
+      </div>
       {/* Call to Action Section */}
       <section className="py-20">
         <div className="container mx-auto text-center">
@@ -84,6 +141,8 @@ const HomePage = () => {
           <a href="/signup" className="primary-btn">Sign Up</a>
         </div>
       </section>
+
+
 
       {/* Footer Section */}
       <footer className="py-6">

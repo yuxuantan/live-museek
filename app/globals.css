@@ -7,8 +7,8 @@ body {
   margin: 0;
   /* background-color: var(--color-base); */
   /* add gradient to background color using color base */
-  /* background: linear-gradient(90deg, var(--color-base) 0%, var(--color-primary) 300%); */
-  background: var(--color-base);
+  background: linear-gradient(90deg, var(--color-base) 0%, var(--color-secondary) 300%);
+  /* background: var(--color-base); */
   color: var(--color-base-content);
   /* @apply bg-gray-100; */
 }
@@ -35,7 +35,7 @@ a {
 }
 
 .primary-btn {
-  background-color: var(--color-primary);
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   color: var(--color-primary-content);
   padding: 10px 20px;
   font: bold;
@@ -45,8 +45,14 @@ a {
 }
 
 .primary-btn:hover {
-/* brighter bg color */
-  background-color: rgb(180 108 255);
+  /* brighter bg color and put spotlight around the button*/
+  background-color: #ff4dd2;
+  /* animate button on hover. increase size slowly */
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+  /* add shadow to button */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
 }
 
 .primary-btn-inverse {
@@ -97,8 +103,11 @@ a:hover {
   --color-base: #101327;
   --color-base-content: #FFFFFF;
   /* set color primary as tailwind bg-violet-500 */
-  --color-primary: rgb(130 68 255);
+  /* --color-primary: rgb(130 68 255); */
+  --color-primary: #f824ae;
   --color-primary-content: #FFFFFF;
+  
+  --color-secondary: rgb(130 68 255);
 }
 
 .card {
@@ -116,4 +125,17 @@ a:hover {
 
 .bgcolor-base {
   background-color: var(--color-base);
+}
+
+
+.hero-section {
+  position: relative;
+}
+
+.hero-overlay {
+  transition: opacity 0.7s ease;
+}
+
+.hero-section:hover .hero-overlay {
+  opacity: 0.7;
 }

@@ -66,8 +66,8 @@ const Navbar = () => {
                                 <Link href="/seek-musicians" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/seek-musicians')}`}>
                                     Seek Musicians
                                 </Link>
-                                <Link href="/login" className={`px-3 py-2 rounded text-sm font-medium text-gray-300 underline-offset-8 ${isActive('/login')}`}>
-                                    Login
+                                <Link href="/login" className={`px-3 py-2 rounded text-sm font-medium text-gray-100 ${isActive('/login')}`}>
+                                    Login/ Signup
                                 </Link>
                             </>
                         )}
@@ -103,7 +103,7 @@ const Navbar = () => {
                                     Seek Musicians
                                 </Link>
                                 <Link href="/login" className={`block px-3 py-2 rounded text-sm font-medium ${isActive('/login')}`} onClick={() => setIsOpen(false)}>
-                                    Login
+                                    Login/ Signup
                                 </Link>
                             </>
                         )}

@@ -17,13 +17,49 @@ const containerStyle = {
 };
 
 const EventsPage = () => {
-  const center = useMemo(() => ({ lat: 1.3521, lng: 103.8198 }), []); // Centered on Singapore
+  const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
+
+  useEffect(() => {
+    const getUserLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setUserLocation({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            });
+          },
+          (error) => {
+            console.error('Error getting user location:', error);
+          }
+        );
+      } else {
+        console.error('Geolocation is not supported by this browser.');
+      }
+    };
+
+    getUserLocation();
+  }, []);
+
+  const center = useMemo(() => (userLocation ? userLocation : { lat: 1.3521, lng: 103.8198 }), [userLocation]);
   const [events, setEvents] = useState<Event[]>([]);
   const [musicians, setMusicians] = useState<Musician[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedGenres, setSelectedGenres] = useState<MultiValue<{ value: string, label: string }>>([]);
-  const [selectedTime, setSelectedTime] = useState<string>('All');
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleString('en-US')); // Default date
+  const [selectedTime, setSelectedTime] = useState<string>(() => {
+    const currentTime = new Date().getHours();
+    if (currentTime >= 6 && currentTime < 12) {
+      return '6am-12noon';
+    } else if (currentTime >= 12 && currentTime < 18) {
+      return '12noon-6pm';
+    } else if (currentTime >= 18 && currentTime < 21) {
+      return '6pm-9pm';
+    } else {
+      return '9pm-12midnight';
+    }
+  });
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('sv-SE'));
+
 
   const times = ['All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight'];
 
@@ -80,7 +116,7 @@ const EventsPage = () => {
   };
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDate(event.target.value);
+    setSelectedDate(new Date(event.target.value).toISOString().substring(0, 10));
   };
 
   return (
