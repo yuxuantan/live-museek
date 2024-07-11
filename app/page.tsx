@@ -3,19 +3,36 @@ import React from 'react';
 
 const HomePage = () => {
   const [email, setEmail] = React.useState('');
+  const [message, setMessage] = React.useState('');
+
   // Handle email input change
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
   };
   // Handle form submission
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // Send email to backend
     console.log(email);
-    setEmail('');
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setMessage(data.message);
+      setEmail('');
+    } else {
+      setMessage(data.error);
+    }
   };
 
-  return  (
+  return (
     <div>
 
       {/* Hero Section */}
@@ -33,7 +50,7 @@ const HomePage = () => {
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Subscribe to Our Newsletter</h2>
           <p className="text-lg mb-8">Stay up-to-date with the latest live music events that you won&apos;t want to miss! Sign up now and receive personalized event recommendations tailored to your preferences. We promise not to spam you!</p>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className='space-y-6'>
             <div className="flex justify-center">
               <input
                 type="email"
@@ -49,14 +66,15 @@ const HomePage = () => {
                 Subscribe
               </button>
             </div>
+            {message && <p>{message}</p>}
           </form>
         </div>
       </section>
       {/* line */}
       <div className="container mx-auto text-center">
-        <hr className="border-1 border-gray-300"/>
+        <hr className="border-1 border-gray-300" />
       </div>
-      
+
       {/* About Us Section */}
       <section className="py-20">
         <div className="container mx-auto text-center">
@@ -74,10 +92,10 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+
       {/* line */}
       <div className="container mx-auto text-center">
-        <hr className="border-1 border-gray-300"/>
+        <hr className="border-1 border-gray-300" />
       </div>
 
       {/* Featured Events Section */}
@@ -100,7 +118,7 @@ const HomePage = () => {
 
       {/* line */}
       <div className="container mx-auto text-center">
-        <hr className="border-1 border-gray-300"/>
+        <hr className="border-1 border-gray-300" />
       </div>
 
       {/* How It Works Section */}
@@ -129,9 +147,9 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-          {/* line */}
-          <div className="container mx-auto text-center">
-        <hr className="border-1 border-gray-300"/>
+      {/* line */}
+      <div className="container mx-auto text-center">
+        <hr className="border-1 border-gray-300" />
       </div>
       {/* Call to Action Section */}
       <section className="py-20">
