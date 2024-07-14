@@ -25,7 +25,8 @@ const Login: React.FC = () => {
     console.log("Social login with provider", provider);
     try {
       await loginWithProvider(provider);
-      // router.push('/profile'); // Redirect to profile page on successful login
+      router.push('/musician'); // Redirect to profile page on successful login
+      // window.location.href = '/musician'; // Redirect to profile page on successful login + mount auth again
     } catch (error: any) {
       setError(error.message);
     }

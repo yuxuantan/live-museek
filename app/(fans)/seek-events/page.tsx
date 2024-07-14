@@ -19,6 +19,30 @@ const containerStyle = {
 const EventsPage = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
 
+  const center = useMemo(() => (userLocation ? userLocation : { lat: 1.3521, lng: 103.8198 }), [userLocation]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [musicians, setMusicians] = useState<Musician[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedGenres, setSelectedGenres] = useState<MultiValue<{ value: string, label: string }>>([]);
+  const [selectedTime, setSelectedTime] = useState<string>('All'
+    // () => {
+    //   const currentTime = new Date().getHours();
+    //   if (currentTime >= 6 && currentTime < 12) {
+    //     return '6am-12noon';
+    //   } else if (currentTime >= 12 && currentTime < 18) {
+    //     return '12noon-6pm';
+    //   } else if (currentTime >= 18 && currentTime < 21) {
+    //     return '6pm-9pm';
+    //   } else {
+    //     return '9pm-12midnight';
+    //   }
+    // }
+  );
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('sv-SE'));
+
+
+  const times = ['All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight'];
+
   useEffect(() => {
     const getUserLocation = () => {
       if (navigator.geolocation) {
@@ -38,32 +62,8 @@ const EventsPage = () => {
       }
     };
 
-    getUserLocation();
-  }, []);
-
-  const center = useMemo(() => (userLocation ? userLocation : { lat: 1.3521, lng: 103.8198 }), [userLocation]);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [musicians, setMusicians] = useState<Musician[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedGenres, setSelectedGenres] = useState<MultiValue<{ value: string, label: string }>>([]);
-  const [selectedTime, setSelectedTime] = useState<string>(() => {
-    const currentTime = new Date().getHours();
-    if (currentTime >= 6 && currentTime < 12) {
-      return '6am-12noon';
-    } else if (currentTime >= 12 && currentTime < 18) {
-      return '12noon-6pm';
-    } else if (currentTime >= 18 && currentTime < 21) {
-      return '6pm-9pm';
-    } else {
-      return '9pm-12midnight';
-    }
-  });
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('sv-SE'));
 
 
-  const times = ['All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight'];
-
-  useEffect(() => {
     const fetchEvents = async () => {
       const { data, error } = await supabase.from('events').select('*');
       if (error) {
@@ -90,6 +90,7 @@ const EventsPage = () => {
 
     fetchEvents();
     fetchMusicians();
+    getUserLocation();
   }, []);
 
   const filterEvents = (event: Event) => {
@@ -122,6 +123,9 @@ const EventsPage = () => {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Events</h1>
+
+      {/* display events */}
+
       <div className="flex md:flex-row flex-col md:space-x-4">
         <div className='flex flex-row space-x-4'>
           <div className="mb-4">
@@ -165,7 +169,7 @@ const EventsPage = () => {
         <div className="md:col-span-1 space-y-4">
           {filteredEvents.map(event => (
             <div key={event.eventId} className={`p-4 rounded-lg shadow ${selectedEvent && selectedEvent.eventId === event.eventId ? 'bg-green-800' : 'card'}`}>
-              <h2 className="text-xl font-semibold">{event.name} - {event.musicGenres.join(', ')}</h2>
+              <h2 className="text-xl font-semibold">{event.name} - {event.musicGenres && event.musicGenres.length > 0 ? event.musicGenres.join(', ') : ''}</h2>
               <p>Performer: <a href={`/seek-musicians/${event.performerId}`} className="text-blue-500 hover:underline">{musicians.find(m => m.id === event.performerId)?.name}</a></p>
               <p>Location: <a href={`https://maps.google.com/?q=${event.realLifeLocation}`} target="_blank" className="text-blue-500 hover:underline">{event.location}</a></p>
               <p>Date: {event.performanceStart.toLocaleString('en-US').substring(0, 9)}</p>

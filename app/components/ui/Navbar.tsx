@@ -25,7 +25,7 @@ const Navbar = () => {
         <nav className="">
             <div className="">
                 <div className="flex justify-between h-16 items-center">
-                    <Link href="/" className="text-white text-lg font-bold hover:text-gray-300 flex flex-row items-center">
+                    <Link href="/" className="text-white text-4xl font-bold hover:text-gray-300 flex flex-row items-center">
                         <img src="/logo.png" alt="logo" className="h-10 w-10 mr-1" />
                         LiveMuseek
                     </Link>
