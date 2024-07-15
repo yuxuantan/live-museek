@@ -102,6 +102,8 @@ const HomePage = () => {
       <section id="events" className="py-20">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Featured Events</h2>
+          {/* write description of featured events. say how for a price you can feature here. link to payment page */}
+          <p className="text-lg mb-8">Check out some of the top live music events happening soon. Want to feature your event here? <a href="/payment" className="text-blue-500 hover:underline">Learn More</a></p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Example Event */}
             <div className="card p-6 rounded-lg shadow">

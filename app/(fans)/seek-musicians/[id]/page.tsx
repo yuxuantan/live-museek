@@ -13,7 +13,7 @@ const MusicianDetailPage = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const { data, error } = await supabase.from('events').select('*').eq('performerId', params.id);
+      const { data, error } = await supabase.from('events').select('*').eq('performerIds', params.id);
       if (error) {
         console.error('Error fetching events:', error);
       } else {

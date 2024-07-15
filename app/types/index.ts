@@ -14,9 +14,10 @@ export interface Musician {
 export interface Event {
   eventId: number | null; // null for new events, number for existing events
   name: string;
+  description: string;
   location: string;
   realLifeLocation: string;
-  performerId: string;
+  performerIds: string[];
   musicGenres: string[];
   performanceStart: Date; // datetime 
   performanceEnd: Date; // datetime 

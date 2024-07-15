@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, use } from 'react';
-import { Event } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { Event, Musician } from '../../types';
 import { supabase } from '../../supabaseClient';
 import Select, { MultiValue } from 'react-select';
 
@@ -13,11 +13,11 @@ interface EventFormProps {
   onEditEvent: (event: Event) => void;
   onDeleteEvent: (eventId: number) => void;
   selectedEvent: Event | null;
-  performerId: string;
+  myPerformerId: string;
 }
 
-const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDeleteEvent, selectedEvent, performerId }) => {
-  const [event, setEvent] = useState<Event>({ eventId: null, name: '', location: '', realLifeLocation: '', performerId: performerId, musicGenres: [], performanceStart: new Date(), performanceEnd: new Date() });
+const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDeleteEvent, selectedEvent, myPerformerId }) => {
+  const [event, setEvent] = useState<Event>({ eventId: null, name: '', description: '', location: '', realLifeLocation: '', performerIds: [myPerformerId], musicGenres: [], performanceStart: new Date(), performanceEnd: new Date() });
   const [selectedGenres, setSelectedGenres] = useState<MultiValue<{
     value: string;
     label: string;
@@ -34,11 +34,11 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
     setEvent({ ...event, musicGenres: selectedGenres.map((genre) => genre.value) });
   };
 
-  // TODO: load all performers from supabase db
-  const performerOptions: { value: string; label: string }[] = [{value: "performer1", label: "performer1"}, {value: "performer2", label: "performer2"}];
+  
+  const performerOptions: { value: string; label: string }[] = [];
   const handleChangePerformers = (selectedPerformers: MultiValue<{ value: string; label: string }>) => {
-    // TODO: handle change performers
     console.log("handle change placeholder")
+    setSelectedPerformers(selectedPerformers);
   };
 
   useEffect(() => {
@@ -59,6 +59,18 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
     }
   }, [selectedEvent]);
 
+  const fetchMusicians = async () => {
+    const { data, error } = await supabase.from('musicians').select('*');
+    if (error) {
+      console.error('Error fetching musicians:', error);
+    } else {
+      console.log('fetchMusicians', data);
+   
+      performerOptions.push(...data.map((musician: Musician) => ({ value: musician.id, label: musician.name })));
+      // TODO: get name of musician with id myPerformerId, then autofill the performerIds with that name
+    }
+  };
+  fetchMusicians();
 
 
 
@@ -74,9 +86,10 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
       // update event in supabase db
       supabase.from('events').update({
         name: event.name,
+        description: event.description,
         location: event.location,
         realLifeLocation: event.realLifeLocation,
-        performerId: event.performerId,
+        performerIds: event.performerIds,
         musicGenres: event.musicGenres,
         performanceStart: event.performanceStart,
         performanceEnd: event.performanceEnd
@@ -92,9 +105,10 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
       // add event to supabase db
       supabase.from('events').insert([{
         name: event.name,
+        description: event.description,
         location: event.location,
         realLifeLocation: event.realLifeLocation,
-        performerId: event.performerId,
+        performerId: event.performerIds,
         musicGenres: event.musicGenres,
         performanceStart: event.performanceStart,
         performanceEnd: event.performanceEnd
@@ -107,7 +121,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
       });
     }
 
-    setEvent({ eventId: null, name: '', location: '', realLifeLocation: '', performerId: performerId, musicGenres: [], performanceStart: new Date(), performanceEnd: new Date() });
+    setEvent({ eventId: null, name: '', description: '', location: '', realLifeLocation: '', performerIds: [myPerformerId], musicGenres: [], performanceStart: new Date(), performanceEnd: new Date() });
     setValidationError(null);
   };
 
@@ -119,7 +133,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
         } else {
           console.log('Event deleted successfully:', data);
           onDeleteEvent(selectedEvent.eventId ? selectedEvent.eventId : 0); // pass 0 if eventId is null. which will never happen because theres no path that leads to deleting a event with null id 
-          setEvent({ eventId: null, name: '', location: '', realLifeLocation: '', performerId: performerId, musicGenres: [], performanceStart: new Date(), performanceEnd: new Date() });
+          setEvent({ eventId: null, name: '', description: '', location: '', realLifeLocation: '', performerIds: [myPerformerId], musicGenres: [], performanceStart: new Date(), performanceEnd: new Date() });
           setSelectedGenres(null);
         }
       });
@@ -148,7 +162,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
   return (
     <form onSubmit={handleSubmit} className="card space-y-4 p-4 border rounded shadow-md">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Performer</label>
+        <label className="block text-sm font-medium text-gray-700">Performer(s)</label>
         <Select
           isMulti
           value={selectedPerformers}
@@ -165,6 +179,15 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
           type="text"
           value={event.name}
           onChange={(e) => setEvent({ ...event, name: e.target.value })}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Event Description</label>
+        <textarea
+          value={event.description}
+          onChange={(e) => setEvent({ ...event, description: e.target.value })}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           required
         />

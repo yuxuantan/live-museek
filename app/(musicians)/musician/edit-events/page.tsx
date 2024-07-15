@@ -12,7 +12,7 @@ const CreateEventPage: React.FC = () => {
   const { musicianProfile } = useAuth();
 
   const fetchEvents = async () => {
-    const { data, error } = await supabase.from('events').select('*').eq('performerId', musicianProfile?.id);
+    const { data, error } = await supabase.from('events').select('*').eq('performerIds', musicianProfile?.id);
     if (error) {
       console.error('Error fetching events:', error);
     } else {
@@ -175,7 +175,7 @@ const CreateEventPage: React.FC = () => {
             onEditEvent={handleEditEvent}
             onDeleteEvent={handleDeleteEvent}
             selectedEvent={selectedEvent}
-            performerId={musicianProfile?.id}
+            myPerformerId={musicianProfile?.id}
           />
         </Popup>
       </div>

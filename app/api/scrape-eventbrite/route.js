@@ -7,7 +7,7 @@ export async function GET() {
         console.log('Scraping Eventbrite...');
         const resp = await scrapeEventBrite(); // await the completion of scrapeEventBrite
         // delete events with performerId = 'eventbrite' from supabase table
-        const { data: deleteData, error: deleteError } = await supabase.from('events').delete().match({ performerId: 'eventbrite' });
+        const { data: deleteData, error: deleteError } = await supabase.from('events').delete().match({ performerIds: 'eventbrite' });
         if (deleteError) {
             console.error('Error deleting data from Supabase:', deleteError.message);
             return new Response(JSON.stringify({ error: 'Error deleting data from Supabase. See backend logs.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
@@ -72,6 +72,9 @@ async function scrapeEventBrite() {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            if (data.name.text.includes("Trial")) {
+                continue;
+            }
             // call venue api to get location
             const venueUrl = `https://www.eventbriteapi.com/v3/venues/${data.venue_id}/`;
             const { data: venueData } = await axios.get(venueUrl, {
