@@ -102,7 +102,7 @@ async function scrapeEventBrite() {
                 realLifeLocation: venueData.name,//venueData.address.localized_address_display,
                 performerIds: "eventbrite",
                 ext_url: data.url, // NEW
-                logo_url: data.logo.url, // NEW
+                logo_url: data.logo?.url, // NEW
             }
             
             
