@@ -99,10 +99,6 @@ const EventsPage = () => {
     setSelectedTime(event.target.value);
   };
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDate(new Date(event.target.value).toISOString().substring(0, 10));
-  };
-
   const toggleDescription = (eventId: number) => {
     setExpandedEvents(prev => {
       const newSet = new Set(prev);
@@ -115,6 +111,16 @@ const EventsPage = () => {
     });
   };
 
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDate(new Date(event.target.value).toISOString().substring(0, 10));
+  };
+
+  const handleDateChangeByOffset = (offset: number) => {
+    const currentDate = new Date(selectedDate);
+    currentDate.setDate(currentDate.getDate() + offset);
+    setSelectedDate(currentDate.toISOString().substring(0, 10));
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Events</h1>
@@ -123,12 +129,48 @@ const EventsPage = () => {
         <div className='flex flex-row space-x-4'>
           <div className="mb-4">
             <h2 className="text-sm font-semibold">Performance Start Date</h2>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={handleDateChange}
-              className="input-box mt-1 px-3 py-2 rounded-md shadow-sm"
-            />
+            <div className="flex items-center">
+              <button
+                onClick={() => handleDateChangeByOffset(-1)}
+                className="p-2 rounded-full bg-black hover:bg-gray-500 focus:outline-none"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 transform -rotate-90" // Add transform rotate-180 class here
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 3a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12A.5.5 0 0110 3zm-7.354 8.646a.5.5 0 010-.708l6-6a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L10 6.707 3.354 13.354a.5.5 0 01-.708 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={handleDateChange}
+                className="input-box mt-1 px-3 py-2 rounded-md shadow-sm"
+              />
+              <button
+                onClick={() => handleDateChangeByOffset(1)}
+                className="p-2 rounded-full bg-black hover:bg-gray-500 focus:outline-none"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 transform rotate-90" // Add transform rotate-180 class here
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 3a.5.5 0 01.5.5v12a.5.5 0 01-1 0v-12A.5.5 0 0110 3zm-7.354 8.646a.5.5 0 010-.708l6-6a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L10 6.707 3.354 13.354a.5.5 0 01-.708 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
           <div className="mb-4">
             <h2 className="text-sm font-semibold">Performance Start Time</h2>
@@ -163,16 +205,28 @@ const EventsPage = () => {
           {filteredEvents.map(event => (
             <div key={event.eventId} className={`p-4 rounded-lg shadow ${selectedEvent && selectedEvent.eventId === event.eventId ? 'bg-green-800' : 'card'}`}>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">{event.name} - {event.musicGenres && event.musicGenres.length > 0 ? event.musicGenres.join(', ') : ''}</h2>
+                <h2 className="text-xl font-semibold">{event.name}</h2>
                 <button onClick={() => toggleDescription(event.eventId ?? 0)}>
                   <span>{expandedEvents.has(event.eventId ?? 0) ? '▲' : '▼'}</span>
                 </button>
               </div>
-              <p>Performer: <a href={`/seek-musicians/${event.performerIds}`} className="text-blue-500 hover:underline">{musicians.find(m => event.performerIds?.includes(m.id))?.name}</a></p>
+              <img src={event.logo_url} alt={event.name} className="w-full h-64 object-contain" />
+              {event.performerIds && musicians.find(m => event.performerIds?.includes(m.id)) && (
+                <>
+                  <p>Performer: <a href={`/seek-musicians/${event.performerIds}`} className="text-blue-500 hover:underline">{musicians.find(m => event.performerIds?.includes(m.id))?.name}</a></p>
+                </>
+              )}
               <p>Location: <a href={`https://maps.google.com/?q=${event.realLifeLocation}`} target="_blank" className="text-blue-500 hover:underline">{event.location}</a></p>
               <p>Date: {event.performanceStart.toLocaleString('en-US').substring(0, 9)}</p>
               <p>Time: {event.performanceStart.toLocaleString('en-US').substring(11,)} to {event.performanceEnd.toLocaleString('en-US').substring(11,)}</p>
-              {expandedEvents.has(event.eventId ?? 0) && <p className="mt-2">{event.description}</p>}
+              {expandedEvents.has(event.eventId ?? 0) && (
+                <>
+                  <p className="mt-2">{event.musicGenres && event.musicGenres.length > 0 ? event.musicGenres.join(', ') : ''}</p>
+                  <p className="mt-2"><a href={event.ext_url} target="_blank" className="text-blue-500 hover:underline">Event URL</a></p>
+                  <hr className="my-2" />
+                  <p className="mt-2" dangerouslySetInnerHTML={{ __html: event.description }}></p>
+                </>
+              )}
             </div>
           ))}
         </div>

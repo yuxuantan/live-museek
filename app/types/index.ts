@@ -21,4 +21,7 @@ export interface Event {
   musicGenres: string[];
   performanceStart: Date; // datetime 
   performanceEnd: Date; // datetime 
+  logo_url: string;
+  ext_url: string;
+  summary: string;
 }

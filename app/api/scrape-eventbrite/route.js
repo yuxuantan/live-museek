@@ -40,7 +40,6 @@ async function scrapeEventBrite() {
             let { data } = await axios.get(encodedUrl, { timeout: 5000 });
             const $ = cheerio.load(data);
             const eventCardLinks = $('a.event-card-link');
-            
             let thisPageEventIds = [];
             eventCardLinks.each((index, element) => {
                 thisPageEventIds.push($(element).attr('data-event-id'));
@@ -72,7 +71,7 @@ async function scrapeEventBrite() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            if (data.name.text.includes("Trial")) {
+            if (data.name.text.toLowerCase().includes("trial") || data.name.text.toLowerCase().includes("course")) {
                 continue;
             }
             // call venue api to get location
@@ -82,17 +81,30 @@ async function scrapeEventBrite() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log('Extracted venue details:', venueData);
+            console.log('Extracted venue details for ' + eventId);
+            // extract event description
+            const descriptionUrl = `https://www.eventbriteapi.com/v3/events/${eventId}/description`;
+            const { data: descriptionData } = await axios.get(descriptionUrl, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log('Extracted description for ' + eventId);
+
             // FOR NOW only get name, description, summary, logo, start, end, venue_id from data
             let data_selected = {
                 name: data.name.text,
-                description: data.description.text,
+                summary: data.summary, // NEW
+                description: descriptionData.description,
                 performanceStart: data.start.utc,
                 performanceEnd: data.end.utc,
                 location: venueData.name,
                 realLifeLocation: venueData.name,//venueData.address.localized_address_display,
-                performerId: "eventbrite"
+                performerIds: "eventbrite",
+                ext_url: data.url, // NEW
+                logo_url: data.logo.url, // NEW
             }
+            
             
             extractedEvents.push(data_selected);
             console.log("Extracted event details for id "+ eventId)
