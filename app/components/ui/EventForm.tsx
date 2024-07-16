@@ -17,7 +17,7 @@ interface EventFormProps {
 }
 
 const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDeleteEvent, selectedEvent, myPerformerId }) => {
-  const [event, setEvent] = useState<Event>({ eventId: null, name: '', description: '', location: '', realLifeLocation: '', performerIds: [myPerformerId], musicGenres: [], performanceStart: new Date(), performanceEnd: new Date() });
+  const [event, setEvent] = useState<Event>({ eventId: null, name: '', description: '', location: '', realLifeLocation: '', performerIds: [myPerformerId], musicGenres: [], performanceStart: new Date(), performanceEnd: new Date(), summary:'', logo_url: '', ext_url: '' });
   const [selectedGenres, setSelectedGenres] = useState<MultiValue<{
     value: string;
     label: string;
@@ -121,7 +121,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
       });
     }
 
-    setEvent({ eventId: null, name: '', description: '', location: '', realLifeLocation: '', performerIds: [myPerformerId], musicGenres: [], performanceStart: new Date(), performanceEnd: new Date() });
+    setEvent({ eventId: null, name: '', description: '', location: '', realLifeLocation: '', performerIds: [myPerformerId], musicGenres: [], performanceStart: new Date(), performanceEnd: new Date(), summary:'', logo_url: '', ext_url: ''  });
     setValidationError(null);
   };
 
@@ -133,7 +133,7 @@ const EventForm: React.FC<EventFormProps> = ({ onAddEvent, onEditEvent, onDelete
         } else {
           console.log('Event deleted successfully:', data);
           onDeleteEvent(selectedEvent.eventId ? selectedEvent.eventId : 0); // pass 0 if eventId is null. which will never happen because theres no path that leads to deleting a event with null id 
-          setEvent({ eventId: null, name: '', description: '', location: '', realLifeLocation: '', performerIds: [myPerformerId], musicGenres: [], performanceStart: new Date(), performanceEnd: new Date() });
+          setEvent({ eventId: null, name: '', description: '', location: '', realLifeLocation: '', performerIds: [myPerformerId], musicGenres: [], performanceStart: new Date(), performanceEnd: new Date(), summary:'', logo_url: '', ext_url: ''  });
           setSelectedGenres(null);
         }
       });
