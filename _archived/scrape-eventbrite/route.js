@@ -1,6 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../app/supabaseClient';
 
 export async function GET() {
     try {
