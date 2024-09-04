@@ -12,6 +12,7 @@ body {
   color: var(--color-base-content);
   /* @apply bg-gray-100; */
   font-size: larger;
+  height: 100%;
 }
 
 header {

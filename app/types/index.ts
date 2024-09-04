@@ -1,27 +1,16 @@
 // types/index.ts
-export interface Musician {
-  id: string;
-  name: string;
-  genre: string;
-  language: string;
-  location: string;
-  bio: string;
-  facebook: string;
-  twitter: string;
-  instagram: string;
+// (busker_id, location_id, location_name, location_address, start_datetime, end_datetime, created_at)
+export interface Performance {
+    busker_id: string;
+    location_id: string;
+    location_name: string;
+    location_address: string;
+    start_datetime: Date;
+    end_datetime: Date;
+    created_at: string;
 }
 
-export interface Event {
-  eventId: number | null; // null for new events, number for existing events
-  name: string;
-  description: string;
-  location: string;
-  realLifeLocation: string;
-  performerIds: string[];
-  musicGenres: string[];
-  performanceStart: Date; // datetime 
-  performanceEnd: Date; // datetime 
-  logo_url: string;
-  ext_url: string;
-  summary: string;
+// (busker_id, name, act, art_form, bio, image_url, socials, created_at)
+export interface Busker {
+
 }

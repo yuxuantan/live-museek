@@ -15,7 +15,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         <AuthProvider>
           <Navbar />
           <main className="">{children}</main>
-          <FeedbackForm />
+          {/* <FeedbackForm /> */}
 
         </AuthProvider>
       </body>
