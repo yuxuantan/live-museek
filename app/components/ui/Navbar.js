@@ -29,7 +29,7 @@ const Navbar = () => {
 
     return (
         <nav className="bg-gray-800">
-            /* Mobile Bottom Navbar */
+            {/* Mobile Bottom Navbar */}
             <div className="md:hidden inset-x-0 bottom-0 bg-gray-800 text-white flex justify-evenly py-2 fixed w-full">
                 <Link href="/seek-events" className={`flex flex-col items-center ${isActive('/seek-events')}`}>
                     <FontAwesomeIcon icon={faSearch} size="lg" />
