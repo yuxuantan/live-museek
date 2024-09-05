@@ -5,7 +5,7 @@ import { supabase } from '../../../supabaseClient';
 const BuskerDetailPage = ({ params }) => {
   const [performances, setPerformances] = useState([]);
   const [busker, setBusker] = useState(null);
-  const [profileImage, setProfileImage] = useState('https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250');
+  // const [profileImage, setProfileImage] = useState('https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250');
 
   useEffect(() => {
     const fetchPerformances = async () => {
@@ -44,11 +44,11 @@ const BuskerDetailPage = ({ params }) => {
 
           </div>
           <div>
-            {profileImage && (
-              <div className="flex justify-center">
-                <img src={`https://eservices.nac.gov.sg${busker?.image_url}`} className="w-32 h-32 rounded-full" />
-              </div>
-            )}
+            
+              {/* <div className="flex justify-center"> */}
+              <img src={`https://eservices.nac.gov.sg${busker?.image_url}`} className="w-32 h-32 rounded-full" />
+              {/* </div> */}
+
           </div>
         </div>
         <p className="text-gray-600 mb-4">{busker?.bio}</p>

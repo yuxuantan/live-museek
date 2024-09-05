@@ -24,13 +24,13 @@ const BuskersPage = () => {
   const [selectedAct, setselectedAct] = useState('');
   const [selectedArtForm, setselectedArtForm] = useState('');
 
-  const acts = [...new Set(buskers.map(busker => busker.act))];
+  const acts = [...new Set(buskers.flatMap(busker => busker.act.replace('amp;', '').split(/[,&]/).map(act => act.trim())))].sort();
   const art_forms = [...new Set(buskers.map(busker => busker.art_form))];
 
   const filteredBuskers = buskers.filter(busker => {
     return (
       (busker.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (selectedAct === '' || busker.act === selectedAct) &&
+      (selectedAct === '' || busker.act.includes(selectedAct)) &&
       (selectedArtForm === '' || busker.art_form === selectedArtForm)
     );
   });
@@ -69,6 +69,7 @@ const BuskersPage = () => {
           </select>
         </div>
       </div>
+      <span class="text-gray-500">{filteredBuskers.length} results found</span>
       <ul>
         {filteredBuskers.map(busker => (
           <li key={busker.id} className="mb-4">
@@ -76,7 +77,6 @@ const BuskersPage = () => {
               {busker.name}
             </Link>
             <p className="">{busker.act} - {busker.art_form}</p>
-            <p className="">{busker.bio}</p>
             {/* add a line */}
             <hr className="my-4" />
           </li>
