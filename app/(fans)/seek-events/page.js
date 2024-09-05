@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { supabase } from '../../supabaseClient';
-import {faAngleLeft, faAngleRight} from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const DynamicMap = dynamic(() => import('../../components/ui/Map'), {
@@ -115,7 +115,7 @@ const PerformancesPage = () => {
         />
 
         {/* Date and Time Filter Boxes */}
-        <div className="absolute bottom-8 right-16 sm:w-40 w-42 p-2 bg-gray-600 rounded-lg shadow-md space-y-2 sm:space-y-4">
+        <div className="absolute top-16 md:top-24 right-6 md:right-10 w-1/2 md:w-1/4 p-2 bg-gray-600 rounded-lg shadow-md space-y-2 sm:space-y-4">
           <div className="flex items-center justify-between space-x-2">
             <button
               onClick={() => handleDateChangeByOffset(-1)}
@@ -150,9 +150,22 @@ const PerformancesPage = () => {
 
       {/* Popup to show performance details */}
       {selectedPerformance && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center md:justify-end md:pr-10 bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-4/5 md:w-1/3 ">
-            <h1 className="text-xlg font-semibold text-gray-500">{buskers[selectedPerformance.busker_id]['name']}</h1>
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center justify-items-center md:justify-end md:pr-10 bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg w-4/5 md:w-1/3 grid justify-center">
+            <div className="flex justify-end pb-2">
+              <button
+                onClick={() => setSelectedPerformance(null)}
+                className="mt-4 px-4 py-2 bg-gray-100 text-white rounded-md hover:bg-gray-600 focus:outline-none"
+              >
+                ❌
+              </button>
+            </div>
+
+            <h1 className="text-xlg font-semibold text-gray-500">
+              <a href={`seek-buskers/${selectedPerformance.busker_id}`} class="text-black">
+                {buskers[selectedPerformance.busker_id]['name']}
+              </a>
+            </h1>
             <h2 className="text-sm font-semibold text-gray-500">{buskers[selectedPerformance.busker_id]['act']}</h2>
             <img src={`https://eservices.nac.gov.sg${buskers[selectedPerformance.busker_id]['image_url']}`} alt={buskers[selectedPerformance.busker_id]['name']} className="w-40 h-40 rounded-lg mt-2" />
             <p className="text-sm text-gray-500">
@@ -161,12 +174,7 @@ const PerformancesPage = () => {
               {selectedPerformance.start_datetime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {selectedPerformance.end_datetime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
             <p className="text-sm text-gray-500">{selectedPerformance.description}</p>
-            <button
-              onClick={() => setSelectedPerformance(null)}
-              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none"
-            >
-              Close
-            </button>
+
           </div>
         </div>
       )}
