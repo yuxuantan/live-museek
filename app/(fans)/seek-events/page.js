@@ -19,11 +19,11 @@ const PerformancesPage = () => {
   const [performances, setPerformances] = useState([]);
   const [buskers, setBuskers] = useState({});
   const [selectedPerformance, setSelectedPerformance] = useState(null);
-  const [selectedTime, setSelectedTime] = useState('All');
+  const [selectedTime, setSelectedTime] = useState('Time: All');
   const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString('sv-SE'));
 
   const center = useMemo(() => (userLocation ? userLocation : { lat: 1.3521, lng: 103.8198 }), [userLocation]);
-  const times = ['All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight'];
+  const times = ['Time: All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight'];
 
   useEffect(() => {
     const getUserLocation = () => {
@@ -78,7 +78,7 @@ const PerformancesPage = () => {
   }, []);
 
   const filterPerformances = (performance) => {
-    const isTimeMatch = selectedTime === 'All' || (
+    const isTimeMatch = selectedTime === 'Time: All' || (
       (selectedTime === '6am-12noon' && performance.start_datetime?.getHours() >= 6 && performance.start_datetime?.getHours() < 12) ||
       (selectedTime === '12noon-6pm' && performance.start_datetime?.getHours() >= 12 && performance.start_datetime?.getHours() < 18) ||
       (selectedTime === '6pm-9pm' && performance.start_datetime?.getHours() >= 18 && performance.start_datetime?.getHours() < 21) ||
@@ -115,7 +115,7 @@ const PerformancesPage = () => {
         />
 
         {/* Date and Time Filter Boxes */}
-        <div className="absolute bottom-2 right-20 sm:w-40 w-42 p-2 bg-gray-600 rounded-lg shadow-md space-y-2 sm:space-y-4">
+        <div className="absolute bottom-8 right-16 sm:w-40 w-42 p-2 bg-gray-600 rounded-lg shadow-md space-y-2 sm:space-y-4">
           <div className="flex items-center justify-between space-x-2">
             <button
               onClick={() => handleDateChangeByOffset(-1)}
