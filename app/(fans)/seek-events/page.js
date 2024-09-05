@@ -151,7 +151,7 @@ const PerformancesPage = () => {
       {/* Popup to show performance details */}
       {selectedPerformance && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-4/5">
+          <div className="bg-white p-4 rounded-lg shadow-lg w-4/5 md:w-1/3 md:align-right">
             <h1 className="text-xlg font-semibold text-gray-500">{buskers[selectedPerformance.busker_id]['name']}</h1>
             <h2 className="text-sm font-semibold text-gray-500">{buskers[selectedPerformance.busker_id]['act']}</h2>
             <img src={`https://eservices.nac.gov.sg${buskers[selectedPerformance.busker_id]['image_url']}`} alt={buskers[selectedPerformance.busker_id]['name']} className="w-40 h-40 rounded-lg mt-2" />
