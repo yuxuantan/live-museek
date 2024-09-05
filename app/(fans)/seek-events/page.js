@@ -152,15 +152,16 @@ const PerformancesPage = () => {
       {selectedPerformance && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center justify-items-center md:justify-end md:pr-10 bg-black bg-opacity-50">
           <div className="bg-white p-4 rounded-lg shadow-lg w-4/5 md:w-1/3 grid justify-center">
-            <div className="flex justify-end pb-2">
+            <div className="flex items-end ">
+              <h1 className="text-blue-500 font-bold mr-24">{selectedPerformance.location_name}</h1>
               <button
                 onClick={() => setSelectedPerformance(null)}
-                className="mt-4 px-4 py-2 bg-gray-100 text-white rounded-md hover:bg-gray-600 focus:outline-none"
+                className="px-4 py-2 bg-gray-100 text-white rounded-md hover:bg-gray-600 focus:outline-none"
               >
                 ❌
               </button>
             </div>
-
+            
             <h1 className="text-xlg font-semibold text-gray-500">
               <a href={`seek-buskers/${selectedPerformance.busker_id}`} class="text-black">
                 {buskers[selectedPerformance.busker_id]['name']}
