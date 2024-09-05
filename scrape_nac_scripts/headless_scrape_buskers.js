@@ -23,10 +23,6 @@ async function scrapeWebsite() {
     // for each busker_id, get busker details from website using axios
     let busker_list = []
     await Promise.all(busker_ids.map(async (busker_id) => {
-        // TEMP ONLY SCRAPE THIS GUY
-        // if (busker_id != "f29096f9-e51a-4fa9-8270-777fa763a8d6") {
-        //     return;
-        // }
         const busker_url = `https://eservices.nac.gov.sg/Busking/busker/profile/${busker_id}`;
         const response = await axios.get(busker_url);
         const $ = cheerio.load(response.data);

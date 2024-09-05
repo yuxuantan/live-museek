@@ -19,7 +19,6 @@ const Map = ({ center, performances, containerStyle, onMarkerClick }) => {
         new Promise((resolve, reject) => {
           geocoder.geocode({ address: performance.location_address }, (results, status) => {
             if (status === 'OK' && results != null && results.length > 0) {
-              console.log(`Geocoding successful for: ${performance.location_address}`);
               resolve({
                 ...performance,
                 lat: results[0].geometry.location.lat(),

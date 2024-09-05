@@ -11,10 +11,12 @@ export const metadata = {
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
-      <body className="px-4 sm:px-12 lg:px-16 max-w-7xl mx-auto py-6">
+      <body className="h-screen flex flex-col">
         <AuthProvider>
-          <Navbar />
-          <main className="">{children}</main>
+          <main className="grow">{children}</main>
+          <header className="z-10">
+            <Navbar />
+          </header>
           {/* <FeedbackForm /> */}
 
         </AuthProvider>

@@ -9,15 +9,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const DynamicMap = dynamic(() => import('../../components/ui/Map'), {
   ssr: false,
 });
-
 const containerStyle = {
   width: '100%',
-  height: '450px',
+  height: '100%',
 };
 
 const PerformancesPage = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [performances, setPerformances] = useState([]);
+  const [buskers, setBuskers] = useState({});
   const [selectedPerformance, setSelectedPerformance] = useState(null);
   const [selectedTime, setSelectedTime] = useState('All');
   const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString('sv-SE'));
@@ -44,6 +44,21 @@ const PerformancesPage = () => {
       }
     };
 
+    const fetchBuskers = async () => {
+      const { data, error } = await supabase.from('buskers').select('*');
+      if (error) {
+        console.error('Error fetching buskers:', error);
+      }
+      else {
+        // set busker_id as key for buskers object
+        let buskersDict = {};
+        data.forEach((busker) => {
+          buskersDict[busker.busker_id] = busker;
+        });
+        setBuskers(buskersDict);
+      }
+    };
+
     const fetchPerformances = async () => {
       const { data, error } = await supabase.from('performances').select('*');
       if (error) {
@@ -58,6 +73,7 @@ const PerformancesPage = () => {
     };
 
     fetchPerformances();
+    fetchBuskers();
     getUserLocation();
   }, []);
 
@@ -89,7 +105,7 @@ const PerformancesPage = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg">
         <DynamicMap
           center={center}
@@ -136,7 +152,9 @@ const PerformancesPage = () => {
       {selectedPerformance && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-4 rounded-lg shadow-lg w-4/5">
-            <h2 className="text-lg font-semibold text-gray-500">{selectedPerformance.busker_id}</h2>
+            <h1 className="text-xlg font-semibold text-gray-500">{buskers[selectedPerformance.busker_id]['name']}</h1>
+            <h2 className="text-sm font-semibold text-gray-500">{buskers[selectedPerformance.busker_id]['act']}</h2>
+            <img src={`https://eservices.nac.gov.sg${buskers[selectedPerformance.busker_id]['image_url']}`} alt={buskers[selectedPerformance.busker_id]['name']} className="w-40 h-40 rounded-lg mt-2" />
             <p className="text-sm text-gray-500">
               {selectedPerformance.start_datetime.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               <br />
