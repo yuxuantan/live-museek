@@ -1,7 +1,8 @@
 'use client'; // Ensures this component only renders on the client
-
 import React, { useState, useEffect } from 'react';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+
+
 
 const Map = ({ center, performances, containerStyle, onMarkerClick }) => {
   const { isLoaded, loadError } = useLoadScript({
@@ -14,28 +15,35 @@ const Map = ({ center, performances, containerStyle, onMarkerClick }) => {
   useEffect(() => {
     if (isLoaded && window.google) {
       const geocoder = new window.google.maps.Geocoder();
+      const uniqueAddresses = new Set();
 
       const geocodePromises = performances.map(performance =>
         new Promise((resolve, reject) => {
-          geocoder.geocode({ address: performance.location_address }, (results, status) => {
-            if (status === 'OK' && results != null && results.length > 0) {
-              resolve({
-                ...performance,
-                lat: results[0].geometry.location.lat(),
-                lng: results[0].geometry.location.lng(),
-              });
-            } else {
-              console.error(`Geocode was not successful for the following reason: ${status}`);
-              reject(`Geocode was not successful for the following reason: ${status}`);
-            }
-          });
+          if (!uniqueAddresses.has(performance.location_address)) {
+            uniqueAddresses.add(performance.location_address);
+            geocoder.geocode({ address: performance.location_address }, (results, status) => {
+              if (status === 'OK' && results != null && results.length > 0) {
+                resolve({
+                  ...performance,
+                  lat: results[0].geometry.location.lat(),
+                  lng: results[0].geometry.location.lng(),
+                });
+              } else {
+                console.error(`Geocode was not successful for the following reason: ${status}`);
+                reject(`Geocode was not successful for the following reason: ${status}`);
+              }
+            });
+          } else {
+            resolve(null); // Skip geocoding for duplicate addresses
+          }
         })
       );
 
       Promise.all(geocodePromises)
         .then((results) => {
-          console.log('Geocoding results:', results);
-          setMarkers(results);
+          const filteredResults = results.filter(result => result !== null);
+          console.log('Geocoding results:', filteredResults);
+          setMarkers(filteredResults);
         })
         .catch(error => console.error('Geocoding error: ', error));
     }
@@ -52,7 +60,7 @@ const Map = ({ center, performances, containerStyle, onMarkerClick }) => {
             key={marker.event_id}
             position={{ lat: marker.lat, lng: marker.lng }}
             icon={{
-              url: marker.event_id === activeMarker ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+              url: marker.event_id === activeMarker ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
               scaledSize: new window.google.maps.Size(40, 40), // Increase the size of the marker
             }}
             onClick={() => {
