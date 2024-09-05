@@ -60,7 +60,7 @@ const Map = ({ center, performances, containerStyle, onMarkerClick }) => {
             key={marker.event_id}
             position={{ lat: marker.lat, lng: marker.lng }}
             icon={{
-              url: marker.event_id === activeMarker ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+              url: marker.event_id === activeMarker ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
               scaledSize: new window.google.maps.Size(40, 40), // Increase the size of the marker
             }}
             onClick={() => {
