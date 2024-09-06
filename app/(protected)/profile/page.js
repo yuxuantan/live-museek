@@ -1,27 +1,26 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import withAuth from '../../components/withAuth';
 import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../supabaseClient';
 
 const DashboardPage = () => {
-  const { user, buskerProfile, updateBuskerProfile } = useAuth();
+  const { user, buskerProfile } = useAuth();
 
   const [acceptSwapRequest, setAcceptSwapRequest] = useState(false);
-  const [contactMethods, setContactMethods] = useState<string[]>([]);
+  const [contactMethods, setContactMethods] = useState([]);
+  const [selectedContactMethod, setSelectedContactMethod] = useState('');
+  const [contactInput, setContactInput] = useState('');
 
   const handleSwapRequestToggle = () => {
     setAcceptSwapRequest(!acceptSwapRequest);
   };
-  const [selectedContactMethod, setSelectedContactMethod] = useState<string>('');
-  const [contactInput, setContactInput] = useState<string>('');
 
-  const handleContactMethodChange = (selectedMethod: string) => {
+  const handleContactMethodChange = (selectedMethod) => {
     setSelectedContactMethod(selectedMethod);
     setContactInput('');
   };
 
-  const handleContactInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleContactInputChange = (e) => {
     setContactInput(e.target.value);
   };
 
@@ -83,7 +82,7 @@ const DashboardPage = () => {
       </div>
     </div>
   );
-}
+};
 
 DashboardPage.displayName = 'DashboardPage';
 export default withAuth(DashboardPage);
