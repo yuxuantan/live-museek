@@ -6,18 +6,19 @@ const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [musicianProfile, setMusicianProfile] = useState(null);
+  const [buskerProfile, setBuskerProfile] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const loadUserData = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user ?? null);
+
     console.log('getUserData', user);
-    const { data, error } = await supabase.from('musicians').select().eq('id', user?.id.toString());
+    const { data, error } = await supabase.from('buskers').select().eq('user_id', user?.id.toString());
     if (error) setError(error.message);
-    setMusicianProfile(data ? data[0] : null);
-    console.log('getMusicianProfileData', data);
+    setBuskerProfile(data ? data[0] : null);
+    console.log('setBuskerProfileData', data);
     setLoading(false); // Set loading to false after user data has been loaded
   };
 
@@ -26,6 +27,7 @@ export const AuthProvider = ({ children }) => {
     loadUserData();
     const authListener = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null);
+      setLoading(false);
     });
     return () => {
       authListener.data.subscription.unsubscribe();
@@ -38,10 +40,10 @@ export const AuthProvider = ({ children }) => {
     setUser(data.user);
   };
 
-  const updateMusicianProfile = async (musicianProfile) => {
-    const { data, error } = await supabase.from('musicians').upsert(musicianProfile);
+  const updateBuskerProfile = async (musicianProfile) => {
+    const { data, error } = await supabase.from('musicians').upsert(buskerProfile);
     if (error) throw error;
-    setMusicianProfile(musicianProfile);
+    setBuskerProfile(buskerProfile);
   };
 
   const loginWithProvider = async (provider) => {
@@ -70,10 +72,11 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    setLoading(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, musicianProfile, updateMusicianProfile, login, loginWithProvider, signUp, resetPassword, updatePassword, logout, error, loading }}>
+    <AuthContext.Provider value={{ user, buskerProfile, updateBuskerProfile, login, loginWithProvider, signUp, resetPassword, updatePassword, logout, error, loading }}>
       {children}
     </AuthContext.Provider>
   );

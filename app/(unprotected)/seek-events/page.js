@@ -155,12 +155,6 @@ const PerformancesPage = () => {
           <div className="bg-white p-4 rounded-lg shadow-lg w-4/5 md:w-1/3 grid justify-center">
             <div className="flex items-end ">
               <h1 className="text-blue-500 font-bold">{selectedPerformance.location_name}</h1>
-              {/* <button
-                onClick={() => setSelectedPerformance(null)}
-                className="px-4 py-2 bg-gray-100 text-white rounded-md hover:bg-gray-600 focus:outline-none"
-              >
-                ❌
-              </button> */}
             </div>
             
             <h1 className="text-xlg font-semibold text-gray-500">

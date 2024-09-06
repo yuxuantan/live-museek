@@ -11,8 +11,14 @@ const withAuth = <P extends object>(Component: React.ComponentType<P>): React.FC
       if (!loading && !user) {
         router.replace('/login'); // Redirect to login page if not authenticated
       }
-    }, []);
+    }, [user, loading]); // Re-run whenever `user` or `loading` changes
 
+    // While loading, return null (or a spinner/loading component)
+    if (loading) {
+      return <div>Loading...</div>;
+    }
+
+    // If user is still not available, return null to prevent rendering
     if (!user) {
       return null;
     }

@@ -15,7 +15,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(email, password);
-      window.location.href = '/musician'; // Redirect to profile page on successful login + mount auth again
+      window.location.href = '/profile'; // Redirect to profile page on successful login + mount auth again
     } catch (error) {
       setError(error.message);
     }
@@ -25,7 +25,7 @@ const Login = () => {
     console.log("Social login with provider", provider);
     try {
       await loginWithProvider(provider);
-      router.push('/musician'); // Redirect to profile page on successful login
+      router.push('/profile'); // Redirect to profile page on successful login
       // window.location.href = '/musician'; // Redirect to profile page on successful login + mount auth again
     } catch (error) {
       setError(error.message);
