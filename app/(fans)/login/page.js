@@ -4,34 +4,33 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 
-const Login: React.FC = () => {
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const { login, loginWithProvider } = useAuth();
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
       await login(email, password);
       window.location.href = '/musician'; // Redirect to profile page on successful login + mount auth again
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message);
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+  const handleSocialLogin = async (provider) => {
     console.log("Social login with provider", provider);
     try {
       await loginWithProvider(provider);
       router.push('/musician'); // Redirect to profile page on successful login
       // window.location.href = '/musician'; // Redirect to profile page on successful login + mount auth again
-    } catch (error: any) {
+    } catch (error) {
       setError(error.message);
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center mt-12">
@@ -82,8 +81,7 @@ const Login: React.FC = () => {
           >
             <span className="mr-2">Login with Google</span>
             <img src="/google.png" className="h-8"/>
-            {/* insert google image from web*/}
-
+            {/* insert google image from web */}
           </button>
           <button
             onClick={() => handleSocialLogin('facebook')}
@@ -118,5 +116,4 @@ const Login: React.FC = () => {
   );
 };
 
-Login.displayName = 'Login';
 export default Login;
