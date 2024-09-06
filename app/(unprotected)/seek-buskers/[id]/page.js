@@ -65,7 +65,9 @@ const BuskerDetailPage = ({ params }) => {
           <h2 className="text-2xl font-semibold mb-4">Upcoming Events</h2>
           {performances.filter(performance => new Date(performance.start_datetime) > new Date()).length > 0 ? (
             <ul>
-              {performances.filter(performance => new Date(performance.start_datetime) > new Date()).map(performance => (
+              {performances.filter(performance => new Date(performance.start_datetime) > new Date())
+              .sort((a, b) => new Date(a.start_datetime) - new Date(b.start_datetime))
+              .map(performance => (
                 <li key={performance.event_id} className="mb-4">
                   <div className="p-4 bg-gray-100 rounded-lg shadow">
                     <p className="text-gray-700">Date: {String(performance.start_datetime).substring(0, 10)}</p>
