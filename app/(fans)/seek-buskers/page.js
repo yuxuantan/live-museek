@@ -37,7 +37,7 @@ const BuskersPage = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Buskers</h1>
+      {/* <h1 className="text-3xl font-bold mb-6">Buskers</h1> */}
       <div className="mb-6">
         <div className="flex lg:flex-row flex-col lg:space-x-4 space-y-4">
           <input

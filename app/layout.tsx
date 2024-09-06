@@ -1,7 +1,7 @@
 import './globals.css';
 import Navbar from './components/ui/Navbar';
 import { ReactNode } from 'react';
-// import { AuthProvider } from '../_archived/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import FeedbackForm from './components/ui/FeedbackForm'
 export const metadata = {
   title: 'LiveMuseek',
@@ -12,14 +12,14 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
       <body className="h-screen flex flex-col">
-        {/* <AuthProvider> */}
-          <main className="grow">{children}</main>
+        <AuthProvider>
+          <main className="grow md:mt-16 mb-14 md:mb-0">{children}</main>
           <header className="z-10">
             <Navbar />
           </header>
           {/* <FeedbackForm /> */}
 
-        {/* </AuthProvider> */}
+        </AuthProvider>
       </body>
     </html>
   );

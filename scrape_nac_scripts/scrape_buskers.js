@@ -11,14 +11,18 @@ async function scrapeWebsite() {
     } else {
         console.log("Fetching success")
     }
-
+    // get count data
+    console.log("num performances: " + data.length)
     // get unique busker_ids from the performances table
     let busker_ids = []
     data.forEach(performance => {
         busker_ids.push(performance.busker_id)
     })
     busker_ids = [...new Set(busker_ids)]
-    console.log(busker_ids)
+    // console.log(busker_ids)
+    busker_ids.forEach(busker_id => {
+        console.log(busker_id)
+    })
 
     // for each busker_id, get busker details from website using axios
     let busker_list = []
@@ -47,24 +51,24 @@ async function scrapeWebsite() {
         console.log(busker);
         busker_list.push(busker);
     }));
-    // delete all buskers in buskers table
-    const response = await supabase.from('buskers').delete().gt('busker_id', 1) // delete all buskers with id >1 means delete all buskers
-    if (response.error != null) {
-        console.log("Error deleting buskers")
-        console.log(response)
-    } else {
-        console.log("Buskers deleted successfully")
-    }
+    // // delete all buskers in buskers table
+    // const response = await supabase.from('buskers').delete().eq('id', 1) // delete all buskers with id >1 means delete all buskers
+    // if (response.error != null) {
+    //     console.log("Error deleting buskers")
+    //     console.log(response)
+    // } else {
+    //     console.log("Buskers deleted successfully")
+    // }
 
     // insert all buskers in buskers_list into buskers table
-    const response2 = await supabase.from('buskers').insert(busker_list)
+    const response2 = await supabase.from('buskers').upsert(busker_list, { onConflict: 'busker_id' })
     if (response2.error != null) {
         console.log("Error inserting buskers")
         console.log(response2)
     } else {
-        console.log("Buskers inserted successfully")
+        console.log("Buskers upserted successfully")
     }
-    
+
 }
 
 scrapeWebsite();
