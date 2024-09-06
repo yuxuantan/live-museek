@@ -26,7 +26,7 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-full">
+    <div className="flex items-center justify-center h-full m-4">
       <div className="grid items-center justify-center content-center gap-4 md:w-3/5 justify-self-center">
         <h1 className="text-3xl">User Profile</h1>
         <p>User Email: {user?.email}</p>
