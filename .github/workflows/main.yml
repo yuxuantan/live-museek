@@ -2,7 +2,7 @@ name: Run Node.js Script
 
 on:
   schedule:
-    - cron: '0 * * * *'  # This cron expression triggers the workflow every hour at the top of the hour
+    - cron: '*/5 * * * *'  # This cron expression triggers the workflow every hour at the top of the hour
 
 jobs:
   run-node-script:
@@ -21,4 +21,4 @@ jobs:
         run: npm install
 
       - name: Run script
-        run: node scrape_nac_scripts/headless_scrape_perf.js
+        run: node scrape_nac_scripts/scrape_buskers.js
