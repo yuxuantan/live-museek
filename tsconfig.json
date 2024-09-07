@@ -22,6 +22,6 @@
     },
     "target": "es2015"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/components/ui/Map.js", "app/components/ui/Navbar.js", "app/(unprotected)/seek-musicians/[id]/page.js", "app/(unprotected)/seek-busker/page.js", "app/context/AuthContext.js", "app/(unprotected)/login/page.js", "app/(unprotected)/signup/page.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/components/ui/Map.js", "app/components/ui/Navbar.js", "app/(unprotected)/seek-musicians/[id]/page.js", "app/(unprotected)/seek-busker/page.js", "app/context/AuthContext.js", "app/(unprotected)/login/page.js", "app/(unprotected)/signup/page.js", "app/(protected)/profile/page.js"],
   "exclude": ["node_modules"]
 }
