@@ -47,6 +47,7 @@ async function scrapeWebsite() {
             "bio": busker_bio,
             "image_url": busker_image_url,
             "socials": busker_socials,
+            "updated_at": new Date()
         };
         console.log(busker);
         busker_list.push(busker);
