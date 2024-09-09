@@ -16,6 +16,7 @@
     "@supabase/supabase-js": "^2.43.4",
     "@vercel/postgres": "^0.8.0",
     "cheerio": "^1.0.0-rc.12",
+    "daisyui": "^4.12.10",
     "mailgun.js": "^10.2.1",
     "next": "14.2.3",
     "puppeteer": "^23.2.2",

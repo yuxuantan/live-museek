@@ -69,7 +69,7 @@ const BuskersPage = () => {
           </select>
         </div>
       </div>
-      <span class="text-gray-500">{filteredBuskers.length} results found</span>
+      <span className="text-gray-500">{filteredBuskers.length} results found</span>
       <ul>
         {filteredBuskers.map(busker => (
           <li key={busker.id} className="mb-4">

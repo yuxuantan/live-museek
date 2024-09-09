@@ -1,27 +1,62 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import withAuth from '../../components/withAuth';
 import { useAuth } from '../../context/AuthContext';
 
 const DashboardPage = () => {
-  const { user, buskerProfile } = useAuth();
+  const { user, buskerProfile, updateBuskerProfile } = useAuth();
 
-  const [acceptSwapRequest, setAcceptSwapRequest] = useState(false);
-  const [contactMethods, setContactMethods] = useState([]);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [updateError, setUpdateError] = useState(false);
+  const [acceptSwapRequest, setAcceptSwapRequest] = useState(undefined);
   const [selectedContactMethod, setSelectedContactMethod] = useState('');
   const [contactInput, setContactInput] = useState('');
+
+  useEffect(() => {
+    if (buskerProfile) {
+      setAcceptSwapRequest(buskerProfile?.swap_configs?.accept_swap_requests ?? false);
+      setSelectedContactMethod(buskerProfile?.swap_configs?.contact_method ?? '');
+      setContactInput(buskerProfile?.swap_configs?.contact_info ?? '');
+    }
+  }, [buskerProfile]);
 
   const handleSwapRequestToggle = () => {
     setAcceptSwapRequest(!acceptSwapRequest);
   };
 
-  const handleContactMethodChange = (selectedMethod) => {
-    setSelectedContactMethod(selectedMethod);
+  const handleContactMethodChange = (e) => {
+    setSelectedContactMethod(e.target.value);
     setContactInput('');
   };
 
+
   const handleContactInputChange = (e) => {
     setContactInput(e.target.value);
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      await updateBuskerProfile({
+        busker_id: buskerProfile.busker_id,
+        name: buskerProfile.name,
+        art_form: buskerProfile.art_form,
+        act: buskerProfile.act,
+        bio: buskerProfile.bio,
+        image_url: buskerProfile.image_url,
+        socials: buskerProfile.socials,
+        user_id: buskerProfile.user_id,
+        swap_configs: {
+          accept_swap_requests: acceptSwapRequest,
+          contact_method: selectedContactMethod,
+          contact_info: contactInput
+        }
+      });
+      console.log("Update success");
+      setUpdateSuccess(true);
+    } catch (error) {
+      console.log("Update failed");
+      setUpdateError(true);
+    }
   };
 
   return (
@@ -48,7 +83,7 @@ const DashboardPage = () => {
             <select
               className="w-full p-2 border border-gray-300 rounded-md text-black"
               value={selectedContactMethod}
-              onChange={(e) => handleContactMethodChange(e.target.value)}
+              onChange={handleContactMethodChange}
             >
               <option value="">Select Contact Method</option>
               <option value="Telegram">Telegram</option>
@@ -68,9 +103,23 @@ const DashboardPage = () => {
               </div>
             )}
           </div>
+
         )}
+        {/* save button */}
+        <button class="primary-btn w-1/3" onClick={handleUpdateProfile}>Save Configs</button>
+        {
+          updateSuccess &&
+          <div class="toast toast-middle toast-end">
+            <div class="alert alert-success">
+              <span>Configs saved</span>
+            </div>
+          </div>
+        }
+        {updateError && <p className="text-red-500">Update failed</p>}
+
         <div className="card rounded p-6 space-y-4">
           <h1 className="font-bold underline text-2xl">Linked Busker Details</h1>
+          <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/busker_images/${buskerProfile?.busker_id}.jpg`}></img>
           <p>ID: {buskerProfile?.busker_id}</p>
           <p>Name: {buskerProfile?.name}</p>
           <p>Art Form: {buskerProfile?.art_form}</p>
@@ -79,6 +128,8 @@ const DashboardPage = () => {
           <p>ImageURL: {buskerProfile?.image_url}</p>
           <p>Socials: {buskerProfile?.socials}</p>
         </div>
+
+
       </div>
     </div>
   );

@@ -40,8 +40,8 @@ export const AuthProvider = ({ children }) => {
     setUser(data.user);
   };
 
-  const updateBuskerProfile = async (musicianProfile) => {
-    const { data, error } = await supabase.from('musicians').upsert(buskerProfile);
+  const updateBuskerProfile = async (buskerProfile) => {
+    const { data, error } = await supabase.from('buskers').upsert(buskerProfile);
     if (error) throw error;
     setBuskerProfile(buskerProfile);
   };

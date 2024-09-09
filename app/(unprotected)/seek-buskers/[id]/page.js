@@ -44,10 +44,10 @@ const BuskerDetailPage = ({ params }) => {
 
           </div>
           <div>
-            
-              {/* <div className="flex justify-center"> */}
-              <img src={`https://eservices.nac.gov.sg${busker?.image_url}`} className="w-32 h-32 rounded-full" />
-              {/* </div> */}
+
+            <div className="flex justify-center">
+              <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/busker_images/${busker?.busker_id}.jpg`} className="w-32 h-32 rounded-full" />
+            </div>
 
           </div>
         </div>
@@ -66,16 +66,16 @@ const BuskerDetailPage = ({ params }) => {
           {performances.filter(performance => new Date(performance.start_datetime) > new Date()).length > 0 ? (
             <ul>
               {performances.filter(performance => new Date(performance.start_datetime) > new Date())
-              .sort((a, b) => new Date(a.start_datetime) - new Date(b.start_datetime))
-              .map(performance => (
-                <li key={performance.event_id} className="mb-4">
-                  <div className="p-4 bg-gray-100 rounded-lg shadow">
-                    <p className="text-gray-700">Date: {String(performance.start_datetime).substring(0, 10)}</p>
-                    <p className="text-gray-700">Time: {String(performance.start_datetime).substring(11, 16)} - {String(performance.end_datetime).substring(11, 16)}</p>
-                    <p className="text-gray-700">Location: <a href={`https://maps.google.com/?q=${performance.location_address}`} target="_blank" className="text-blue-500 hover:underline">{performance.location_name}</a></p>
-                  </div>
-                </li>
-              ))}
+                .sort((a, b) => new Date(a.start_datetime) - new Date(b.start_datetime))
+                .map(performance => (
+                  <li key={performance.event_id} className="mb-4">
+                    <div className="p-4 bg-gray-100 rounded-lg shadow">
+                      <p className="text-gray-700">Date: {String(performance.start_datetime).substring(0, 10)}</p>
+                      <p className="text-gray-700">Time: {String(performance.start_datetime).substring(11, 16)} - {String(performance.end_datetime).substring(11, 16)}</p>
+                      <p className="text-gray-700">Location: <a href={`https://maps.google.com/?q=${performance.location_address}`} target="_blank" className="text-blue-500 hover:underline">{performance.location_name}</a></p>
+                    </div>
+                  </li>
+                ))}
             </ul>
           ) : (
             <p className="text-gray-600">No upcoming performances found for this Busker.</p>
