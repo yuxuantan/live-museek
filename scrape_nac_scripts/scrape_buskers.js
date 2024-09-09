@@ -25,6 +25,15 @@ async function scrapeWebsite() {
     });
     busker_ids = [...new Set(busker_ids)];
 
+    // fetch distinct busker ids from buskers table and remove them from busker_ids which will be used for scraping
+    const { data: buskers_data, error: buskers_error } = await supabase.from('buskers').select('busker_id');
+    if (buskers_error) {
+        console.log("Error fetching buskers");
+    }
+    const buskers = buskers_data.map(busker => busker.busker_id);
+    busker_ids = busker_ids.filter(busker_id => !buskers.includes(busker_id));
+    
+
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
