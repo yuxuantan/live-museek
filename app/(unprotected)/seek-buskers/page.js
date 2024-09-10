@@ -76,7 +76,7 @@ const BuskersPage = () => {
             <Link href={`/seek-buskers/${busker.busker_id}`} className="hover:underline">
               {busker.name}
             </Link>
-            <p className="">{busker.act} - {busker.art_form}</p>
+            <p>{busker.act} - {busker.art_form}</p>
             {/* add a line */}
             <hr className="my-4" />
           </li>

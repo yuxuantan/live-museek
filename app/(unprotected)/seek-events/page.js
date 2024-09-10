@@ -105,8 +105,8 @@ const PerformancesPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg">
+    <div className="flex flex-col h-screen">
+      <div className="grow relative w-full h-full rounded-lg overflow-hidden shadow-lg">
         <DynamicMap
           center={center}
           performances={filteredPerformances}
