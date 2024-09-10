@@ -106,7 +106,7 @@ const PerformancesPage = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="grow relative w-full h-full rounded-lg overflow-hidden shadow-lg">
+      <div className="grow relative rounded-lg overflow-hidden shadow-lg">
         <DynamicMap
           center={center}
           performances={filteredPerformances}
@@ -115,7 +115,7 @@ const PerformancesPage = () => {
         />
 
         {/* Date and Time Filter Boxes */}
-        <div className="absolute top-16 md:top-24 right-6 md:right-10 w-1/2 md:w-1/4 p-2 bg-gray-600 rounded-lg shadow-md space-y-2 sm:space-y-4">
+        <div className="absolute top-16 md:top-24 right-6 md:right-10 w-2/3 md:w-1/4 p-2 bg-gray-600 rounded-lg shadow-md space-y-2 sm:space-y-4">
           <div className="flex items-center justify-between space-x-2">
             <button
               onClick={() => handleDateChangeByOffset(-1)}
@@ -127,7 +127,9 @@ const PerformancesPage = () => {
               type="date"
               value={selectedDate}
               onChange={handleDateChange}
-              className="text-xs rounded bg-white shadow-sm text-black"
+              className="text-s rounded bg-white shadow-sm text-black py-1"
+              // style={{ fontSize: '16px' }} // Increase the font size
+
             />
             <button
               onClick={() => handleDateChangeByOffset(1)}
@@ -137,7 +139,7 @@ const PerformancesPage = () => {
             </button>
           </div>
           <div className="flex items-center">
-            <select value={selectedTime} onChange={handleTimeChange} className="text-xs px-1 py-1 rounded bg-color-white shadow-sm w-full text-black">
+            <select value={selectedTime} onChange={handleTimeChange} className="text-s px-1 py-1 rounded bg-color-white shadow-sm w-full text-black">
               {times.map((time) => (
                 <option key={time} value={time}>
                   {time}
