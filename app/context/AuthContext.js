@@ -40,9 +40,26 @@ export const AuthProvider = ({ children }) => {
     setUser(data.user);
   };
 
-  const updateBuskerProfile = async (buskerProfile) => {
+  const updateBuskerProfile = async (buskerProfile, customBuskerImage = null) => {
+    console.log('updating busker profile', buskerProfile);
     const { data, error } = await supabase.from('buskers').upsert(buskerProfile);
     if (error) throw error;
+
+    if (customBuskerImage) {
+      const image_upload_response = await supabase.storage.from('busker_custom_images').upload(`${buskerProfile.busker_id}.jpg`, customBuskerImage, { contentType: 'image/jpg', upsert: true });
+      if (image_upload_response.error != null) {
+        console.log("Error uploading image");
+        console.log(image_upload_response);
+      }
+    }
+    else {
+      // delete custom image
+      const image_delete_response = await supabase.storage.from('busker_custom_images').remove([`${buskerProfile.busker_id}.jpg`]);
+      if (image_delete_response.error != null) {
+        console.log("Error deleting image");
+        console.log(image_delete_response);
+      }
+    }
     setBuskerProfile(buskerProfile);
   };
 

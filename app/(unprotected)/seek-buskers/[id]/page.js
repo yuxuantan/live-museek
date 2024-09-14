@@ -7,6 +7,8 @@ const BuskerDetailPage = ({ params }) => {
   const [busker, setBusker] = useState(null);
   // const [profileImage, setProfileImage] = useState('https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250');
 
+  // get current epoch time to ensure caching doesn't make the image stale
+  const currentEpochTime = Math.floor(new Date().getTime() / 1000);
   useEffect(() => {
     const fetchPerformances = async () => {
       const { data, error } = await supabase.from('performances').select('*').eq('busker_id', params.id);
@@ -38,26 +40,24 @@ const BuskerDetailPage = ({ params }) => {
       <div className="card rounded-lg shadow-lg p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-
             <div className="flex justify-center">
-              <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${busker?.busker_id}.jpg`} className="h-fit aspect-square object-cover object-center rounded-full" />
+              <img
+                src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_custom_images/${busker?.busker_id}.jpg?${currentEpochTime}`}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = `https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${busker?.busker_id}.jpg?${currentEpochTime}`;
+                }}
+                className="h-fit aspect-square object-cover object-center rounded-full"
+              />
             </div>
-
           </div>
           <div className="self-center">
             <h1 className="text-2xl md:text-3xl font-bold mb-4">{busker?.name}</h1>
             <p className="text-lg md:text-xl text-gray-700 mb-4">{busker?.act}</p>
             <p className="text-lg md:text-xl text-gray-700 mb-4">{busker?.art_form}</p>
-
           </div>
         </div>
-        <p className="text-gray-600 my-8">{busker?.bio}</p>
-        {/* <hr className="my-4" /> */}
-        {/* <div className="flex space-x-4 justify-evenly">
-          <a href={Busker?.facebook} target="_blank" className="text-blue-500 hover:underline">Facebook</a>
-          <a href={Busker?.twitter} target="_blank" className="text-blue-500 hover:underline">Twitter</a>
-          <a href={Busker?.instagram} target="_blank" className="text-blue-500 hover:underline">Instagram</a>
-        </div> */}
+        <p className="text-gray-600 my-8">{busker?.custom_profile?.custom_bio ?? busker?.bio.trim() ?? ''}</p>
       </div>
 
       <div className="flex flex-col mb-6 md:space-x-6 space-y-6">

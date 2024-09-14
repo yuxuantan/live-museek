@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import withAuth from '../../components/withAuth';
 import { useAuth } from '../../context/AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
 
 const DashboardPage = () => {
   const { user, buskerProfile, updateBuskerProfile } = useAuth();
@@ -13,26 +15,53 @@ const DashboardPage = () => {
   const [contactInput, setContactInput] = useState('');
   const [activeTab, setActiveTab] = useState(0); // To manage active tab
   // custombio
-  const [customBio, setCustomBio] = useState('');
+  const [bioInput, setBioInput] = useState('');
   // customimage
   const [customImage, setCustomImage] = useState('');
+
   const [imagePreview, setImagePreview] = useState(null); // Store the image preview URL
 
+  // get current epoch time to ensure caching doesn't make the image stale
+  const currentEpochTime = Math.floor(new Date().getTime() / 1000);
 
   useEffect(() => {
+    console.log('busker profile reloaded')
     if (buskerProfile) {
       setAcceptSwapRequest(buskerProfile?.swap_configs?.accept_swap_requests ?? false);
       setSelectedContactMethod(buskerProfile?.swap_configs?.contact_method ?? '');
       setContactInput(buskerProfile?.swap_configs?.contact_info ?? '');
-      setCustomBio(buskerProfile?.custom_profile?.custom_bio ?? '');
-      if (buskerProfile?.custom_profile?.custom_image) {
-        setImagePreview(URL.createObjectURL(buskerProfile?.custom_profile?.custom_image));
-      }
-      else {
-        setImagePreview(`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${buskerProfile?.busker_id}.jpg` ?? null);
-      }
+      setBioInput(buskerProfile?.custom_profile?.custom_bio ?? buskerProfile?.bio ?? '');
+      setImagePreview(buskerProfile?.busker_id 
+        ? `https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_custom_images/${buskerProfile.busker_id}.jpg?${currentEpochTime}`
+        : null
+      );
+      
     }
   }, [buskerProfile]);
+
+  const handleResetProfile = async () => {
+    const confirmReset = window.confirm("Are you sure you want to reset your profile to it's defaults? This action cannot be undone.");
+    if (!confirmReset) return;
+
+    try {
+      await updateBuskerProfile({
+        busker_id: buskerProfile.busker_id,
+        name: buskerProfile.name,
+        art_form: buskerProfile.art_form,
+        act: buskerProfile.act,
+        bio: buskerProfile.bio,
+        image_url: buskerProfile.image_url,
+        socials: buskerProfile.socials,
+        user_id: buskerProfile.user_id,
+        custom_profile: {
+          custom_bio: null,
+        }
+      });
+      setUpdateSuccess(true);
+    } catch (error) {
+      setUpdateError(true);
+    }
+  };
 
   const handleSwapRequestToggle = () => {
     setAcceptSwapRequest(!acceptSwapRequest);
@@ -47,7 +76,7 @@ const DashboardPage = () => {
     setContactInput(e.target.value);
   };
   const handleBioInputChange = (e) => {
-    setCustomBio(e.target.value);
+    setBioInput(e.target.value);
   };
 
   // Handle file input and show image preview
@@ -80,9 +109,11 @@ const DashboardPage = () => {
           contact_info: contactInput
         },
         custom_profile: {
-          custom_bio: customBio,
+          custom_bio: bioInput,
         }
-      });
+      }, customImage);
+
+
       setUpdateSuccess(true);
     } catch (error) {
       setUpdateError(true);
@@ -92,7 +123,7 @@ const DashboardPage = () => {
   return (
     <div className="flex items-center justify-center h-full m-4">
       <div className="items-center justify-center content-center gap-4 md:w-3/5 justify-self-center">
-        <h1 className="text-3xl mb-12">User Profile</h1>
+        <h1 className="text-3xl m-4">User Profile</h1>
 
         {/* Tabs component */}
         <div className="tabs tabs-lg">
@@ -100,26 +131,61 @@ const DashboardPage = () => {
             className={`tab tab-bordered ${activeTab === 0 ? 'underline underline-offset-8 tab-active text-blue-600' : 'text-gray-400'}`}
             onClick={() => setActiveTab(0)}
           >
-            Swap Settings
+            Busker Profile
           </a>
           <a
             className={`tab tab-bordered ${activeTab === 1 ? 'underline underline-offset-8 tab-active text-blue-600' : 'text-gray-400'}`}
             onClick={() => setActiveTab(1)}
           >
-            Linked Busker Profile
-          </a>
-          {/* custom profile (premium only) */}
-          <a
-            className={`tab tab-bordered ${activeTab === 2 ? 'underline underline-offset-8 tab-active text-blue-600' : 'text-gray-400'}`}
-            onClick={() => setActiveTab(2)}
-          >
-            Custom Profile [Premium only]
+            Swap Settings
           </a>
         </div>
 
         {/* Tab content */}
-        <div className="mt-4">
+        <div className="">
+
           {activeTab === 0 && (
+            <div className="content p-4 card space-y-4 p-4 pb-12">
+              {/* <p>* Premium members can edit busker profile</p> */}
+              {/* Linked Busker Profile tab content */}
+              <div className="relative">
+                {/* Display the uploaded image */}
+                {imagePreview && (
+                  <div className="mt-4">
+                    <label htmlFor="img_upload" className="btn rounded-full absolute bottom-0 left-36 bg-gray-300 hover:bg-blue-300"><FontAwesomeIcon icon={faCamera} /></label>
+                    <img
+                      src={`${imagePreview}`}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = `https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${buskerProfile?.busker_id}.jpg?${currentEpochTime}`;
+                      }}
+                      className="h-48 aspect-square object-cover object-center rounded-full"
+                    />
+                  </div>
+                )}
+              </div>
+              <input type='file' id="img_upload" accept="image/*" className="invisible" onChange={handleProfileImgInputChange} />
+              <p className="text-bold">Busker ID: {buskerProfile?.busker_id}</p>
+              <p>Name: {buskerProfile?.name}</p>
+              <p>Art Form: {buskerProfile?.art_form}</p>
+              <p>Act: {buskerProfile?.act}</p>
+              {/* <p>Bio: {buskerProfile?.bio}</p> */}
+              {/* custom bio */}
+              <label className="block font-bold">Bio</label>
+              <textarea
+                className="p-4 border-black bg-gray-300 rounded-lg"
+                value={bioInput ?? ''}
+                onChange={handleBioInputChange}
+                placeholder="describe who you are"
+              />
+              <p>Socials: {buskerProfile?.socials}</p>
+
+              <button className="primary-btn md:w-1/3 mt-4" onClick={handleUpdateProfile}>Save Changes</button>
+              {/* button to revert to NAC defaults */}
+              <button className="primary-btn-inverse md:w-1/3 mt-4" onClick={handleResetProfile}>Reset to default</button>
+            </div>
+          )}
+          {activeTab === 1 && (
             <div className="content p-4 card">
               {/* Settings tab content */}
               <label className="inline-flex items-center cursor-pointer gap-4">
@@ -133,8 +199,8 @@ const DashboardPage = () => {
               </label>
 
               {acceptSwapRequest && (
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  <label className="block mb-2 font-bold">Preferred contact method</label>
+                <div className="mt-4 grid md:grid-cols-2 gap-4">
+                  <label className="block font-bold">Preferred contact method</label>
                   <p></p>
                   <select
                     className="w-full p-2 border border-gray-300 rounded-md text-black"
@@ -161,50 +227,9 @@ const DashboardPage = () => {
                 </div>
               )}
 
-              <button className="primary-btn w-1/3 mt-4" onClick={handleUpdateProfile}>Save Configs</button>
+              <button className="primary-btn md:w-1/3 mt-4" onClick={handleUpdateProfile}>Save Configs</button>
               {updateSuccess && <div className="toast toast-middle toast-end"><div className="alert alert-success"><span>Configs saved</span></div></div>}
               {updateError && <p className="text-red-500">Update failed</p>}
-            </div>
-          )}
-
-          {activeTab === 1 && (
-            <div className="content p-4">
-              {/* Linked Busker Profile tab content */}
-              <div className="card rounded p-6 space-y-4">
-                <img className="w-2/5" src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/busker_images/${buskerProfile?.busker_id}.jpg`} alt="Busker" />
-                <p>ID: {buskerProfile?.busker_id}</p>
-                <p>Name: {buskerProfile?.name}</p>
-                <p>Art Form: {buskerProfile?.art_form}</p>
-                <p>Act: {buskerProfile?.act}</p>
-                <p>Bio: {buskerProfile?.bio}</p>
-                <p>ImageURL: {buskerProfile?.image_url}</p>
-                <p>Socials: {buskerProfile?.socials}</p>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 2 && (
-            <div className="content p-4">
-              {/* Custom Profile tab content */}
-              <div className="card rounded p-6 space-y-4">
-                {/* custom bio */}
-                <label className="block mb-2 font-bold">Intro</label>
-                <textarea className="p-4 border-black bg-gray-300 rounded-lg" value={customBio} onChange={handleBioInputChange} placeholder="describe who you are"/>
-
-                {/* custom image */}
-                <label className="block mb-2 font-medium">Custom Profile Image:</label>
-                <input type='file' className="p-4 border-black" onChange={handleProfileImgInputChange} />
-
-                {/* Display the uploaded image */}
-                {imagePreview && (
-                  <div className="mt-4">
-                    <img src={imagePreview} alt="Custom Profile" className="w-32 h-32 object-cover" />
-                  </div>
-                )}
-
-                {/* save button */}
-                <button className="primary-btn w-1/3 mt-4" onClick={handleUpdateProfile}>Save Profile</button>
-              </div>
             </div>
           )}
         </div>
