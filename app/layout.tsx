@@ -11,7 +11,7 @@ export const metadata = {
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
-      <body className="flex flex-col">
+      <body className="flex flex-col h-screen">
         <AuthProvider>
           <main className="md:mt-16 mb-14 md:mb-0">{children}</main>
           <header className="z-10">

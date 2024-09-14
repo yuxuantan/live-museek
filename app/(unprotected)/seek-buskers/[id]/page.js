@@ -36,23 +36,23 @@ const BuskerDetailPage = ({ params }) => {
   return (
     <div className="container mx-auto p-6">
       <div className="card rounded-lg shadow-lg p-6 mb-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-4">{busker?.name}</h1>
-            <p className="text-xl text-gray-700 mb-4">{busker?.act}</p>
-            <p className="text-xl text-gray-700 mb-4">{busker?.art_form}</p>
-
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
 
             <div className="flex justify-center">
-              <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/busker_images/${busker?.busker_id}.jpg`} className="w-32 h-32 rounded-full" />
+              <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${busker?.busker_id}.jpg`} className="h-fit aspect-square object-cover object-center rounded-full" />
             </div>
 
           </div>
+          <div className="self-center">
+            <h1 className="text-2xl md:text-3xl font-bold mb-4">{busker?.name}</h1>
+            <p className="text-lg md:text-xl text-gray-700 mb-4">{busker?.act}</p>
+            <p className="text-lg md:text-xl text-gray-700 mb-4">{busker?.art_form}</p>
+
+          </div>
         </div>
-        <p className="text-gray-600 mb-4">{busker?.bio}</p>
-        <hr className="my-4" />
+        <p className="text-gray-600 my-8">{busker?.bio}</p>
+        {/* <hr className="my-4" /> */}
         {/* <div className="flex space-x-4 justify-evenly">
           <a href={Busker?.facebook} target="_blank" className="text-blue-500 hover:underline">Facebook</a>
           <a href={Busker?.twitter} target="_blank" className="text-blue-500 hover:underline">Twitter</a>
@@ -60,8 +60,8 @@ const BuskerDetailPage = ({ params }) => {
         </div> */}
       </div>
 
-      <div className="flex md:flex-row flex-col mb-6 md:space-x-6 space-y-6">
-        <div className="card rounded-lg shadow-lg p-6 md:w-1/2">
+      <div className="flex flex-col mb-6 md:space-x-6 space-y-6">
+        <div className="card rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-semibold mb-4">Upcoming Events</h2>
           {performances.filter(performance => new Date(performance.start_datetime) > new Date()).length > 0 ? (
             <ul>

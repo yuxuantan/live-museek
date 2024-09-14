@@ -58,7 +58,6 @@ async function scrapeWebsite() {
             "act": busker_act,
             "art_form": busker_art_form,
             "bio": busker_bio,
-            "image_url": busker_image_url,
             "socials": busker_socials,
             "updated_at": new Date()
         };
@@ -70,7 +69,7 @@ async function scrapeWebsite() {
         const image_data = await response.buffer();
 
         // Upload image to Supabase storage
-        const image_upload_response = await supabase.storage.from('busker_images').upload(`busker_images/${busker_id}.jpg`, image_data, { contentType: 'image/jpg' });
+        const image_upload_response = await supabase.storage.from('busker_images').upload(`${busker_id}.jpg`, image_data, { contentType: 'image/jpg' });
 
         if (image_upload_response.error != null) {
             console.log("Error uploading image");

@@ -2,17 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body {
   /* padding: 20px; */
   margin: 0;
   /* background-color: var(--color-base); */
   /* add gradient to background color using color base */
-  background: linear-gradient(90deg, var(--color-base) 0%, var(--color-secondary) 200%);
+  
   /* background: var(--color-base); */
   color: var(--color-base-content);
   /* @apply bg-gray-100; */
   /* font-size: larger; */
   height: 100%;
+}
+html {
+  background: linear-gradient(90deg, var(--color-base) 0%, var(--color-secondary) 200%);
 }
 
 /* header { */
