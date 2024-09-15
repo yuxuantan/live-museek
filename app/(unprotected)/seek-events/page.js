@@ -175,7 +175,7 @@ const PerformancesPage = () => {
               </a>
             </h1>
             <h2 className="text-sm font-semibold text-gray-500">{buskers[selectedPerformance.busker_id]['act']}</h2>
-            <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/busker_images/${selectedPerformance?.busker_id}.jpg`} alt={buskers[selectedPerformance.busker_id]['name']} className="w-40 h-40 rounded-lg mt-2" />
+            <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${selectedPerformance?.busker_id}.jpg`} alt={buskers[selectedPerformance.busker_id]['name']} className="w-40 h-40 rounded-lg mt-2" />
             <p className="text-sm text-gray-500">
               {selectedPerformance.start_datetime.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               <br />

@@ -1,3 +1,4 @@
+// get list of all locations from main page drop downlist, navigates to each location page, clicking more button until all events are loaded, then scrapes all events
 import { createClient } from '@supabase/supabase-js';
 import puppeteer from 'puppeteer';
 import cheerio from 'cheerio';

@@ -1,5 +1,3 @@
-// this can be run once per day at most to get the latest list of locations. NAC not likely to add new locations every day. (at most every 3 months)
-
 import cheerio from 'cheerio';
 import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
