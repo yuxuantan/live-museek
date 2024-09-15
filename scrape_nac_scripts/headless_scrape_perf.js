@@ -20,8 +20,8 @@ async function scrapeWebsite() {
     const options = location.find('option');
     const num_locations = options.length;
 
+    let location_list = [];
     // Array to collect all the scraped data
-    const allEvents = [];
     let counter = 1
     let performances_list = [];
     for (const element of options.toArray()) {
@@ -32,6 +32,7 @@ async function scrapeWebsite() {
             continue; // Skip invalid location
         }
 
+        
         console.log(`Scraping location #${counter}/${num_locations}: ${location_name}`);
         counter += 1
         const location_url = `https://eservices.nac.gov.sg/Busking/locations/${location_id}/events`;
@@ -80,8 +81,6 @@ async function scrapeWebsite() {
         const event_divs = events.find('.col-md-6.col-lg-2.col-cuttor');
 
         event_divs.each((index, element) => {
-
-            // const performer_name = $(element).find('h3').text().trim();
             const busker_id_url = $(element).find('h3 a').attr('href');
             const busker_id = busker_id_url.substring(busker_id_url.indexOf('/profile/') + '/profile/'.length);
             const performance_times = $(element).find('.dash-bx-times');
@@ -104,8 +103,9 @@ async function scrapeWebsite() {
 
         });
 
-        console.log('Done scraping location: ' + location_name);
+        console.log('Done scraping location events: ' + location_name);
     }
+
     // write all event objects in performances_list to the database 'events' table. (busker_id, location_id, location_name, location_address, start_datetime, end_datetime, created_at)
     // write to supabase
     // clear the db table 'performances'
@@ -127,6 +127,7 @@ async function scrapeWebsite() {
     }
     await browser.close();
 }
+
 
 scrapeWebsite();
 

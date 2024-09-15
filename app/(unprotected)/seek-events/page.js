@@ -64,11 +64,21 @@ const PerformancesPage = () => {
       if (error) {
         console.error('Error fetching performances:', error);
       } else {
-        data.forEach((performance) => {
-          performance.start_datetime = new Date(performance.start_datetime);
-          performance.end_datetime = new Date(performance.end_datetime);
-        });
-        setPerformances(data);
+        // fetch locations
+        const { data: locationsData, error: locationsError } = await supabase.from('locations').select('*');
+        if (locationsError) {
+          console.error('Error fetching locations:', locationsError);
+        } else {
+          data.forEach((performance) => {
+            performance.start_datetime = new Date(performance.start_datetime);
+            performance.end_datetime = new Date(performance.end_datetime);
+            performance.location_name = locationsData.find(location => location.id === performance.location_id)?.name;
+            performance.location_address = locationsData.find(location => location.id === performance.location_id)?.address;
+            performance.lat = locationsData.find(location => location.id === performance.location_id)?.lat;
+            performance.lng = locationsData.find(location => location.id === performance.location_id)?.lng;
+          });
+          setPerformances(data);
+        }
       }
     };
 

@@ -95,14 +95,6 @@ const DashboardPage = () => {
   const handleUpdateProfile = async () => {
     try {
       await updateBuskerProfile({
-        busker_id: buskerProfile.busker_id,
-        name: buskerProfile.name,
-        art_form: buskerProfile.art_form,
-        act: buskerProfile.act,
-        bio: buskerProfile.bio,
-        image_url: buskerProfile.image_url,
-        socials: buskerProfile.socials,
-        user_id: buskerProfile.user_id,
         swap_configs: {
           accept_swap_requests: acceptSwapRequest,
           contact_method: selectedContactMethod,
