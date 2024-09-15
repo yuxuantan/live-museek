@@ -15,6 +15,13 @@ const BuskerDetailPage = ({ params }) => {
       if (error) {
         console.error('Error fetching performances:', error);
       } else {
+        // fetch locations
+        const { data: locationsData, error: locationsError } = await supabase.from('locations').select('*');
+        // join locations to performances
+        data.forEach((performance) => {
+          performance.location_name = locationsData.find(location => location.id === performance.location_id)?.name;
+          performance.location_address = locationsData.find(location => location.id === performance.location_id)?.address;
+        });
         console.log("fetchPerformances", data);
         setPerformances(data);
       }

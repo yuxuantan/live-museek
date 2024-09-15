@@ -69,12 +69,6 @@ async function scrapeWebsite() {
         // Get the page content after all events are loaded
         const locationContent = await page.content();
         const locationPage = cheerio.load(locationContent);
-        // get the div with id = "div-header", 
-        const location_address_header = locationPage('#div-header')
-        // get the first child with ul
-        const location_address_ul = location_address_header.find('ul').first();
-        // then get the first li with "dash-bx-times" class
-        const location_address = location_address_ul.find('li.dash-bx-times').first().text().trim();
 
         console.log("Done loading the page: " + location_name);
         const events = locationPage('#div-booking-result-view');
@@ -91,8 +85,6 @@ async function scrapeWebsite() {
             const performance = {
                 busker_id: busker_id,
                 location_id: location_id,
-                location_name: location_name,
-                location_address: location_address,
                 //date = 'Sat, 28 September'; time= '04:00:PM-06:00:PM'
                 // year = this year
                 start_datetime: new Date(date + ' ' + time.split('-')[0]), // UTC
