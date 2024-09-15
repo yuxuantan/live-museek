@@ -28,4 +28,5 @@ jobs:
       - name: Run script
         run: |
           node scrape_nac_scripts/headless_scrape_perf.js
-          node scrape_nac_scripts/scrape_buskers.js
+          node scrape_nac_scripts/headless_scrape_buskers.js
+          node scrape_nac_scripts/scrape_locations.js
