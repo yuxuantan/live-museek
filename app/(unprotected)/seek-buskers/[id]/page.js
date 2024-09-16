@@ -130,7 +130,7 @@ export default function BuskerDetailPage({ params }) {
                           <li key={performance.event_id}>
                             <div className="card bg-base-100 shadow-sm">
                               <div className="card-body p-4">
-                                <p className="text-base-content">Time: {new Date(performance.start_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {new Date(performance.end_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                              <p className="text-gray-700">Time: {String(performance.start_datetime).substring(11, 16)} - {String(performance.end_datetime).substring(11, 16)}</p>
                                 <p className="text-base-content">Location: <a href={`/location/${performance.location_id}`} className="link link-primary">{performance.location_name}</a></p>
                               </div>
                             </div>
