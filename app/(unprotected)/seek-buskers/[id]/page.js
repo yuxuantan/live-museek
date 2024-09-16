@@ -90,7 +90,7 @@ export default function BuskerDetailPage({ params }) {
                 className="btn btn-primary btn-sm absolute bottom-0 right-0 m-2"
                 onClick={() => setShowQR(!showQR)}
               >
-                {showQR ? 'Hide QR' : 'Show QR'}
+                {showQR ? 'Hide QR' : 'Generate Sharing QR'}
               </button>
             </div>
             <div className="self-center col-span-2">
@@ -100,7 +100,7 @@ export default function BuskerDetailPage({ params }) {
               {showQR && (
                 <div className="mt-4">
                   <QRCodeSVG value={qrCodeUrl} size={128} />
-                  <p className="mt-2 text-sm text-base-content/70">Scan to view profile</p>
+                  <p className="mt-2 text-sm text-base-content/70">Scan to get link to current page</p>
                 </div>
               )}
             </div>
