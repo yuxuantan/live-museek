@@ -28,7 +28,7 @@ const BuskerDetailPage = ({ params }) => {
                 console.log("fetchPerformances", performanceData);
                 setPerformances(performanceData);
             }
-            const { data: locationsData, error: locationsError } = await supabase.from('locations').select('*').eq('id', params.id);
+            const { data: locationsData, error: locationsError } = await supabase.from('locations').select('*').eq('location_id', params.id);
             if (locationsError) {
                 console.error('Error fetching locations:', locationsError);
             }
@@ -53,7 +53,7 @@ const BuskerDetailPage = ({ params }) => {
                 <div className="grid grid-cols-1 gap-8">
                     <h1 className="text-bold text-3xl">{location?.name}</h1>
                     {/* image */}
-                    <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/location_images/${location?.id}.jpg` + `?${currentEpochTime}`} alt={location ? location.name : ''} className="rounded-lg shadow-lg w-1/2" />
+                    <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/location_images/${location?.location_id}.jpg` + `?${currentEpochTime}`} alt={location ? location.name : ''} className="rounded-lg shadow-lg md:w-1/2" />
                     {/* area */}
                     <p className="text-gray-600">{location?.area}</p>
                     {/* description */}
@@ -84,7 +84,7 @@ const BuskerDetailPage = ({ params }) => {
                                 ))}
                         </ul>
                     ) : (
-                        <p className="text-gray-600">No upcoming performances found for this Busker.</p>
+                        <p className="text-gray-600">No upcoming performances found for this location.</p>
                     )}
                 </div>
             </div>

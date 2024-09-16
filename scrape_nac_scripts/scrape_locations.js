@@ -41,11 +41,11 @@ async function scrape_locations() {
     const num_locations = options.length;
 
     // fetch locations from supabase
-    const { data: locations_data, error: locations_error } = await supabase.from('locations').select('id');
+    const { data: locations_data, error: locations_error } = await supabase.from('locations').select('location_id');
     if (locations_error) {
         console.log("Error fetching locations");
     }
-    const supabase_locations = locations_data.map(location => location.id);
+    const supabase_locations = locations_data.map(location => location.location_id);
     // compare with the location ids from the NAC website. if no difference, end the script
     const location_ids = options.map((index, element) => $(element).val()).get().filter(id => id !== "00000000-0000-0000-0000-000000000000");
     if (location_ids.every(id => supabase_locations.includes(id))) {
@@ -92,7 +92,7 @@ async function scrape_locations() {
         
         
         location_list.push({
-            "id": location_id,
+            "location_id": location_id,
             "name": location_name,
             "address": location_address,
             "description": location_description,

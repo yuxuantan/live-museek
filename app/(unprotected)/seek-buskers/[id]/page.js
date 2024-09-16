@@ -19,8 +19,8 @@ const BuskerDetailPage = ({ params }) => {
         const { data: locationsData, error: locationsError } = await supabase.from('locations').select('*');
         // join locations to performances
         data.forEach((performance) => {
-          performance.location_name = locationsData.find(location => location.id === performance.location_id)?.name;
-          performance.location_address = locationsData.find(location => location.id === performance.location_id)?.address;
+          performance.location_name = locationsData.find(location => location.location_id === performance.location_id)?.name;
+          performance.location_address = locationsData.find(location => location.location_id === performance.location_id)?.address;
         });
         console.log("fetchPerformances", data);
         setPerformances(data);
@@ -64,7 +64,9 @@ const BuskerDetailPage = ({ params }) => {
             <p className="text-lg md:text-xl text-gray-700 mb-4">{busker?.art_form}</p>
           </div>
         </div>
-        <p className="text-gray-600 my-8">{busker?.custom_profile?.custom_bio ?? busker?.bio.trim() ?? ''}</p>
+        {busker?.custom_profile?.custom_bio || busker?.bio?.trim() ? (
+          <p className="text-gray-600 mt-2 mb-8">{busker?.custom_profile?.custom_bio ?? busker?.bio.trim()}</p>
+        ) : null}
       </div>
 
       <div className="flex flex-col mb-6 md:space-x-6 space-y-6">
