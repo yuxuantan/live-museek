@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../supabaseClient';
+import { mergeBackToBackPerformances } from '../../../utils';
 
 const BuskerDetailPage = ({ params }) => {
     const [performances, setPerformances] = useState([]);
@@ -26,7 +27,9 @@ const BuskerDetailPage = ({ params }) => {
                         performance.busker_act = busker?.act;
                         performance.busker_art_form = busker?.art_form;
                     });
-                    setPerformances(performanceData);
+                    // Remove duplicate timeslots and merge back-to-back performances at the same location
+                    const mergedPerformances = mergeBackToBackPerformances(performanceData);
+                    setPerformances(mergedPerformances);
                 }
             }
 
@@ -97,7 +100,7 @@ const BuskerDetailPage = ({ params }) => {
                                             <li key={performance.event_id} className="mb-4">
                                                 <div className="p-4 bg-gray-100 rounded-lg shadow">
                                                     <p className="text-gray-700">Time: {String(performance.start_datetime).substring(11, 16)} - {String(performance.end_datetime).substring(11, 16)}</p>
-                                                    <p className="text-gray-700">Busker: <a href={`/seek-buskers/${performance.busker_id}`} target="_blank" className="text-blue-500 hover:underline">{performance.busker_name}</a></p>
+                                                    <p className="text-gray-700">Busker: <a href={`/seek-buskers/${performance.busker_id}`} className="text-blue-500 hover:underline">{performance.busker_name}</a></p>
                                                     <p className="text-gray-700">Act: {performance.busker_act}</p>
                                                     <p className="text-gray-700">Art Form: {performance.busker_art_form}</p>
                                                 </div>

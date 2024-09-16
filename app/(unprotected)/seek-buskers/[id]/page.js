@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../supabaseClient';
+import { mergeBackToBackPerformances } from '../../../utils';
 
 const BuskerDetailPage = ({ params }) => {
   const [performances, setPerformances] = useState([]);
@@ -22,7 +23,10 @@ const BuskerDetailPage = ({ params }) => {
           performance.location_name = locationsData.find(location => location.location_id === performance.location_id)?.name;
           performance.location_address = locationsData.find(location => location.location_id === performance.location_id)?.address;
         });
-        setPerformances(data);
+
+        // Remove duplicate timeslots and merge back-to-back performances at the same location
+        const mergedPerformances = mergeBackToBackPerformances(data);
+        setPerformances(mergedPerformances);
       }
     };
 
@@ -38,6 +42,8 @@ const BuskerDetailPage = ({ params }) => {
     fetchPerformances();
     fetchBusker();
   }, [params.id]);
+
+  
 
   // Get today's date and tomorrow's date
   const today = new Date();
@@ -106,14 +112,16 @@ const BuskerDetailPage = ({ params }) => {
                     {date} ({formatDateLabel(date)}) [{groupedPerformances[date].length}]
                   </summary>
                   <ul className="pl-4">
-                    {groupedPerformances[date].map(performance => (
-                      <li key={performance.event_id} className="mb-4">
-                        <div className="p-4 bg-gray-100 rounded-lg shadow">
-                          <p className="text-gray-700">Time: {String(performance.start_datetime).substring(11, 16)} - {String(performance.end_datetime).substring(11, 16)}</p>
-                          <p className="text-gray-700">Location: <a href={`https://maps.google.com/?q=${performance.location_address}`} target="_blank" className="text-blue-500 hover:underline">{performance.location_name}</a></p>
-                        </div>
-                      </li>
-                    ))}
+                    {groupedPerformances[date]
+                      .sort((a, b) => new Date(a.start_datetime) - new Date(b.start_datetime))
+                      .map(performance => (
+                        <li key={performance.event_id} className="mb-4">
+                          <div className="p-4 bg-gray-100 rounded-lg shadow">
+                            <p className="text-gray-700">Time: {String(performance.start_datetime).substring(11, 16)} - {String(performance.end_datetime).substring(11, 16)}</p>
+                            <p className="text-gray-700">Location: <a href={`/location/${performance.location_id}`} className="text-blue-500 hover:underline">{performance.location_name}</a></p>
+                          </div>
+                        </li>
+                      ))}
                   </ul>
                 </details>
               ))}
