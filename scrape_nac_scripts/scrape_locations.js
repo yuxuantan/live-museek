@@ -47,14 +47,14 @@ async function scrape_locations() {
     }
     const supabase_locations = locations_data.map(location => location.id);
     // compare with the location ids from the NAC website. if no difference, end the script
-    // const location_ids = options.map((index, element) => $(element).val()).get().filter(id => id !== "00000000-0000-0000-0000-000000000000");
-    // if (location_ids.every(id => supabase_locations.includes(id))) {
-    //     console.log("No new locations found. Exiting script");
-    //     return;
-    // }
-    // else{
-    //     console.log("New locations found. Rescraping all locations");
-    // }
+    const location_ids = options.map((index, element) => $(element).val()).get().filter(id => id !== "00000000-0000-0000-0000-000000000000");
+    if (location_ids.every(id => supabase_locations.includes(id))) {
+        console.log("No new locations found. Exiting script");
+        return;
+    }
+    else{
+        console.log("New locations found. Rescraping all locations");
+    }
 
 
 

@@ -1,29 +1,33 @@
-'use client'; // Ensures this component only renders on the client
+'use client'
 
-import { useMemo, useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import { supabase } from '../../supabaseClient';
-import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useMemo, useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+import { supabase } from '../../supabaseClient'
+import { Calendar, Clock, MapPin, Filter } from 'lucide-react'
+import { format } from "date-fns"
 
 const DynamicMap = dynamic(() => import('../../components/ui/Map'), {
   ssr: false,
-});
+})
+
 const containerStyle = {
   width: '100%',
   height: '100%',
-};
+}
 
-const PerformancesPage = () => {
-  const [userLocation, setUserLocation] = useState(null);
-  const [performances, setPerformances] = useState([]);
-  const [buskers, setBuskers] = useState({});
-  const [selectedPerformance, setSelectedPerformance] = useState(null);
-  const [selectedTime, setSelectedTime] = useState('Time: All');
-  const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString('sv-SE'));
-
-  const center = useMemo(() => (userLocation ? userLocation : { lat: 1.3521, lng: 103.8198 }), [userLocation]);
-  const times = ['Time: All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight'];
+export default function PerformancesPage() {
+  const [userLocation, setUserLocation] = useState(null)
+  const [performances, setPerformances] = useState([])
+  const [buskers, setBuskers] = useState({})
+  const [selectedPerformance, setSelectedPerformance] = useState(null)
+  const [selectedTime, setSelectedTime] = useState('All')
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [filterType, setFilterType] = useState('time')
+  const [selectedLocation, setSelectedLocation] = useState('All Locations')
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  
+  const center = useMemo(() => (userLocation ? userLocation : { lat: 1.3521, lng: 103.8198 }), [userLocation])
+  const times = ['All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight']
 
   useEffect(() => {
     const getUserLocation = () => {
@@ -33,86 +37,86 @@ const PerformancesPage = () => {
             setUserLocation({
               lat: position.coords.latitude,
               lng: position.coords.longitude,
-            });
+            })
           },
           (error) => {
-            console.error('Error getting user location:', error);
+            console.error('Error getting user location:', error)
           }
-        );
+        )
       } else {
-        console.error('Geolocation is not supported by this browser.');
+        console.error('Geolocation is not supported by this browser.')
       }
-    };
+    }
 
     const fetchBuskers = async () => {
-      const { data, error } = await supabase.from('buskers').select('*');
+      const { data, error } = await supabase.from('buskers').select('*')
       if (error) {
-        console.error('Error fetching buskers:', error);
+        console.error('Error fetching buskers:', error)
       }
       else {
-        // set busker_id as key for buskers object
-        let buskersDict = {};
+        let buskersDict = {}
         data.forEach((busker) => {
-          buskersDict[busker.busker_id] = busker;
-        });
-        setBuskers(buskersDict);
+          buskersDict[busker.busker_id] = busker
+        })
+        setBuskers(buskersDict)
       }
-    };
+    }
 
     const fetchPerformances = async () => {
-      const { data, error } = await supabase.from('performances').select('*');
+      const { data, error } = await supabase.from('performances').select('*')
       if (error) {
-        console.error('Error fetching performances:', error);
+        console.error('Error fetching performances:', error)
       } else {
-        // fetch locations
-        const { data: locationsData, error: locationsError } = await supabase.from('locations').select('*');
+        const { data: locationsData, error: locationsError } = await supabase.from('locations').select('*')
         if (locationsError) {
-          console.error('Error fetching locations:', locationsError);
+          console.error('Error fetching locations:', locationsError)
         } else {
           data.forEach((performance) => {
-            performance.start_datetime = new Date(performance.start_datetime);
-            performance.end_datetime = new Date(performance.end_datetime);
-            performance.location_name = locationsData.find(location => location.id === performance.location_id)?.name;
-            performance.location_address = locationsData.find(location => location.id === performance.location_id)?.address;
-            performance.lat = locationsData.find(location => location.id === performance.location_id)?.lat;
-            performance.lng = locationsData.find(location => location.id === performance.location_id)?.lng;
-          });
-          setPerformances(data);
+            performance.start_datetime = new Date(performance.start_datetime)
+            performance.end_datetime = new Date(performance.end_datetime)
+            performance.location_name = locationsData.find(location => location.id === performance.location_id)?.name
+            performance.location_address = locationsData.find(location => location.id === performance.location_id)?.address
+            performance.lat = locationsData.find(location => location.id === performance.location_id)?.lat
+            performance.lng = locationsData.find(location => location.id === performance.location_id)?.lng
+          })
+          console.log('Performances:', data)
+          setPerformances(data)
         }
       }
-    };
+    }
 
-    fetchPerformances();
-    fetchBuskers();
-    getUserLocation();
-  }, []);
+    fetchPerformances()
+    fetchBuskers()
+    getUserLocation()
+  }, [])
 
   const filterPerformances = (performance) => {
-    const isTimeMatch = selectedTime === 'Time: All' || (
+    const isTimeMatch = selectedTime === 'All' || (
       (selectedTime === '6am-12noon' && performance.start_datetime?.getHours() >= 6 && performance.start_datetime?.getHours() < 12) ||
       (selectedTime === '12noon-6pm' && performance.start_datetime?.getHours() >= 12 && performance.start_datetime?.getHours() < 18) ||
       (selectedTime === '6pm-9pm' && performance.start_datetime?.getHours() >= 18 && performance.start_datetime?.getHours() < 21) ||
       (selectedTime === '9pm-12midnight' && performance.start_datetime?.getHours() >= 21)
-    );
-    const isDateMatch = selectedDate === '' || (performance.start_datetime instanceof Date && performance.start_datetime.toISOString().substring(0, 10) === selectedDate);
-    return isTimeMatch && isDateMatch;
-  };
+    )
+    const isDateMatch = selectedDate === '' || (performance.start_datetime instanceof Date && performance.start_datetime.toDateString() === selectedDate.toDateString())
+    
+    return isTimeMatch && isDateMatch
+  }
 
-  const filteredPerformances = performances.filter(filterPerformances);
+  const filteredPerformances = performances.filter(filterPerformances)
 
-  const handleTimeChange = (event) => {
-    setSelectedTime(event.target.value);
-  };
+  const handleTimeChange = (e) => {
+    setSelectedTime(e.target.value)
+  }
 
-  const handleDateChange = (event) => {
-    setSelectedDate(new Date(event.target.value).toISOString().substring(0, 10));
-  };
+  const handleDateChange = (e) => {
+    setSelectedDate(new Date(e.target.value))
+  }
 
-  const handleDateChangeByOffset = (offset) => {
-    const currentDate = new Date(selectedDate);
-    currentDate.setDate(currentDate.getDate() + offset);
-    setSelectedDate(currentDate.toISOString().substring(0, 10));
-  };
+  const handleLocationChange = (e) => {
+    setSelectedLocation(e.target.value)
+  }
+
+  const locations = [...new Set(performances.map(p => p.location_name))]
 
   return (
     <div className="flex flex-col h-screen">
@@ -124,74 +128,118 @@ const PerformancesPage = () => {
           onMarkerClick={setSelectedPerformance}
         />
 
-        {/* Date and Time Filter Boxes */}
-        <div className="absolute top-16 md:top-24 right-6 md:right-10 w-2/3 md:w-1/4 p-2 bg-gray-600 rounded-lg shadow-md space-y-2 sm:space-y-4">
-          <div className="flex items-center justify-between space-x-2">
-            <button
-              onClick={() => handleDateChangeByOffset(-1)}
-              className="p-1 px-2 rounded bg-white focus:outline-none"
-            >
-              <FontAwesomeIcon icon={faAngleLeft} size="lg" color="black" />
-            </button>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={handleDateChange}
-              className="text-s rounded bg-white shadow-sm text-black py-1"
-              // style={{ fontSize: '16px' }} // Increase the font size
+        {/* Filter Toggle Button */}
+        <button
+          className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md z-10"
+          onClick={() => setIsFilterOpen(!isFilterOpen)}
+        >
+          <Filter className="w-6 h-6 text-gray-600" />
+        </button>
 
-            />
-            <button
-              onClick={() => handleDateChangeByOffset(1)}
-              className="p-1 px-2 rounded bg-white focus:outline-none"
-            >
-              <FontAwesomeIcon icon={faAngleRight} size="lg" color="black" />
-            </button>
+        {/* Filter Box */}
+        {isFilterOpen && (
+          <div className="absolute top-16 right-4 w-64 bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="tabs tabs-boxed bg-gray-100">
+              <a
+                className={`tab flex-1 ${filterType === 'time' ? 'tab-active bg-white text-gray-800' : 'text-gray-600'}`}
+                onClick={() => setFilterType('time')}
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Time
+              </a>
+              <a
+                className={`tab flex-1 ${filterType === 'location' ? 'tab-active bg-white text-gray-800' : 'text-gray-600'}`}
+                onClick={() => setFilterType('location')}
+              >
+                <MapPin className="w-4 h-4 mr-2" />
+                Location
+              </a>
+            </div>
+            <div className="p-4">
+              {filterType === 'time' && (
+                <div className="space-y-4">
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Date</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={format(selectedDate, "yyyy-MM-dd")}
+                      onChange={handleDateChange}
+                      className="input input-bordered w-full text-sm"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Time</span>
+                    </label>
+                    <select
+                      value={selectedTime}
+                      onChange={handleTimeChange}
+                      className="select select-bordered w-full text-sm"
+                    >
+                      {times.map((time) => (
+                        <option key={time} value={time}>
+                          {time}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+              {filterType === 'location' && (
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Location</span>
+                  </label>
+                  <select
+                    value={selectedLocation}
+                    onChange={handleLocationChange}
+                    className="select select-bordered w-full text-sm"
+                  >
+                    <option value="All Locations">All Locations</option>
+                    {locations.map((location) => (
+                      <option key={location} value={location}>
+                        {location}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex items-center">
-            <select value={selectedTime} onChange={handleTimeChange} className="text-s px-1 py-1 rounded bg-color-white shadow-sm w-full text-black">
-              {times.map((time) => (
-                <option key={time} value={time}>
-                  {time}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Popup to show performance details */}
       {selectedPerformance && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center justify-items-center md:justify-end md:pr-10 bg-black bg-opacity-50"
-          onClick={()=>setSelectedPerformance(null)}>
-          <div className="bg-white p-4 rounded-lg shadow-lg w-4/5 md:w-1/3 grid justify-center">
-            <div className="flex items-end ">
-              <h1 className="text-blue-500 font-bold">
-                <a href={`/location/${selectedPerformance.location_id}`} className="text-blue-500">
-                  {selectedPerformance.location_name}
-                </a>
-              </h1>
-            </div>
-            
-            <h1 className="text-xlg font-semibold text-gray-500">
-              <a href={`seek-buskers/${selectedPerformance.busker_id}`} className="text-black">
-                {buskers[selectedPerformance.busker_id]['name']}
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedPerformance(null)}>
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-xl font-bold mb-2">
+              <a href={`/location/${selectedPerformance.location_id}`} className="text-blue-600 hover:underline">
+                {selectedPerformance.location_name}
               </a>
-            </h1>
-            <h2 className="text-sm font-semibold text-gray-500">{buskers[selectedPerformance.busker_id]['act']}</h2>
-            <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${selectedPerformance?.busker_id}.jpg`} alt={buskers[selectedPerformance.busker_id]['name']} className="w-40 h-40 rounded-lg mt-2" />
-            <p className="text-sm text-gray-500">
-              {selectedPerformance.start_datetime.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </h2>
+            <h3 className="text-lg font-semibold mb-1">
+              <a href={`/seek-buskers/${selectedPerformance.busker_id}`} className="text-gray-800 hover:underline">
+                {buskers[selectedPerformance.busker_id]?.name}
+              </a>
+            </h3>
+            <p className="text-gray-600 mb-4">{buskers[selectedPerformance.busker_id]?.act}</p>
+            <img 
+              src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${selectedPerformance?.busker_id}.jpg`} 
+              alt={buskers[selectedPerformance.busker_id]?.name} 
+              className="w-full h-40 object-cover rounded-lg mb-4" 
+            />
+            <p className="text-gray-700 mb-2 text-sm">
+              {format(selectedPerformance.start_datetime, "EEEE, MMMM d, yyyy")}
               <br />
-              {selectedPerformance.start_datetime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {selectedPerformance.end_datetime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {format(selectedPerformance.start_datetime, "h:mm a")} - {format(selectedPerformance.end_datetime, "h:mm a")}
             </p>
-            <p className="text-sm text-gray-500">{selectedPerformance.description}</p>
-
+            <p className="text-gray-600 text-sm">{selectedPerformance.description}</p>
           </div>
         </div>
       )}
     </div>
-  );
-};
-
-export default PerformancesPage;
+  )
+}
