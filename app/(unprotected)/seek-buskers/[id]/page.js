@@ -1,14 +1,17 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../supabaseClient';
 import { mergeBackToBackPerformances } from '../../../utils';
+import { QRCodeSVG } from 'qrcode.react';
 
-const BuskerDetailPage = ({ params }) => {
+export default function BuskerDetailPage({ params }) {
   const [performances, setPerformances] = useState([]);
   const [busker, setBusker] = useState(null);
+  const [showQR, setShowQR] = useState(false);
 
-  // Get current epoch time to avoid image caching issues
   const currentEpochTime = Math.floor(new Date().getTime() / 1000);
+  const qrCodeUrl = `livemuseek.com/seek-buskers/${params.id}`;
 
   useEffect(() => {
     const fetchPerformances = async () => {
@@ -16,26 +19,27 @@ const BuskerDetailPage = ({ params }) => {
       if (error) {
         console.error('Error fetching performances:', error);
       } else {
-        // Fetch locations
         const { data: locationsData, error: locationsError } = await supabase.from('locations').select('*');
-        // Join locations to performances
-        data.forEach((performance) => {
-          performance.location_name = locationsData.find(location => location.location_id === performance.location_id)?.name;
-          performance.location_address = locationsData.find(location => location.location_id === performance.location_id)?.address;
-        });
-
-        // Remove duplicate timeslots and merge back-to-back performances at the same location
-        const mergedPerformances = mergeBackToBackPerformances(data);
-        setPerformances(mergedPerformances);
+        if (locationsError) {
+          console.error('Error fetching locations:', locationsError);
+        } else {
+          const performancesWithLocations = data.map((performance) => ({
+            ...performance,
+            location_name: locationsData.find(location => location.location_id === performance.location_id)?.name,
+            location_address: locationsData.find(location => location.location_id === performance.location_id)?.address,
+          }));
+          const mergedPerformances = mergeBackToBackPerformances(performancesWithLocations);
+          setPerformances(mergedPerformances);
+        }
       }
     };
 
     const fetchBusker = async () => {
-      const { data, error } = await supabase.from('buskers').select('*').eq('busker_id', params.id);
+      const { data, error } = await supabase.from('buskers').select('*').eq('busker_id', params.id).single();
       if (error) {
         console.error('Error fetching busker:', error);
       } else {
-        setBusker(data[0]);
+        setBusker(data);
       }
     };
 
@@ -43,18 +47,12 @@ const BuskerDetailPage = ({ params }) => {
     fetchBusker();
   }, [params.id]);
 
-  
-
-  // Get today's date and tomorrow's date
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
-  // Function to format the date label
   const formatDateLabel = (dateString) => {
     const date = new Date(dateString);
-
-    // Check if the date is today, tomorrow, or a different day of the week
     if (date.toDateString() === today.toDateString()) {
       return 'Today';
     } else if (date.toDateString() === tomorrow.toDateString()) {
@@ -64,7 +62,6 @@ const BuskerDetailPage = ({ params }) => {
     }
   };
 
-  // Group performances by date
   const groupedPerformances = performances
     .filter(performance => new Date(performance.start_datetime) > new Date())
     .reduce((acc, performance) => {
@@ -76,64 +73,79 @@ const BuskerDetailPage = ({ params }) => {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="card rounded-lg shadow-lg p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <div className="flex justify-center">
+      <div className="card bg-base-100 shadow-xl mb-6">
+        <div className="card-body">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="relative">
               <img
                 src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_custom_images/${busker?.busker_id}.jpg?${currentEpochTime}`}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = `https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${busker?.busker_id}.jpg?${currentEpochTime}`;
                 }}
-                className="h-fit aspect-square object-cover object-center rounded-full"
+                className="w-full aspect-square object-cover object-center rounded-full"
+                alt={busker?.name}
               />
+              <button
+                className="btn btn-primary btn-sm absolute bottom-0 right-0 m-2"
+                onClick={() => setShowQR(!showQR)}
+              >
+                {showQR ? 'Hide QR' : 'Show QR'}
+              </button>
+            </div>
+            <div className="self-center col-span-2">
+              <h1 className="text-2xl md:text-3xl font-bold mb-4">{busker?.name}</h1>
+              <p className="text-lg md:text-xl text-base-content mb-4">{busker?.act}</p>
+              <p className="text-lg md:text-xl text-base-content mb-4">{busker?.art_form}</p>
+              {showQR && (
+                <div className="mt-4">
+                  <QRCodeSVG value={qrCodeUrl} size={128} />
+                  <p className="mt-2 text-sm text-base-content/70">Scan to view profile</p>
+                </div>
+              )}
             </div>
           </div>
-          <div className="self-center">
-            <h1 className="text-2xl md:text-3xl font-bold mb-4">{busker?.name}</h1>
-            <p className="text-lg md:text-xl text-gray-700 mb-4">{busker?.act}</p>
-            <p className="text-lg md:text-xl text-gray-700 mb-4">{busker?.art_form}</p>
-          </div>
+          {busker?.custom_profile?.custom_bio || busker?.bio?.trim() ? (
+            <p className="text-base-content/80 mt-6">{busker?.custom_profile?.custom_bio ?? busker?.bio.trim()}</p>
+          ) : null}
         </div>
-        {busker?.custom_profile?.custom_bio || busker?.bio?.trim() ? (
-          <p className="text-gray-600 mt-2 mb-8">{busker?.custom_profile?.custom_bio ?? busker?.bio.trim()}</p>
-        ) : null}
       </div>
 
-      <div className="flex flex-col mb-6 md:space-x-6 space-y-6">
-        <div className="card rounded-lg shadow-lg p-6">
+      <div className="card bg-base-100 shadow-xl">
+        <div className="card-body">
           <h2 className="text-2xl font-semibold mb-4">Upcoming Events</h2>
           {Object.keys(groupedPerformances).length > 0 ? (
-            <div>
+            <div className="space-y-4">
               {Object.keys(groupedPerformances).sort().map(date => (
-                <details key={date} className="mb-4">
-                  <summary className="cursor-pointer text-xl mb-2">
+                <div key={date} className="collapse collapse-arrow bg-base-200">
+                  <input type="checkbox" /> 
+                  <div className="collapse-title text-xl font-medium">
                     {date} ({formatDateLabel(date)}) [{groupedPerformances[date].length}]
-                  </summary>
-                  <ul className="pl-4">
-                    {groupedPerformances[date]
-                      .sort((a, b) => new Date(a.start_datetime) - new Date(b.start_datetime))
-                      .map(performance => (
-                        <li key={performance.event_id} className="mb-4">
-                          <div className="p-4 bg-gray-100 rounded-lg shadow">
-                            <p className="text-gray-700">Time: {String(performance.start_datetime).substring(11, 16)} - {String(performance.end_datetime).substring(11, 16)}</p>
-                            <p className="text-gray-700">Location: <a href={`/location/${performance.location_id}`} className="text-blue-500 hover:underline">{performance.location_name}</a></p>
-                          </div>
-                        </li>
-                      ))}
-                  </ul>
-                </details>
+                  </div>
+                  <div className="collapse-content">
+                    <ul className="space-y-4">
+                      {groupedPerformances[date]
+                        .sort((a, b) => new Date(a.start_datetime) - new Date(b.start_datetime))
+                        .map(performance => (
+                          <li key={performance.event_id}>
+                            <div className="card bg-base-100 shadow-sm">
+                              <div className="card-body p-4">
+                                <p className="text-base-content">Time: {new Date(performance.start_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {new Date(performance.end_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                                <p className="text-base-content">Location: <a href={`/location/${performance.location_id}`} className="link link-primary">{performance.location_name}</a></p>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-600">No upcoming performances found for this busker.</p>
+            <p className="text-base-content/70">No upcoming performances found for this busker.</p>
           )}
         </div>
       </div>
     </div>
   );
 }
-
-BuskerDetailPage.displayName = 'BuskerDetailPage';
-export default BuskerDetailPage;

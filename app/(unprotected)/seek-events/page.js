@@ -140,7 +140,7 @@ export default function PerformancesPage() {
 
        
         {/* Filter Box */}
-        <div className="absolute m-4 bottom-16 w-5/6 md:w-1/3 md:right-4 bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="absolute m-4 top-8 w-5/6 md:w-1/3 md:right-4 bg-white rounded-lg shadow-md overflow-hidden">
           <div className="tabs tabs-boxed bg-gray-100">
             <a
               className={`tab flex-1 ${filterType === 'time' ? 'bg-gray-600 text-white' : 'text-gray-600'}`}
