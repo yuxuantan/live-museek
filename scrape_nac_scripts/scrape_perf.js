@@ -21,7 +21,6 @@ async function scrapeWebsite() {
     const options = location.find('option');
     const num_locations = options.length;
 
-    let location_list = [];
     // Array to collect all the scraped data
     let counter = 1
     let performances_list = [];

@@ -166,11 +166,15 @@ const PerformancesPage = () => {
           onClick={()=>setSelectedPerformance(null)}>
           <div className="bg-white p-4 rounded-lg shadow-lg w-4/5 md:w-1/3 grid justify-center">
             <div className="flex items-end ">
-              <h1 className="text-blue-500 font-bold">{selectedPerformance.location_name}</h1>
+              <h1 className="text-blue-500 font-bold">
+                <a href={`/location/${selectedPerformance.location_id}`} className="text-blue-500">
+                  {selectedPerformance.location_name}
+                </a>
+              </h1>
             </div>
             
             <h1 className="text-xlg font-semibold text-gray-500">
-              <a href={`seek-buskers/${selectedPerformance.busker_id}`} class="text-black">
+              <a href={`seek-buskers/${selectedPerformance.busker_id}`} className="text-black">
                 {buskers[selectedPerformance.busker_id]['name']}
               </a>
             </h1>

@@ -2,6 +2,7 @@ import cheerio from 'cheerio';
 import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
 import { Client } from '@googlemaps/google-maps-services-js';
+import puppeteer from 'puppeteer';
 
 const client = new Client({});
 
@@ -46,20 +47,26 @@ async function scrape_locations() {
     }
     const supabase_locations = locations_data.map(location => location.id);
     // compare with the location ids from the NAC website. if no difference, end the script
-    const location_ids = options.map((index, element) => $(element).val()).get().filter(id => id !== "00000000-0000-0000-0000-000000000000");
-    if (location_ids.every(id => supabase_locations.includes(id))) {
-        console.log("No new locations found. Exiting script");
-        return;
-    }
-    else{
-        console.log("New locations found. Rescraping all locations");
-    }
+    // const location_ids = options.map((index, element) => $(element).val()).get().filter(id => id !== "00000000-0000-0000-0000-000000000000");
+    // if (location_ids.every(id => supabase_locations.includes(id))) {
+    //     console.log("No new locations found. Exiting script");
+    //     return;
+    // }
+    // else{
+    //     console.log("New locations found. Rescraping all locations");
+    // }
+
+
 
 
     let location_list = [];
     let counter = 1;
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+
     for (const element of options.toArray()) {
-        console.log("Scraping location #" + (location_list.length + 1) + "/" + num_locations);
+        console.log("Scraping location #" + (counter) + "/" + num_locations);
         let location_name = $(element).text();
         let location_id = $(element).val();
         if (location_id === "00000000-0000-0000-0000-000000000000") {
@@ -67,9 +74,10 @@ async function scrape_locations() {
         }
         const location_url = `https://eservices.nac.gov.sg/Busking/locations/${location_id}/events`;
         // navigate to the location page using axios
-        const response = await axios.get(location_url);
+        // const response = await axios.get(location_url);
+        await page.goto(location_url, { timeout: 60000 });
         // get the html
-        const html = response.data;
+        const html = await page.content();
         // load the html into cheerio
         const $2 = cheerio.load(html);
         // get the div with id = "div-header", 
@@ -92,6 +100,20 @@ async function scrape_locations() {
             "lat": location_lat_long.lat,
             "lng": location_lat_long.lng,
         });
+
+        // save the image in supabase storage. url is https://eservices.nac.gov.sg/Busking/booking/GetAppImage?id=99a57be6-d511-4397-914b-919105d06070
+        const image_url = `https://eservices.nac.gov.sg/Busking/booking/GetAppImage?id=${location_id}`;
+        const response = await page.goto(image_url, { timeout: 60000 });
+        const image_data = await response.buffer();
+        const image_upload_response = await supabase.storage.from('location_images').upload(`${location_id}.jpg`, image_data, { contentType: 'image/jpg' });
+
+        if (image_upload_response.error != null) {
+            console.log("Error uploading image");
+            console.log(image_upload_response);
+        }
+        else {
+            console.log("Image uploaded successfully");
+        }
         counter += 1;
     }
 
@@ -117,6 +139,8 @@ async function scrape_locations() {
         console.log("Locations inserted successfully");
         console.log(data);
     }
+
+    await browser.close();
 
 }
 
