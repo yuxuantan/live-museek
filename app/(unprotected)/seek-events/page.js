@@ -92,8 +92,8 @@ export default function PerformancesPage() {
   }, [])
 
   const filterPerformances = (performance) => {
-    const start_datetime_date = new Date(performance.start_datetime)
-    // const end_datetime_date = new Date(performance.end_datetime)
+    const start_datetime_date = new Date(performance.start_datetime);
+    start_datetime_date.setHours(start_datetime_date.getHours() - 8);
     const isTimeMatch = selectedTime === 'All' || (
       (selectedTime === '6am-12noon' && start_datetime_date.getHours() >= 6 && start_datetime_date.getHours() < 12) ||
       (selectedTime === '12noon-6pm' && start_datetime_date.getHours() >= 12 && start_datetime_date.getHours() < 18) ||

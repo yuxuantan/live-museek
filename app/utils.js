@@ -20,11 +20,9 @@ const mergeBackToBackPerformances = (performances) => {
         // const prevEndTime = new Date(prev.end_datetime);
         // const currStartTime = new Date(performance.start_datetime);
 
-        console.log(prev.busker_id, performance.busker_id, prev.location_id, performance.location_id, prev.end_datetime, performance.start_datetime);
         // Check if the current performance starts immediately after the previous one and at the same location
         if (prev.busker_id === performance.busker_id && prev.location_id === performance.location_id && prev.end_datetime === performance.start_datetime) {
           // Merge performances by extending the end time
-          console.log("Merging performances", prev, performance);
           prev.end_datetime = performance.end_datetime;
         } else {
           // Push the previous performance to the merged list and start a new one
