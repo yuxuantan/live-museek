@@ -63,7 +63,6 @@ export default function BuskerDetailPage({ params }) {
   };
 
   const groupedPerformances = performances
-    .filter(performance => new Date(performance.start_datetime) > new Date())
     .reduce((acc, performance) => {
       const date = new Date(performance.start_datetime).toISOString().substring(0, 10);
       if (!acc[date]) acc[date] = [];

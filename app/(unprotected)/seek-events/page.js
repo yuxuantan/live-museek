@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { supabase } from '../../supabaseClient'
 import { Calendar, Clock, MapPin, Filter } from 'lucide-react'
 import { format } from "date-fns"
+import { mergeBackToBackPerformances } from '../../utils';
 
 const DynamicMap = dynamic(() => import('../../components/ui/Map'), {
   ssr: false,
@@ -20,7 +21,7 @@ export default function PerformancesPage() {
   const [performances, setPerformances] = useState([])
   const [buskers, setBuskers] = useState({})
   const [locations, setLocations] = useState([])
-  const [selectedPerformance, setSelectedPerformance] = useState(null)
+  const [selectedPerformanceLocation, setSelectedPerformanceLocation] = useState(null)
   const [selectedTime, setSelectedTime] = useState('All')
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [filterType, setFilterType] = useState('time')
@@ -72,15 +73,13 @@ export default function PerformancesPage() {
           console.error('Error fetching locations:', locationsError)
         } else {
           data.forEach((performance) => {
-            performance.start_datetime = new Date(performance.start_datetime)
-            performance.end_datetime = new Date(performance.end_datetime)
             performance.location_name = locationsData.find(location => location.location_id === performance.location_id)?.name
             performance.location_address = locationsData.find(location => location.location_id === performance.location_id)?.address
             performance.lat = locationsData.find(location => location.location_id === performance.location_id)?.lat
             performance.lng = locationsData.find(location => location.location_id === performance.location_id)?.lng
           })
           console.log('Performances:', data)
-          setPerformances(data)
+          setPerformances(mergeBackToBackPerformances(data))
           setLocations(locationsData)
         }
       }
@@ -93,13 +92,15 @@ export default function PerformancesPage() {
   }, [])
 
   const filterPerformances = (performance) => {
+    const start_datetime_date = new Date(performance.start_datetime)
+    // const end_datetime_date = new Date(performance.end_datetime)
     const isTimeMatch = selectedTime === 'All' || (
-      (selectedTime === '6am-12noon' && performance.start_datetime?.getHours() >= 6 && performance.start_datetime?.getHours() < 12) ||
-      (selectedTime === '12noon-6pm' && performance.start_datetime?.getHours() >= 12 && performance.start_datetime?.getHours() < 18) ||
-      (selectedTime === '6pm-9pm' && performance.start_datetime?.getHours() >= 18 && performance.start_datetime?.getHours() < 21) ||
-      (selectedTime === '9pm-12midnight' && performance.start_datetime?.getHours() >= 21)
+      (selectedTime === '6am-12noon' && start_datetime_date.getHours() >= 6 && start_datetime_date.getHours() < 12) ||
+      (selectedTime === '12noon-6pm' && start_datetime_date.getHours() >= 12 && start_datetime_date.getHours() < 18) ||
+      (selectedTime === '6pm-9pm' && start_datetime_date.getHours() >= 18 && start_datetime_date.getHours() < 21) ||
+      (selectedTime === '9pm-12midnight' && start_datetime_date.getHours() >= 21)
     )
-    const isDateMatch = selectedDate === '' || (performance.start_datetime instanceof Date && performance.start_datetime.toDateString() === selectedDate.toDateString())
+    const isDateMatch = selectedDate === '' || (start_datetime_date instanceof Date && start_datetime_date.toDateString() === selectedDate.toDateString())
 
     return isTimeMatch && isDateMatch
   }
@@ -126,8 +127,8 @@ export default function PerformancesPage() {
             center={center}
             markers={filteredPerformances}
             containerStyle={containerStyle}
-            onMarkerClick={setSelectedPerformance}
-          />  
+            onMarkerClick={setSelectedPerformanceLocation}
+          />
         )}
         {filterType === 'location' && (
           <DynamicMap
@@ -138,7 +139,7 @@ export default function PerformancesPage() {
           />
         )}
 
-       
+
         {/* Filter Box */}
         <div className="absolute m-4 top-8 w-5/6 md:w-1/3 md:right-4 bg-white rounded-lg shadow-md overflow-hidden">
           <div className="tabs tabs-boxed bg-gray-100">
@@ -213,31 +214,38 @@ export default function PerformancesPage() {
       </div>
 
       {/* Popup to show performance details */}
-      {filterType === 'time' && selectedPerformance && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedPerformance(null)}>
+      {filterType === 'time' && selectedPerformanceLocation && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedPerformanceLocation(null)}>
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-2">
-              <a href={`/location/${selectedPerformance.location_id}`} className="text-blue-600 hover:underline">
-                {selectedPerformance.location_name}
+              <a href={`/location/${selectedPerformanceLocation.location_id}`} className="text-blue-600 hover:underline">
+                {selectedPerformanceLocation.location_name}
               </a>
             </h2>
-            <h3 className="text-lg font-semibold mb-1">
-              <a href={`/seek-buskers/${selectedPerformance.busker_id}`} className="text-gray-800 hover:underline">
-                {buskers[selectedPerformance.busker_id]?.name}
-              </a>
-            </h3>
-            <p className="text-gray-600 mb-4">{buskers[selectedPerformance.busker_id]?.act}</p>
+
             <img
-              src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${selectedPerformance?.busker_id}.jpg`}
-              alt={buskers[selectedPerformance.busker_id]?.name}
+              src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/location_images/${selectedPerformanceLocation?.location_id}.jpg`}
+              alt={selectedPerformanceLocation.location_id}
               className="w-5/6 object-cover object-center rounded-lg mb-4"
             />
+            /* get number of performances happening and who are performing at this time range */
             <p className="text-gray-700 mb-2 text-sm">
-              {selectedPerformance.start_datetime ? format(selectedPerformance.start_datetime, "EEEE, MMMM d, yyyy") : 'Invalid date'}
-              <br />
-              {selectedPerformance.start_datetime ? format(selectedPerformance.start_datetime, "h:mm a") : 'Invalid start time'} - {selectedPerformance.end_datetime ? format(selectedPerformance.end_datetime, "h:mm a") : 'Invalid end time'}
+              {filteredPerformances.filter(performance => performance.location_id === selectedPerformanceLocation.location_id).length} performances
             </p>
-            <p className="text-gray-600 text-sm">{selectedPerformance.description}</p>
+            <div className="grid grid-cols-2 gap-4">
+              {filteredPerformances
+                .filter(performance => performance.location_id === selectedPerformanceLocation.location_id)
+                .map(performance => (
+                  <div key={performance.performance_id} className="p-2 bg-gray-100 rounded-lg">
+                    <h3 className="text-lg font-bold text-black">
+                      <a href={`/seek-buskers/${performance.busker_id}`} className="text-blue-600 hover:underline">
+                        {buskers[performance.busker_id]?.name}
+                      </a>
+                    </h3>
+                    <p className="text-sm text-gray-700">{String(performance.start_datetime).substring(11, 16)} - {String(performance.end_datetime).substring(11, 16)}</p>
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
       )}
