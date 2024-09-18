@@ -51,7 +51,7 @@ const SignUp = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white"
             />
           </div>
           <div>
@@ -65,7 +65,7 @@ const SignUp = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border rounded shadow-sm"
+              className="w-full px-3 py-2 border rounded shadow-sm bg-white"
             />
           </div>
           <div>
@@ -79,7 +79,7 @@ const SignUp = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border rounded shadow-sm"
+              className="w-full px-3 py-2 border rounded shadow-sm bg-white"
             />
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}

@@ -169,7 +169,7 @@ export default function PerformancesPage() {
                     type="date"
                     value={format(selectedDate, "yyyy-MM-dd")}
                     onChange={handleDateChange}
-                    className="input input-bordered w-full text-sm  text-black"
+                    className="input input-bordered w-full text-sm  text-black bg-white"
                   />
                 </div>
                 <div className="form-control">
@@ -179,7 +179,7 @@ export default function PerformancesPage() {
                   <select
                     value={selectedTime}
                     onChange={handleTimeChange}
-                    className="select select-bordered w-full text-sm text-black"
+                    className="select select-bordered w-full text-sm text-black bg-white"
                   >
                     {times.map((time) => (
                       <option key={time} value={time}>
@@ -198,7 +198,7 @@ export default function PerformancesPage() {
                 <select
                   value={selectedLocation}
                   onChange={handleLocationChange}
-                  className="select select-bordered w-full text-sm text-black"
+                  className="select select-bordered w-full text-sm text-black bg-white"
                 >
                   <option value="All Locations">All Locations</option>
                   {locations.map((location) => (
