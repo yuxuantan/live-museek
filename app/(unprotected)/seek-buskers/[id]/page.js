@@ -116,7 +116,7 @@ export default function BuskerDetailPage({ params }) {
           {Object.keys(groupedPerformances).length > 0 ? (
             <div className="space-y-4">
               {Object.keys(groupedPerformances).sort().map(date => (
-                <div key={date} className="collapse collapse-arrow bg-base-200">
+                <div key={date} className="collapse collapse-arrow bg-gray-200">
                   <input type="checkbox" /> 
                   <div className="collapse-title text-xl font-medium">
                     {date} ({formatDateLabel(date)}) [{groupedPerformances[date].length}]
