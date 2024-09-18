@@ -228,7 +228,7 @@ export default function PerformancesPage() {
               alt={selectedPerformanceLocation.location_id}
               className="w-5/6 object-cover object-center rounded-lg mb-4"
             />
-            /* get number of performances happening and who are performing at this time range */
+            {/* get number of performances happening and who are performing at this time range */}
             <p className="text-gray-700 mb-2 text-sm">
               {filteredPerformances.filter(performance => performance.location_id === selectedPerformanceLocation.location_id).length} performances
             </p>
