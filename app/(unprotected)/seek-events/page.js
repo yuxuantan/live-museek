@@ -116,7 +116,7 @@ export default function PerformancesPage() {
   }
 
   const handleLocationChange = (e) => {
-    window.location.href = `/location/${e.target.value}`;
+    window.location.href = `/seek-locations/${e.target.value}`;
   }
 
   return (
@@ -218,7 +218,7 @@ export default function PerformancesPage() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedPerformanceLocation(null)}>
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-2">
-              <a href={`/location/${selectedPerformanceLocation.location_id}`} className="text-blue-600 hover:underline">
+              <a href={`/seek-locations/${selectedPerformanceLocation.location_id}`} className="text-blue-600 hover:underline">
                 {selectedPerformanceLocation.location_name}
               </a>
             </h2>
@@ -254,7 +254,7 @@ export default function PerformancesPage() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedLocation(null)}>
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-2">
-              <a href={`/location/${selectedLocation.location_id}`} className="text-blue-600 hover:underline">
+              <a href={`/seek-locations/${selectedLocation.location_id}`} className="text-blue-600 hover:underline">
                 {selectedLocation.name}
               </a>
             </h2>

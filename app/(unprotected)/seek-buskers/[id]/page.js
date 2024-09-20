@@ -130,7 +130,7 @@ export default function BuskerDetailPage({ params }) {
                             <div className="card bg-base-100 shadow-sm">
                               <div className="card-body p-4">
                               <p className="text-gray-700">Time: {String(performance.start_datetime).substring(11, 16)} - {String(performance.end_datetime).substring(11, 16)}</p>
-                                <p className="text-base-content">Location: <a href={`/location/${performance.location_id}`} className="link link-primary">{performance.location_name}</a></p>
+                                <p className="text-base-content">Location: <a href={`/seek-locations/${performance.location_id}`} className="link link-primary">{performance.location_name}</a></p>
                               </div>
                             </div>
                           </li>

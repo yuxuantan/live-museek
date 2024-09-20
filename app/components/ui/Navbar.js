@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faMusic, faUser } from '@fortawesome/free-solid-svg-icons';
-
+import { faSearch, faMusic, faUser, faMapPin } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
 
@@ -29,10 +28,14 @@ const Navbar = () => {
                     <FontAwesomeIcon icon={faMusic} size="lg" className="hover:text-red-500" />
                     <span className="text-xs">Seek Buskers</span>
                 </Link>
+                <Link href="/seek-locations" className={`flex flex-col items-center ${isActive('/seek-locations')}`}>
+                    <FontAwesomeIcon icon={faMapPin} size="lg" className="hover:text-red-500" />
+                    <span className="text-xs">Locations</span>
+                </Link>
                 {user ? (
                     <div className="relative">
                         {showDropdown && (
-                            <div className="absolute bottom-10 mt-2 bg-black rounded-md shadow-lg">
+                            <div className="absolute bottom-10 right-0 mt-2 bg-black rounded-md shadow-lg">
                                 <Link href="/profile" className={`block px-4 py-2 ${isActive('/profile')}`}>Profile</Link>
                                 <button onClick={logout} className="block px-4 py-2 color-black">Logout</button>
                             </div>
@@ -56,6 +59,7 @@ const Navbar = () => {
                 <div className="space-x-4 flex items-center text-xl">
                     <Link href="/seek-events" className={`text-white ${isActive('/seek-events')}`}>Seek Events</Link>
                     <Link href="/seek-buskers" className={`text-white ${isActive('/seek-buskers')}`}>Seek Buskers</Link>
+                    <Link href="/seek-locations" className={`text-white ${isActive('/seek-locations')}`}>Seek Locations</Link>
                     {/* placeholder login btn */}
                     {user ? (
                         // profile
@@ -64,7 +68,7 @@ const Navbar = () => {
                                 <FontAwesomeIcon icon={faUser} size="xl" className="px-4 hover:text-gray-500" />
                             </button>
                             {showDropdown && (
-                                <div className="absolute right-0 mt-2 bg-black rounded-md shadow-lg">
+                                <div className="absolute right-2 mt-2 bg-black rounded-md shadow-lg">
                                     <Link href="/profile" className={`block px-4 py-2 ${isActive('/profile')}`}>Profile</Link>
                                     <button onClick={logout} className="block px-4 py-2 hover:underline">Logout</button>
                                 </div>
