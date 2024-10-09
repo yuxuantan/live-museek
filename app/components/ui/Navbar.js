@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faMusic, faUser, faMapPin } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faMusic, faUser, faMapPin, faHome } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
 
@@ -20,6 +20,10 @@ const Navbar = () => {
         <nav className="bg-gray-800 fixed top-0 inset-x-0">
             {/* Mobile Bottom Navbar */}
             <div className="md:hidden inset-x-0 bottom-0 bg-gray-800 text-white flex justify-evenly py-2 fixed w-full">
+                <Link href="/" className={`flex flex-col items-center ${isActive('/')}`}>
+                    <FontAwesomeIcon icon={faHome} size="lg" className="hover:text-red-500" />
+                    <span className="text-xs">Home</span>
+                </Link>
                 <Link href="/seek-events" className={`flex flex-col items-center ${isActive('/seek-events')}`}>
                     <FontAwesomeIcon icon={faSearch} size="lg" className="hover:text-red-500" />
                     <span className="text-xs">Seek Events</span>
@@ -32,7 +36,7 @@ const Navbar = () => {
                     <FontAwesomeIcon icon={faMapPin} size="lg" className="hover:text-red-500" />
                     <span className="text-xs">Locations</span>
                 </Link>
-                {user ? (
+                {/* {user ? (
                     <div className="relative">
                         {showDropdown && (
                             <div className="absolute bottom-10 right-0 mt-2 bg-black rounded-md shadow-lg">
@@ -50,7 +54,7 @@ const Navbar = () => {
                         <FontAwesomeIcon icon={faUser} size="lg" className="" />
                         <span className="text-xs">Login</span>
                     </Link>
-                )}
+                )} */}
             </div>
 
             {/* Desktop Top Navbar */}
@@ -61,7 +65,7 @@ const Navbar = () => {
                     <Link href="/seek-buskers" className={`text-white ${isActive('/seek-buskers')}`}>Seek Buskers</Link>
                     <Link href="/seek-locations" className={`text-white ${isActive('/seek-locations')}`}>Seek Locations</Link>
                     {/* placeholder login btn */}
-                    {user ? (
+                    {/* {user ? (
                         // profile
                         <div className="">
                             <button className="hover:underline" onMouseEnter={() => setShowDropdown(!showDropdown)}>
@@ -76,7 +80,7 @@ const Navbar = () => {
                         </div>
                     ) : (
                         <Link href="/login" className={`text-white ${isActive('/login')}`}>Login</Link>
-                    )}
+                    )} */}
                 </div>
             </div>
         </nav>
