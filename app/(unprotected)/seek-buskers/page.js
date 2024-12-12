@@ -14,6 +14,8 @@ const BuskersPage = () => {
         console.error('Error fetching Buskers:', error);
       } else {
         console.log("fetchBuskers", data);
+        // sort buskers by name
+        data.sort((a, b) => a.name.localeCompare(b.name));
         setBuskers(data);
       }
     };
