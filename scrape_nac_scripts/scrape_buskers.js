@@ -81,7 +81,7 @@ async function scrapeWebsite() {
     await browser.close();
 
     // Insert all buskers in buskers_list into buskers table
-    const response2 = await supabase.from('buskers').upsert(busker_list, { onConflict: 'busker_id' });
+    const response2 = await supabase.from('buskers').upsert(busker_list, { onConflict: 'name' });
     if (response2.error != null) {
         console.log("Error inserting buskers");
         console.log(response2);
