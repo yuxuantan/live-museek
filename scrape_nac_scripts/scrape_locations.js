@@ -62,7 +62,10 @@ async function scrape_locations() {
     let location_list = [];
     let counter = 1;
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ 
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
 
     for (const element of options.toArray()) {

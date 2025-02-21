@@ -34,7 +34,10 @@ async function scrapeWebsite() {
     busker_ids = busker_ids.filter(busker_id => !buskers.includes(busker_id));
     
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ 
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
 
     for (const busker_id of busker_ids) {
