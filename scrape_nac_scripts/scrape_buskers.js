@@ -1,27 +1,36 @@
 // TODO: only scrape buskers in performances table that doesnt exist in the buskers table
-import { createClient } from '@supabase/supabase-js';
 import cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
+import { createScraperSupabaseClient } from './supabase_client.js';
 
 async function scrapeWebsite() {
     // connect to db
-    const supabase = createClient('https://qjdrzetcvhgyvjxhhutx.supabase.co', 'sb_publishable_4XCsHHwc10-L-sOoe_teyQ_WIu685az')
-    const { data, error } = await supabase.from('performances').select();
+    const supabase = createScraperSupabaseClient();
+    const { data, error } = await supabase.from('performances').select('busker_id');
     let busker_list = [];
 
     if (error) {
         console.log("Error fetching performances");
+        console.log(error);
+        return;
     } else {
         console.log("Fetching success");
     }
 
     // get count data
-    console.log("num performances: " + data.length);
+    const performances = data ?? [];
+    console.log("num performances: " + performances.length);
+    if (performances.length === 0) {
+        console.log("No performances found. Skipping busker scraping.");
+        return;
+    }
 
     // get unique busker_ids from the performances table
     let busker_ids = [];
-    data.forEach(performance => {
-        busker_ids.push(performance.busker_id);
+    performances.forEach((performance) => {
+        if (performance.busker_id) {
+            busker_ids.push(performance.busker_id);
+        }
     });
     busker_ids = [...new Set(busker_ids)];
 
@@ -29,9 +38,15 @@ async function scrapeWebsite() {
     const { data: buskers_data, error: buskers_error } = await supabase.from('buskers').select('busker_id');
     if (buskers_error) {
         console.log("Error fetching buskers");
+        console.log(buskers_error);
+        return;
     }
-    const buskers = buskers_data.map(busker => busker.busker_id);
+    const buskers = (buskers_data ?? []).map((busker) => busker.busker_id);
     busker_ids = busker_ids.filter(busker_id => !buskers.includes(busker_id));
+    if (busker_ids.length === 0) {
+        console.log("No new buskers found. Exiting script.");
+        return;
+    }
     
 
     const browser = await puppeteer.launch({ 
@@ -67,27 +82,48 @@ async function scrapeWebsite() {
         console.log(busker);
 
         // Download image using Puppeteer
-        const image_url_full = `https://eservices.nac.gov.sg${busker_image_url}`;
-        const response = await page.goto(image_url_full, { timeout: 60000 });
-        const image_data = await response.buffer();
+        if (busker_image_url) {
+            const image_url_full = `https://eservices.nac.gov.sg${busker_image_url}`;
+            const response = await page.goto(image_url_full, { timeout: 60000 });
+            const image_data = await response.buffer();
 
-        // Upload image to Supabase storage
-        const image_upload_response = await supabase.storage.from('busker_images').upload(`${busker_id}.jpg`, image_data, { contentType: 'image/jpg' });
+            // Upload image to Supabase storage
+            const image_upload_response = await supabase.storage
+                .from('busker_images')
+                .upload(`${busker_id}.jpg`, image_data, { contentType: 'image/jpg', upsert: true });
 
-        if (image_upload_response.error != null) {
-            console.log("Error uploading image");
-            console.log(image_upload_response);
+            if (image_upload_response.error != null) {
+                console.log("Error uploading image");
+                console.log(image_upload_response);
+            }
+        } else {
+            console.log(`No profile image found for busker ${busker_id}`);
         }
         busker_list.push(busker);
     }
 
     await browser.close();
+    if (busker_list.length === 0) {
+        console.log("No buskers scraped. Skipping database write.");
+        return;
+    }
 
     // Insert all buskers in buskers_list into buskers table
-    const response2 = await supabase.from('buskers').upsert(busker_list, { onConflict: 'name' });
-    if (response2.error != null) {
+    const upsertResponse = await supabase.from('buskers').upsert(busker_list, { onConflict: 'busker_id' });
+    if (upsertResponse.error?.code === '42P10') {
+        console.log("Missing unique constraint for upsert conflict target. Falling back to insert.");
+        const insertResponse = await supabase.from('buskers').insert(busker_list);
+        if (insertResponse.error != null) {
+            console.log("Error inserting buskers");
+            console.log(insertResponse);
+            return;
+        }
+        console.log("Buskers inserted successfully");
+        return;
+    }
+    if (upsertResponse.error != null) {
         console.log("Error inserting buskers");
-        console.log(response2);
+        console.log(upsertResponse);
     } else {
         console.log("Buskers upserted successfully");
     }

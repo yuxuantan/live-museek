@@ -1,11 +1,11 @@
 // get list of all locations from main page drop downlist, navigates to each location page, clicking more button until all events are loaded, then scrapes all events
-import { createClient } from '@supabase/supabase-js';
 import puppeteer from 'puppeteer';
 import cheerio from 'cheerio';
+import { createScraperSupabaseClient } from './supabase_client.js';
 
 async function scrapeWebsite() {
     // init supabase
-    const supabase = createClient('https://qjdrzetcvhgyvjxhhutx.supabase.co', 'sb_publishable_4XCsHHwc10-L-sOoe_teyQ_WIu685az')
+    const supabase = createScraperSupabaseClient();
 
 
     const browser = await puppeteer.launch({ 
@@ -78,20 +78,33 @@ async function scrapeWebsite() {
         const event_divs = events.find('.col-md-6.col-lg-2.col-cuttor');
 
         event_divs.each((index, element) => {
-            const busker_id_url = $(element).find('h3 a').attr('href');
+            const busker_id_url = locationPage(element).find('h3 a').attr('href');
+            if (!busker_id_url) {
+                return;
+            }
             const busker_id = busker_id_url.substring(busker_id_url.indexOf('/profile/') + '/profile/'.length);
-            const performance_times = $(element).find('.dash-bx-times');
+            const performance_times = locationPage(element).find('.dash-bx-times');
             // first one is date, second one is time. combine the 2 to get the full date and time of the event
-            const date = performance_times.children().first().text().trim() + ' ' + new Date().getFullYear();
-            const time = performance_times.children().eq(1).text().trim()
+            const dateText = performance_times.children().first().text().trim();
+            const timeText = performance_times.children().eq(1).text().trim();
+            if (!dateText || !timeText || !timeText.includes('-')) {
+                return;
+            }
+            const [startTime, endTime] = timeText.split('-');
+            const date = dateText + ' ' + new Date().getFullYear();
+            const startDateTime = new Date(date + ' ' + startTime);
+            const endDateTime = new Date(date + ' ' + endTime);
+            if (Number.isNaN(startDateTime.getTime()) || Number.isNaN(endDateTime.getTime())) {
+                return;
+            }
             // (busker_id, location_id, location_name, location_address, start_datetime, end_datetime, created_at)
             const performance = {
                 busker_id: busker_id,
                 location_id: location_id,
                 //date = 'Sat, 28 September'; time= '04:00:PM-06:00:PM'
                 // year = this year
-                start_datetime: new Date(date + ' ' + time.split('-')[0]), // UTC
-                end_datetime: new Date(date + ' ' + time.split('-')[1]), // UTC
+                start_datetime: startDateTime, // UTC
+                end_datetime: endDateTime, // UTC
             };
             console.log(performance);
             performances_list.push(performance);
@@ -103,6 +116,12 @@ async function scrapeWebsite() {
 
     // write all event objects in performances_list to the database 'events' table. (busker_id, location_id, location_name, location_address, start_datetime, end_datetime, created_at)
     // write to supabase
+    if (performances_list.length === 0) {
+        console.log('No performances scraped. Skipping database overwrite to avoid deleting existing rows.');
+        await browser.close();
+        process.exitCode = 1;
+        return;
+    }
     // clear the db table 'performances'
     console.log('Done scraping all locations. Clearing performances table');
     const response = await supabase.from('performances').delete().gt('event_id', 0) // delete all event_id > 0 means delete all
