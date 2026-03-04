@@ -12,6 +12,7 @@ export default function BuskerDetailPage({ params }) {
 
   const currentEpochTime = Math.floor(new Date().getTime() / 1000);
   const qrCodeUrl = `livemuseek.com/seek-buskers/${params.id}`;
+  const storagePublicBaseUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;
 
   useEffect(() => {
     const fetchPerformances = async () => {
@@ -77,10 +78,10 @@ export default function BuskerDetailPage({ params }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="relative">
               <img
-                src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_custom_images/${busker?.busker_id}.jpg?${currentEpochTime}`}
+                src={`${storagePublicBaseUrl}/busker_custom_images/${busker?.busker_id}.jpg?${currentEpochTime}`}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = `https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${busker?.busker_id}.jpg?${currentEpochTime}`;
+                  e.target.src = `${storagePublicBaseUrl}/busker_images/${busker?.busker_id}.jpg?${currentEpochTime}`;
                 }}
                 className="w-full aspect-square object-cover object-center rounded-full"
                 alt={busker?.name}

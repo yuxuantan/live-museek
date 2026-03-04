@@ -9,6 +9,7 @@ const BuskerDetailPage = ({ params }) => {
 
     // Get current epoch time to avoid image caching issues
     const currentEpochTime = Math.floor(new Date().getTime() / 1000);
+    const storagePublicBaseUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;
 
     useEffect(() => {
         const fetchPerformances = async () => {
@@ -79,7 +80,7 @@ const BuskerDetailPage = ({ params }) => {
                 <div className="grid grid-cols-1">
                     <h1 className="text-bold text-3xl">{location?.name}</h1>
                     <p className="text-gray-600">{location?.address}</p>
-                    <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/location_images/${location?.location_id}.jpg?${currentEpochTime}`} alt={location ? location.name : ''} className="rounded-lg shadow-lg md:w-1/2 my-4" />
+                    <img src={`${storagePublicBaseUrl}/location_images/${location?.location_id}.jpg?${currentEpochTime}`} alt={location ? location.name : ''} className="rounded-lg shadow-lg md:w-1/2 my-4" />
                     <p className="text-gray-600">{location?.description}</p>
                 </div>
             </div>

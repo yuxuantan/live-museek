@@ -23,6 +23,7 @@ const DashboardPage = () => {
 
   // get current epoch time to ensure caching doesn't make the image stale
   const currentEpochTime = Math.floor(new Date().getTime() / 1000);
+  const storagePublicBaseUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;
 
   useEffect(() => {
     console.log('busker profile reloaded')
@@ -32,7 +33,7 @@ const DashboardPage = () => {
       setContactInput(buskerProfile?.swap_configs?.contact_info ?? '');
       setBioInput(buskerProfile?.custom_profile?.custom_bio ?? buskerProfile?.bio ?? '');
       setImagePreview(buskerProfile?.busker_id 
-        ? `https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_custom_images/${buskerProfile.busker_id}.jpg?${currentEpochTime}`
+        ? `${storagePublicBaseUrl}/busker_custom_images/${buskerProfile.busker_id}.jpg?${currentEpochTime}`
         : null
       );
       
@@ -149,7 +150,7 @@ const DashboardPage = () => {
                       src={`${imagePreview}`}
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = `https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/busker_images/${buskerProfile?.busker_id}.jpg?${currentEpochTime}`;
+                        e.target.src = `${storagePublicBaseUrl}/busker_images/${buskerProfile?.busker_id}.jpg?${currentEpochTime}`;
                       }}
                       className="h-48 aspect-square object-cover object-center rounded-full"
                     />

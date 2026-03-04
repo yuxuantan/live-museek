@@ -29,6 +29,7 @@ export default function PerformancesPage() {
 
   const center = useMemo(() => (userLocation ? userLocation : { lat: 1.3521, lng: 103.8198 }), [userLocation])
   const times = ['All', '6am-12noon', '12noon-6pm', '6pm-9pm', '9pm-12midnight']
+  const storagePublicBaseUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;
 
   useEffect(() => {
     const getUserLocation = () => {
@@ -224,7 +225,7 @@ export default function PerformancesPage() {
             </h2>
 
             <img
-              src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/location_images/${selectedPerformanceLocation?.location_id}.jpg`}
+              src={`${storagePublicBaseUrl}/location_images/${selectedPerformanceLocation?.location_id}.jpg`}
               alt={selectedPerformanceLocation.location_id}
               className="w-5/6 object-cover object-center rounded-lg mb-4"
             />
@@ -258,7 +259,7 @@ export default function PerformancesPage() {
                 {selectedLocation.name}
               </a>
             </h2>
-            <img src={`https://mlbwzkspmgxhudfnsfeb.supabase.co/storage/v1/object/public/location_images/${selectedLocation.location_id}.jpg`} alt={selectedLocation.name} className="w-full object-cover object-center rounded-lg mb-4" />
+            <img src={`${storagePublicBaseUrl}/location_images/${selectedLocation.location_id}.jpg`} alt={selectedLocation.name} className="w-full object-cover object-center rounded-lg mb-4" />
             <p className="text-gray-700 mb-2 text-sm">
               {selectedLocation.address}
             </p>
