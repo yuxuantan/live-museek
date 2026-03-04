@@ -5,7 +5,7 @@ import puppeteer from 'puppeteer';
 
 async function scrapeWebsite() {
     // connect to db
-    const supabase = createClient('https://mlbwzkspmgxhudfnsfeb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1sYnd6a3NwbWd4aHVkZm5zZmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY1NzA5NDIsImV4cCI6MjAzMjE0Njk0Mn0.j-2nIAYjiFGMPfaaVAm18SfZxUbY4g57kjbo_RjaBYg')
+    const supabase = createClient('https://qjdrzetcvhgyvjxhhutx.supabase.co', 'sb_publishable_4XCsHHwc10-L-sOoe_teyQ_WIu685az')
     const { data, error } = await supabase.from('performances').select();
     let busker_list = [];
 

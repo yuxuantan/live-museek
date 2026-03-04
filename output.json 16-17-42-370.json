@@ -1,0 +1,2732 @@
+[
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Fri, 06 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "Lovely Caricature",
+    "performer_id": "912a0b72-fb94-4941-8c40-b5b76d5a7b06",
+    "date": "Fri, 06 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Sat, 07 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "JONATHAN TAN KO LENG",
+    "performer_id": "f29096f9-e51a-4fa9-8270-777fa763a8d6",
+    "date": "Sat, 07 September",
+    "time": "07:00:PM-10:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Sun, 08 September",
+    "time": "03:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "Isaac & Chalmers",
+    "performer_id": "e2353d22-e0f7-4954-ae6d-ea6087894f1a",
+    "date": "Sun, 08 September",
+    "time": "06:00:PM-10:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Fri, 13 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "Lovely Caricature",
+    "performer_id": "912a0b72-fb94-4941-8c40-b5b76d5a7b06",
+    "date": "Fri, 13 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Sat, 14 September",
+    "time": "03:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "Lovely Caricature",
+    "performer_id": "912a0b72-fb94-4941-8c40-b5b76d5a7b06",
+    "date": "Sat, 14 September",
+    "time": "06:00:PM-08:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "CHEW CHONG PONG",
+    "performer_id": "35f499ea-b43e-45ec-9e6d-029713b4509d",
+    "date": "Sat, 14 September",
+    "time": "08:00:PM-10:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Sun, 15 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Fri, 20 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Sat, 21 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "飞禽走兽",
+    "performer_id": "f7cde883-6352-4578-9037-258fa271dbf8",
+    "date": "Sat, 21 September",
+    "time": "07:00:PM-10:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Sun, 22 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Fri, 27 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Sat, 28 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "313@SOMERSET",
+    "performer_name": "KOH BERNARD",
+    "performer_id": "2c6b9107-39fc-491c-882a-04746d9d69f1",
+    "date": "Sun, 29 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CLIFF LEE JUN WEI",
+    "performer_id": "dceb2503-b16d-4c99-ae8c-3d064d91ccb9",
+    "date": "Wed, 04 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Wed, 04 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Wed, 04 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Wed, 04 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Wed, 04 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Wed, 04 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Wed, 04 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Wed, 04 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Wed, 04 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Wed, 04 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 05 September",
+    "time": "10:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Thu, 05 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Thu, 05 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Thu, 05 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Thu, 05 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Thu, 05 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WEE TOON HEE",
+    "performer_id": "5e5dd5f1-c960-4add-b916-e8f89e249f65",
+    "date": "Thu, 05 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 05 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 05 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CHUA JEK MUI MARY",
+    "performer_id": "a05a97e6-dfcb-46b4-9201-c2fef398d9f3",
+    "date": "Thu, 05 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 05 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Fri, 06 September",
+    "time": "10:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Fri, 06 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LEE KOK YUEN",
+    "performer_id": "c32d0459-b3e7-4c69-b2d8-d6eda2b57369",
+    "date": "Fri, 06 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 05 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Fri, 06 September",
+    "time": "10:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Fri, 06 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LEE KOK YUEN",
+    "performer_id": "c32d0459-b3e7-4c69-b2d8-d6eda2b57369",
+    "date": "Fri, 06 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LEE KOK YUEN",
+    "performer_id": "c32d0459-b3e7-4c69-b2d8-d6eda2b57369",
+    "date": "Fri, 06 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 06 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 06 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 06 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 06 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "珍珠宝宝",
+    "performer_id": "895c27fe-d03d-46ca-a63e-847bb9b0cd84",
+    "date": "Fri, 06 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TAN LE BING (MAGGIE)",
+    "performer_id": "e80bd4c4-329e-48e3-bb99-9443a5877918",
+    "date": "Fri, 06 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TAN LE BING (MAGGIE)",
+    "performer_id": "e80bd4c4-329e-48e3-bb99-9443a5877918",
+    "date": "Fri, 06 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 06 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "珍珠宝宝",
+    "performer_id": "895c27fe-d03d-46ca-a63e-847bb9b0cd84",
+    "date": "Fri, 06 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TAN LE BING (MAGGIE)",
+    "performer_id": "e80bd4c4-329e-48e3-bb99-9443a5877918",
+    "date": "Fri, 06 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TAN LE BING (MAGGIE)",
+    "performer_id": "e80bd4c4-329e-48e3-bb99-9443a5877918",
+    "date": "Fri, 06 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LIM TECK YI",
+    "performer_id": "81e4db7c-66eb-457a-a107-fec11fe7604c",
+    "date": "Sat, 07 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LIM TECK YI",
+    "performer_id": "81e4db7c-66eb-457a-a107-fec11fe7604c",
+    "date": "Sat, 07 September",
+    "time": "11:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 07 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 07 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 07 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 07 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "GOH SWEE CHEW",
+    "performer_id": "28c9f397-20ee-4887-878e-21d33238f386",
+    "date": "Sat, 07 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CHIA GEOK BOEY IOLEEN",
+    "performer_id": "07cccbe7-3f70-49ae-bdf4-1f8fb980bb4c",
+    "date": "Sat, 07 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 07 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 07 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "GOH SWEE CHEW",
+    "performer_id": "28c9f397-20ee-4887-878e-21d33238f386",
+    "date": "Sat, 07 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CHIA GEOK BOEY IOLEEN",
+    "performer_id": "07cccbe7-3f70-49ae-bdf4-1f8fb980bb4c",
+    "date": "Sat, 07 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "YEO CHIN WEE",
+    "performer_id": "8033dc1c-1b34-4286-875a-a62a219920b1",
+    "date": "Sat, 07 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "YEO CHIN WEE",
+    "performer_id": "8033dc1c-1b34-4286-875a-a62a219920b1",
+    "date": "Sat, 07 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "YEO CHIN WEE",
+    "performer_id": "8033dc1c-1b34-4286-875a-a62a219920b1",
+    "date": "Sat, 07 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "YEO CHIN WEE",
+    "performer_id": "8033dc1c-1b34-4286-875a-a62a219920b1",
+    "date": "Sat, 07 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Sun, 08 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LEE KOK YUEN",
+    "performer_id": "c32d0459-b3e7-4c69-b2d8-d6eda2b57369",
+    "date": "Sun, 08 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LEE KOK YUEN",
+    "performer_id": "c32d0459-b3e7-4c69-b2d8-d6eda2b57369",
+    "date": "Sun, 08 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "MASSUDI BIN MOHAMAD YATIM",
+    "performer_id": "e2990237-d5ff-489b-911e-cfe8c59a8c05",
+    "date": "Sun, 08 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Sun, 08 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LEE KOK YUEN",
+    "performer_id": "c32d0459-b3e7-4c69-b2d8-d6eda2b57369",
+    "date": "Sun, 08 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LEE KOK YUEN",
+    "performer_id": "c32d0459-b3e7-4c69-b2d8-d6eda2b57369",
+    "date": "Sun, 08 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "MASSUDI BIN MOHAMAD YATIM",
+    "performer_id": "e2990237-d5ff-489b-911e-cfe8c59a8c05",
+    "date": "Sun, 08 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Sun, 08 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Sun, 08 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "MASSUDI BIN MOHAMAD YATIM",
+    "performer_id": "e2990237-d5ff-489b-911e-cfe8c59a8c05",
+    "date": "Sun, 08 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Atticpunch",
+    "performer_id": "ea8a1924-7c9c-44f3-9c1c-665e363ebfe6",
+    "date": "Sun, 08 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "MASSUDI BIN MOHAMAD YATIM",
+    "performer_id": "e2990237-d5ff-489b-911e-cfe8c59a8c05",
+    "date": "Sun, 08 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CLIFF LEE JUN WEI",
+    "performer_id": "dceb2503-b16d-4c99-ae8c-3d064d91ccb9",
+    "date": "Mon, 09 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CLIFF LEE JUN WEI",
+    "performer_id": "dceb2503-b16d-4c99-ae8c-3d064d91ccb9",
+    "date": "Mon, 09 September",
+    "time": "11:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TOMO TIMOTHY GOH ENG KIONG",
+    "performer_id": "66aed9af-2d66-429f-b4fb-9a2f7f891871",
+    "date": "Mon, 09 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "MASSUDI BIN MOHAMAD YATIM",
+    "performer_id": "e2990237-d5ff-489b-911e-cfe8c59a8c05",
+    "date": "Sun, 08 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CLIFF LEE JUN WEI",
+    "performer_id": "dceb2503-b16d-4c99-ae8c-3d064d91ccb9",
+    "date": "Mon, 09 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CLIFF LEE JUN WEI",
+    "performer_id": "dceb2503-b16d-4c99-ae8c-3d064d91ccb9",
+    "date": "Mon, 09 September",
+    "time": "11:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TOMO TIMOTHY GOH ENG KIONG",
+    "performer_id": "66aed9af-2d66-429f-b4fb-9a2f7f891871",
+    "date": "Mon, 09 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Mon, 09 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Mon, 09 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Mon, 09 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Mon, 09 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Mon, 09 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Mon, 09 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "GOH YU FAN EVAN",
+    "performer_id": "6035ea7a-d3a5-4ed9-b5bc-87e1f3ba4a09",
+    "date": "Mon, 09 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Mon, 09 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Mon, 09 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Mon, 09 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "GOH YU FAN EVAN",
+    "performer_id": "6035ea7a-d3a5-4ed9-b5bc-87e1f3ba4a09",
+    "date": "Mon, 09 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Mon, 09 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "GOH YU FAN EVAN",
+    "performer_id": "6035ea7a-d3a5-4ed9-b5bc-87e1f3ba4a09",
+    "date": "Mon, 09 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Tue, 10 September",
+    "time": "10:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TOMO TIMOTHY GOH ENG KIONG",
+    "performer_id": "66aed9af-2d66-429f-b4fb-9a2f7f891871",
+    "date": "Tue, 10 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Tue, 10 September",
+    "time": "01:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Silver Hype 銀色组合",
+    "performer_id": "c882461c-0baf-4580-a33d-e950e2d0d16c",
+    "date": "Tue, 10 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "MASSUDI BIN MOHAMAD YATIM",
+    "performer_id": "e2990237-d5ff-489b-911e-cfe8c59a8c05",
+    "date": "Tue, 10 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Leo & Rey",
+    "performer_id": "b4d0a951-92fe-4310-a2ef-8e0bd98d1968",
+    "date": "Tue, 10 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Leo & Rey",
+    "performer_id": "b4d0a951-92fe-4310-a2ef-8e0bd98d1968",
+    "date": "Tue, 10 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Silver Hype 銀色组合",
+    "performer_id": "c882461c-0baf-4580-a33d-e950e2d0d16c",
+    "date": "Tue, 10 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "MASSUDI BIN MOHAMAD YATIM",
+    "performer_id": "e2990237-d5ff-489b-911e-cfe8c59a8c05",
+    "date": "Tue, 10 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Leo & Rey",
+    "performer_id": "b4d0a951-92fe-4310-a2ef-8e0bd98d1968",
+    "date": "Tue, 10 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Leo & Rey",
+    "performer_id": "b4d0a951-92fe-4310-a2ef-8e0bd98d1968",
+    "date": "Tue, 10 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TEO KHIAM HUAT 小张",
+    "performer_id": "47a95e09-bf33-4a52-8d6e-376da189a457",
+    "date": "Tue, 10 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "MASSUDI BIN MOHAMAD YATIM",
+    "performer_id": "e2990237-d5ff-489b-911e-cfe8c59a8c05",
+    "date": "Tue, 10 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CLIFF LEE JUN WEI",
+    "performer_id": "dceb2503-b16d-4c99-ae8c-3d064d91ccb9",
+    "date": "Wed, 11 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CLIFF LEE JUN WEI",
+    "performer_id": "dceb2503-b16d-4c99-ae8c-3d064d91ccb9",
+    "date": "Wed, 11 September",
+    "time": "11:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CLIFF LEE JUN WEI",
+    "performer_id": "dceb2503-b16d-4c99-ae8c-3d064d91ccb9",
+    "date": "Wed, 11 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Wed, 11 September",
+    "time": "01:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WEE TOON HEE",
+    "performer_id": "5e5dd5f1-c960-4add-b916-e8f89e249f65",
+    "date": "Wed, 11 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Wed, 11 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "CLIFF LEE JUN WEI",
+    "performer_id": "dceb2503-b16d-4c99-ae8c-3d064d91ccb9",
+    "date": "Wed, 11 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Wed, 11 September",
+    "time": "01:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WEE TOON HEE",
+    "performer_id": "5e5dd5f1-c960-4add-b916-e8f89e249f65",
+    "date": "Wed, 11 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Wed, 11 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TEO KHIAM HUAT 小张",
+    "performer_id": "47a95e09-bf33-4a52-8d6e-376da189a457",
+    "date": "Wed, 11 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TEO KHIAM HUAT 小张",
+    "performer_id": "47a95e09-bf33-4a52-8d6e-376da189a457",
+    "date": "Wed, 11 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TEO KHIAM HUAT 小张",
+    "performer_id": "47a95e09-bf33-4a52-8d6e-376da189a457",
+    "date": "Wed, 11 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TEO KHIAM HUAT 小张",
+    "performer_id": "47a95e09-bf33-4a52-8d6e-376da189a457",
+    "date": "Wed, 11 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Thu, 12 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "11:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Thu, 12 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "11:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Thu, 12 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WEE TOON HEE",
+    "performer_id": "5e5dd5f1-c960-4add-b916-e8f89e249f65",
+    "date": "Thu, 12 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "GBJJ (Ge bi jiejie) Sisters Next Door",
+    "performer_id": "259a7fe3-8b5d-4977-9521-e48078e5f279",
+    "date": "Thu, 12 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Thu, 12 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Fri, 13 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "GBJJ (Ge bi jiejie) Sisters Next Door",
+    "performer_id": "259a7fe3-8b5d-4977-9521-e48078e5f279",
+    "date": "Thu, 12 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Thu, 12 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "ONG CHEE YONG",
+    "performer_id": "b9cc947b-94cf-432b-b347-f601dd2bed7b",
+    "date": "Thu, 12 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Fri, 13 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 13 September",
+    "time": "11:00:AM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 13 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LEE KOK YUEN",
+    "performer_id": "c32d0459-b3e7-4c69-b2d8-d6eda2b57369",
+    "date": "Fri, 13 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 13 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 13 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 13 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Fri, 13 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "珍珠宝宝",
+    "performer_id": "895c27fe-d03d-46ca-a63e-847bb9b0cd84",
+    "date": "Fri, 13 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 13 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 13 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Fri, 13 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "珍珠宝宝",
+    "performer_id": "895c27fe-d03d-46ca-a63e-847bb9b0cd84",
+    "date": "Fri, 13 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "珍珠宝宝",
+    "performer_id": "895c27fe-d03d-46ca-a63e-847bb9b0cd84",
+    "date": "Fri, 13 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LIM TECK YI",
+    "performer_id": "81e4db7c-66eb-457a-a107-fec11fe7604c",
+    "date": "Sat, 14 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LIM TECK YI",
+    "performer_id": "81e4db7c-66eb-457a-a107-fec11fe7604c",
+    "date": "Sat, 14 September",
+    "time": "11:00:AM-12:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "LIM TECK YI",
+    "performer_id": "81e4db7c-66eb-457a-a107-fec11fe7604c",
+    "date": "Sat, 14 September",
+    "time": "12:00:PM-01:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 14 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 14 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 14 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 14 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 14 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 14 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 14 September",
+    "time": "03:00:PM-04:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "HWLV",
+    "performer_id": "1fe1b4b6-7c22-4522-acb5-f1a8c379d908",
+    "date": "Sat, 14 September",
+    "time": "04:00:PM-05:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "TAY YONG EN JEREMY",
+    "performer_id": "335d904e-0b6d-4b03-b2af-10a32543553f",
+    "date": "Sat, 14 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Stay Tuned (别走调)",
+    "performer_id": "f7d2bc8a-21db-496f-a147-4ff391f2d2a0",
+    "date": "Sat, 14 September",
+    "time": "06:00:PM-07:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "SK Music",
+    "performer_id": "b8964349-7ea9-4589-a205-d10a55d4711c",
+    "date": "Sat, 14 September",
+    "time": "07:00:PM-08:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "SK Music",
+    "performer_id": "b8964349-7ea9-4589-a205-d10a55d4711c",
+    "date": "Sat, 14 September",
+    "time": "08:00:PM-09:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Gold Melody",
+    "performer_id": "fd046278-b583-4425-802d-0465c0faa162",
+    "date": "Sat, 14 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "AMK HUB",
+    "performer_name": "Gold Melody",
+    "performer_id": "fd046278-b583-4425-802d-0465c0faa162",
+    "date": "Sat, 14 September",
+    "time": "09:00:PM-10:00:PM"
+  },
+  {
+    "location": "BEDOK NORTH ST 3 - BLK 539",
+    "performer_name": "WILDMAN",
+    "performer_id": "005043b8-8a75-42d6-8ebf-1531d6b6f077",
+    "date": "Sat, 14 September",
+    "time": "10:00:AM-12:00:PM"
+  },
+  {
+    "location": "BEDOK NORTH ST 3 - BLK 539",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Thu, 26 September",
+    "time": "10:00:AM-12:00:PM"
+  },
+  {
+    "location": "BEDOK NORTH ST 3 - BLK 539",
+    "performer_name": "TEO KHIAM HUAT 小张",
+    "performer_id": "47a95e09-bf33-4a52-8d6e-376da189a457",
+    "date": "Sat, 28 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "BEDOK NORTH ST 3 - BLK 539",
+    "performer_name": "Silver Hype 銀色组合",
+    "performer_id": "c882461c-0baf-4580-a33d-e950e2d0d16c",
+    "date": "Sun, 29 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "BISHAN-ANG MO KIO PARK B",
+    "performer_name": "TAY YONG LIAT BARRY",
+    "performer_id": "46394615-8083-4868-bad4-009be8ec5a54",
+    "date": "Sat, 07 September",
+    "time": "07:00:PM-10:00:PM"
+  },
+  {
+    "location": "BISHAN-ANG MO KIO PARK B",
+    "performer_name": "NG WEILUN KENNETH",
+    "performer_id": "81e1771f-4e94-447c-94cf-7a24be1e80eb",
+    "date": "Sat, 21 September",
+    "time": "06:00:PM-08:00:PM"
+  },
+  {
+    "location": "BISHAN-ANG MO KIO PARK B",
+    "performer_name": "1983",
+    "performer_id": "b6c69bb4-87d1-466d-8131-6b0d9492aed4",
+    "date": "Tue, 24 September",
+    "time": "08:00:PM-10:00:PM"
+  },
+  {
+    "location": "BRAS BASAH COMPLEX",
+    "performer_name": "LIM KOK HWA PHILIP",
+    "performer_id": "c7caddf9-e5be-402e-a998-08e71da9fdd6",
+    "date": "Fri, 06 September",
+    "time": "11:00:AM-01:00:PM"
+  },
+  {
+    "location": "BRAS BASAH COMPLEX",
+    "performer_name": "LIM KOK HWA PHILIP",
+    "performer_id": "c7caddf9-e5be-402e-a998-08e71da9fdd6",
+    "date": "Fri, 06 September",
+    "time": "01:00:PM-02:00:PM"
+  },
+  {
+    "location": "BRAS BASAH COMPLEX",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Tue, 10 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "BRAS BASAH COMPLEX",
+    "performer_name": "WINSTON WEE",
+    "performer_id": "3684a3f4-8a0c-4e48-a1c4-a1ec6d27789a",
+    "date": "Fri, 20 September",
+    "time": "12:00:PM-02:00:PM"
+  },
+  {
+    "location": "BRAS BASAH COMPLEX",
+    "performer_name": "LIM KOK HWA PHILIP",
+    "performer_id": "c7caddf9-e5be-402e-a998-08e71da9fdd6",
+    "date": "Mon, 23 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Fri, 06 September",
+    "time": "11:00:AM-01:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "TAY YONG EN JEREMY",
+    "performer_id": "335d904e-0b6d-4b03-b2af-10a32543553f",
+    "date": "Fri, 06 September",
+    "time": "04:00:PM-07:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "LEE TECK CHIA",
+    "performer_id": "8c5f8fc9-6c06-4e5f-bead-9f6aaaa0ebba",
+    "date": "Fri, 06 September",
+    "time": "07:00:PM-09:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Sat, 07 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "LYE MEOW LENG",
+    "performer_id": "535b6c05-e74e-4307-8dd2-cfc93c5a0f09",
+    "date": "Sat, 07 September",
+    "time": "01:00:PM-03:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "CHOI HENG TAT",
+    "performer_id": "c53b3136-9e6f-4797-93e8-12b150ae0d13",
+    "date": "Sat, 07 September",
+    "time": "03:00:PM-09:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "SIA CHEE ENG",
+    "performer_id": "21e1d447-79cf-4475-bafb-3a0744b72d0f",
+    "date": "Sun, 08 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "LEE TECK CHIA",
+    "performer_id": "8c5f8fc9-6c06-4e5f-bead-9f6aaaa0ebba",
+    "date": "Sun, 08 September",
+    "time": "04:00:PM-07:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Fri, 13 September",
+    "time": "11:00:AM-01:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Fri, 13 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Fri, 13 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "HAPPY GROUP",
+    "performer_id": "f0f58d2d-6dfa-41d9-8f48-55b5294d645a",
+    "date": "Sat, 14 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "CHOI HENG TAT",
+    "performer_id": "c53b3136-9e6f-4797-93e8-12b150ae0d13",
+    "date": "Sat, 14 September",
+    "time": "03:00:PM-09:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "TANG YUEN WAI",
+    "performer_id": "50337eb1-48ad-46a1-9cb9-d7325ad85529",
+    "date": "Sun, 15 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "GOH YU FAN EVAN",
+    "performer_id": "6035ea7a-d3a5-4ed9-b5bc-87e1f3ba4a09",
+    "date": "Sun, 15 September",
+    "time": "06:00:PM-10:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "HAPPY GROUP",
+    "performer_id": "f0f58d2d-6dfa-41d9-8f48-55b5294d645a",
+    "date": "Fri, 20 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Fri, 20 September",
+    "time": "05:00:PM-09:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "Harmony",
+    "performer_id": "141f5411-3c88-4d73-8223-95a26bd56c17",
+    "date": "Sat, 21 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "SIA CHEE ENG",
+    "performer_id": "21e1d447-79cf-4475-bafb-3a0744b72d0f",
+    "date": "Sun, 22 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "LEE TECK CHIA",
+    "performer_id": "8c5f8fc9-6c06-4e5f-bead-9f6aaaa0ebba",
+    "date": "Sun, 22 September",
+    "time": "04:00:PM-07:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Fri, 27 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "CHUA JEK MUI MARY",
+    "performer_id": "a05a97e6-dfcb-46b4-9201-c2fef398d9f3",
+    "date": "Sat, 28 September",
+    "time": "10:00:AM-03:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "YEOW CHAN HOE",
+    "performer_id": "a7a19fa6-5827-4478-bfde-6dd552f32179",
+    "date": "Sat, 28 September",
+    "time": "05:00:PM-07:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "CHOI HENG TAT",
+    "performer_id": "c53b3136-9e6f-4797-93e8-12b150ae0d13",
+    "date": "Sun, 29 September",
+    "time": "10:00:AM-04:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Fri, 27 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "CHUA JEK MUI MARY",
+    "performer_id": "a05a97e6-dfcb-46b4-9201-c2fef398d9f3",
+    "date": "Sat, 28 September",
+    "time": "10:00:AM-03:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "YEOW CHAN HOE",
+    "performer_id": "a7a19fa6-5827-4478-bfde-6dd552f32179",
+    "date": "Sat, 28 September",
+    "time": "05:00:PM-07:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "CHOI HENG TAT",
+    "performer_id": "c53b3136-9e6f-4797-93e8-12b150ae0d13",
+    "date": "Sun, 29 September",
+    "time": "10:00:AM-04:00:PM"
+  },
+  {
+    "location": "BUANGKOK HAWKER CENTRE",
+    "performer_name": "LEE TECK CHIA",
+    "performer_id": "8c5f8fc9-6c06-4e5f-bead-9f6aaaa0ebba",
+    "date": "Sun, 29 September",
+    "time": "04:00:PM-07:00:PM"
+  },
+  {
+    "location": "BUGIS+ OPEN PLAZA 2 (YGF SIDE)",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 05 September",
+    "time": "10:00:AM-11:00:AM"
+  },
+  {
+    "location": "BUGIS+ OPEN PLAZA 2 (YGF SIDE)",
+    "performer_name": "TAN PANG YONG KENNY",
+    "performer_id": "d886e35b-c1f5-4b4a-bb3d-43403c935132",
+    "date": "Sun, 08 September",
+    "time": "07:00:PM-10:00:PM"
+  },
+  {
+    "location": "BUGIS+ OPEN PLAZA 2 (YGF SIDE)",
+    "performer_name": "DQLM",
+    "performer_id": "e2062b08-da00-4014-8d62-1a03bee98104",
+    "date": "Tue, 10 September",
+    "time": "05:00:PM-07:00:PM"
+  },
+  {
+    "location": "BUGIS+ OPEN PLAZA 2 (YGF SIDE)",
+    "performer_name": "RYAN HAN WEI REN",
+    "performer_id": "7c2a3cf4-6fac-4896-b297-98ea332b7ce5",
+    "date": "Fri, 13 September",
+    "time": "06:00:PM-10:00:PM"
+  },
+  {
+    "location": "BUGIS+ OPEN PLAZA 2 (YGF SIDE)",
+    "performer_name": "TAN PANG YONG KENNY",
+    "performer_id": "d886e35b-c1f5-4b4a-bb3d-43403c935132",
+    "date": "Sun, 15 September",
+    "time": "07:00:PM-10:00:PM"
+  },
+  {
+    "location": "BUKIT MERAH CENTRAL - BLK 166 ",
+    "performer_name": "NORMAN MOHD YUSOF",
+    "performer_id": "8525f6a8-6618-4ad3-96cf-249b6524a039",
+    "date": "Wed, 11 September",
+    "time": "05:00:PM-09:00:PM"
+  },
+  {
+    "location": "BUKIT MERAH CENTRAL - BLK 166 ",
+    "performer_name": "NORMAN MOHD YUSOF",
+    "performer_id": "8525f6a8-6618-4ad3-96cf-249b6524a039",
+    "date": "Tue, 17 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "BUKIT MERAH CENTRAL - BLK 166 ",
+    "performer_name": "NORMAN MOHD YUSOF",
+    "performer_id": "8525f6a8-6618-4ad3-96cf-249b6524a039",
+    "date": "Tue, 24 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Wed, 04 September",
+    "time": "11:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Wed, 04 September",
+    "time": "02:00:PM-05:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "NORMAN MOHD YUSOF",
+    "performer_id": "8525f6a8-6618-4ad3-96cf-249b6524a039",
+    "date": "Wed, 04 September",
+    "time": "06:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Thu, 05 September",
+    "time": "12:00:PM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 05 September",
+    "time": "02:00:PM-05:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Thu, 05 September",
+    "time": "06:00:PM-08:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "HO YEN YEE HAYLEY",
+    "performer_id": "f815a856-9903-496c-acb1-4e53d37d7feb",
+    "date": "Fri, 06 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Fri, 06 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "Harmony",
+    "performer_id": "141f5411-3c88-4d73-8223-95a26bd56c17",
+    "date": "Sat, 07 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "Nuradee",
+    "performer_id": "f5124e15-789b-4aae-aa65-bd2204ed66c2",
+    "date": "Sat, 07 September",
+    "time": "02:00:PM-05:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "YAP NYEE FONG",
+    "performer_id": "899bda24-c65e-47c6-82f2-0ad5bfbc1a6e",
+    "date": "Sat, 07 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "Nuradee",
+    "performer_id": "f5124e15-789b-4aae-aa65-bd2204ed66c2",
+    "date": "Sun, 08 September",
+    "time": "10:00:AM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 08 September",
+    "time": "05:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 09 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 09 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BEHAPPY",
+    "performer_id": "5c6fd249-b648-4350-8b2f-e5a092419471",
+    "date": "Tue, 10 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "NORMAN MOHD YUSOF",
+    "performer_id": "8525f6a8-6618-4ad3-96cf-249b6524a039",
+    "date": "Tue, 10 September",
+    "time": "06:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Wed, 11 September",
+    "time": "11:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Wed, 11 September",
+    "time": "01:00:PM-04:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Wed, 11 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 12 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 12 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Thu, 12 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "TAN CHU YUAN",
+    "performer_id": "1941fcc5-1f9a-4d6b-9d31-b0c306447b51",
+    "date": "Fri, 13 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 12 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 12 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Thu, 12 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "TAN CHU YUAN",
+    "performer_id": "1941fcc5-1f9a-4d6b-9d31-b0c306447b51",
+    "date": "Fri, 13 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "TAY YONG EN JEREMY",
+    "performer_id": "335d904e-0b6d-4b03-b2af-10a32543553f",
+    "date": "Fri, 13 September",
+    "time": "01:00:PM-04:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Fri, 13 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "YAP NYEE FONG",
+    "performer_id": "899bda24-c65e-47c6-82f2-0ad5bfbc1a6e",
+    "date": "Sat, 14 September",
+    "time": "10:00:AM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Sat, 14 September",
+    "time": "04:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "YAP NYEE FONG",
+    "performer_id": "899bda24-c65e-47c6-82f2-0ad5bfbc1a6e",
+    "date": "Sun, 15 September",
+    "time": "10:00:AM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 15 September",
+    "time": "05:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 16 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 16 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "YAP NYEE FONG",
+    "performer_id": "899bda24-c65e-47c6-82f2-0ad5bfbc1a6e",
+    "date": "Sun, 15 September",
+    "time": "10:00:AM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 15 September",
+    "time": "05:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 16 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 16 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Mon, 16 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Tue, 17 September",
+    "time": "11:00:AM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Tue, 17 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Wed, 18 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Wed, 18 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "NORMAN MOHD YUSOF",
+    "performer_id": "8525f6a8-6618-4ad3-96cf-249b6524a039",
+    "date": "Wed, 18 September",
+    "time": "06:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 19 September",
+    "time": "11:00:AM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Thu, 19 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Wed, 18 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "NORMAN MOHD YUSOF",
+    "performer_id": "8525f6a8-6618-4ad3-96cf-249b6524a039",
+    "date": "Wed, 18 September",
+    "time": "06:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 19 September",
+    "time": "11:00:AM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Thu, 19 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Fri, 20 September",
+    "time": "03:00:PM-05:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Fri, 20 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "YAP NYEE FONG",
+    "performer_id": "899bda24-c65e-47c6-82f2-0ad5bfbc1a6e",
+    "date": "Sat, 21 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sat, 21 September",
+    "time": "05:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Sun, 22 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 22 September",
+    "time": "04:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 23 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 23 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Sun, 22 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 22 September",
+    "time": "04:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 23 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Mon, 23 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "CHUA JEK MUI MARY",
+    "performer_id": "a05a97e6-dfcb-46b4-9201-c2fef398d9f3",
+    "date": "Mon, 23 September",
+    "time": "04:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Tue, 24 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Tue, 24 September",
+    "time": "02:00:PM-04:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Tue, 24 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Wed, 25 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Wed, 25 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Wed, 25 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 26 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Wed, 25 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Wed, 25 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Wed, 25 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 26 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Thu, 26 September",
+    "time": "02:00:PM-04:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Thu, 26 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "Patrick Chng",
+    "performer_id": "e2b4fc18-aca5-48c8-be1c-f32c6171250a",
+    "date": "Fri, 27 September",
+    "time": "11:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Fri, 27 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Sat, 28 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sat, 28 September",
+    "time": "01:00:PM-04:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Sat, 28 September",
+    "time": "04:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Sun, 29 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Sat, 28 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sat, 28 September",
+    "time": "01:00:PM-04:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "AL Music",
+    "performer_id": "5a7fb7f6-aefa-417f-a539-17a6d046d1dd",
+    "date": "Sat, 28 September",
+    "time": "04:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "MOHAMMAD SAID BIN RAHIM",
+    "performer_id": "d2c0110c-cf3a-4875-8995-cf5b0163a595",
+    "date": "Sun, 29 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "ROSLI BIN DOLLAH @ ROSLI BIN MOHALIM",
+    "performer_id": "cb059b1f-ca62-4e0b-9127-f3787fbaa61b",
+    "date": "Sun, 29 September",
+    "time": "02:00:PM-05:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 29 September",
+    "time": "05:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHANGI VILLAGE - SPACE BETWEEN BLK 2 & 3",
+    "performer_name": "T & J",
+    "performer_id": "2596ff8e-898e-4331-a308-9d7d7ec691b9",
+    "date": "Mon, 30 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CHOA CHU KANG ST 62 - BLK 623",
+    "performer_name": "Harmony",
+    "performer_id": "141f5411-3c88-4d73-8223-95a26bd56c17",
+    "date": "Fri, 06 September",
+    "time": "04:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHOA CHU KANG ST 62 - BLK 623",
+    "performer_name": "LIM KIM LEU",
+    "performer_id": "e8549dff-31ab-4484-b277-6972892d1cb3",
+    "date": "Sun, 08 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHOA CHU KANG ST 62 - BLK 623",
+    "performer_name": "GOH YU FAN EVAN",
+    "performer_id": "6035ea7a-d3a5-4ed9-b5bc-87e1f3ba4a09",
+    "date": "Sun, 08 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHOA CHU KANG ST 62 - BLK 623",
+    "performer_name": "GOH YU FAN EVAN",
+    "performer_id": "6035ea7a-d3a5-4ed9-b5bc-87e1f3ba4a09",
+    "date": "Tue, 10 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHOA CHU KANG ST 62 - BLK 623",
+    "performer_name": "CHOI HENG TAT",
+    "performer_id": "c53b3136-9e6f-4797-93e8-12b150ae0d13",
+    "date": "Wed, 18 September",
+    "time": "10:00:AM-04:00:PM"
+  },
+  {
+    "location": "CHOA CHU KANG ST 62 - BLK 623",
+    "performer_name": "Harmony",
+    "performer_id": "141f5411-3c88-4d73-8223-95a26bd56c17",
+    "date": "Wed, 18 September",
+    "time": "04:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHOA CHU KANG ST 62 - BLK 623",
+    "performer_name": "CHOI HENG TAT",
+    "performer_id": "c53b3136-9e6f-4797-93e8-12b150ae0d13",
+    "date": "Tue, 24 September",
+    "time": "10:00:AM-04:00:PM"
+  },
+  {
+    "location": "CHOA CHU KANG ST 62 - BLK 623",
+    "performer_name": "TAN CHU YUAN",
+    "performer_id": "1941fcc5-1f9a-4d6b-9d31-b0c306447b51",
+    "date": "Fri, 27 September",
+    "time": "05:00:PM-09:00:PM"
+  },
+  {
+    "location": "CHOA CHU KANG ST 62 - BLK 623",
+    "performer_name": "LIM KIM LEU",
+    "performer_id": "e8549dff-31ab-4484-b277-6972892d1cb3",
+    "date": "Sun, 29 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LEONG TENG HWA",
+    "performer_id": "f677823f-51fd-48a7-87a7-d8c470641e67",
+    "date": "Wed, 04 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LIM KIM LEU",
+    "performer_id": "e8549dff-31ab-4484-b277-6972892d1cb3",
+    "date": "Thu, 05 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LEONG TENG HWA",
+    "performer_id": "f677823f-51fd-48a7-87a7-d8c470641e67",
+    "date": "Sat, 07 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Sun, 08 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LEONG TENG HWA",
+    "performer_id": "f677823f-51fd-48a7-87a7-d8c470641e67",
+    "date": "Wed, 11 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LEONG TENG HWA",
+    "performer_id": "f677823f-51fd-48a7-87a7-d8c470641e67",
+    "date": "Fri, 13 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LEONG TENG HWA",
+    "performer_id": "f677823f-51fd-48a7-87a7-d8c470641e67",
+    "date": "Sat, 14 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Sun, 15 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LEONG TENG HWA",
+    "performer_id": "f677823f-51fd-48a7-87a7-d8c470641e67",
+    "date": "Wed, 18 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LEONG TENG HWA",
+    "performer_id": "f677823f-51fd-48a7-87a7-d8c470641e67",
+    "date": "Fri, 20 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "HAPPY GROUP",
+    "performer_id": "f0f58d2d-6dfa-41d9-8f48-55b5294d645a",
+    "date": "Sat, 21 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LIM KIM LEU",
+    "performer_id": "e8549dff-31ab-4484-b277-6972892d1cb3",
+    "date": "Sun, 22 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "LEONG TENG HWA",
+    "performer_id": "f677823f-51fd-48a7-87a7-d8c470641e67",
+    "date": "Wed, 25 September",
+    "time": "10:00:AM-01:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "CHOI HENG TAT",
+    "performer_id": "c53b3136-9e6f-4797-93e8-12b150ae0d13",
+    "date": "Fri, 27 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CHONG PANG GARDEN",
+    "performer_name": "RICHARD TENG CHIN SHUE",
+    "performer_id": "7f92850b-2ace-4acc-aad3-7ef5aa41de11",
+    "date": "Sun, 29 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "HAPPY GROUP",
+    "performer_id": "f0f58d2d-6dfa-41d9-8f48-55b5294d645a",
+    "date": "Fri, 06 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Fri, 06 September",
+    "time": "05:00:PM-06:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Fri, 06 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "LAU YIONG HOCK",
+    "performer_id": "4ed27a09-97ab-4b6b-af8f-7d2a87717c20",
+    "date": "Sat, 07 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "TAY YONG EN JEREMY",
+    "performer_id": "335d904e-0b6d-4b03-b2af-10a32543553f",
+    "date": "Sat, 07 September",
+    "time": "05:00:PM-08:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "HAPPY GROUP",
+    "performer_id": "f0f58d2d-6dfa-41d9-8f48-55b5294d645a",
+    "date": "Sun, 08 September",
+    "time": "10:00:AM-03:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 08 September",
+    "time": "03:00:PM-05:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Sun, 08 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "DQLM",
+    "performer_id": "761a28a7-0b5b-41a1-ac3b-b6aa653c9a51",
+    "date": "Fri, 13 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "SIA CHEE ENG",
+    "performer_id": "21e1d447-79cf-4475-bafb-3a0744b72d0f",
+    "date": "Fri, 13 September",
+    "time": "05:00:PM-08:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "Y.A.M Sing",
+    "performer_id": "4fb22b6a-8546-4a74-b95f-1736e4ee5320",
+    "date": "Fri, 13 September",
+    "time": "08:00:PM-10:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "CHUA JEK MUI MARY",
+    "performer_id": "a05a97e6-dfcb-46b4-9201-c2fef398d9f3",
+    "date": "Sat, 14 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "LYE MEOW LENG",
+    "performer_id": "535b6c05-e74e-4307-8dd2-cfc93c5a0f09",
+    "date": "Sat, 14 September",
+    "time": "02:00:PM-04:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sat, 14 September",
+    "time": "04:00:PM-06:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "GOH YU FAN EVAN",
+    "performer_id": "6035ea7a-d3a5-4ed9-b5bc-87e1f3ba4a09",
+    "date": "Sat, 14 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "WILDMAN",
+    "performer_id": "005043b8-8a75-42d6-8ebf-1531d6b6f077",
+    "date": "Sun, 15 September",
+    "time": "11:00:AM-03:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 15 September",
+    "time": "03:00:PM-05:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "Ha-Pea Pie",
+    "performer_id": "477cb0f5-1c0e-47a3-97fe-140bf1e80cab",
+    "date": "Sun, 15 September",
+    "time": "06:00:PM-10:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "TANG YUEN WAI",
+    "performer_id": "50337eb1-48ad-46a1-9cb9-d7325ad85529",
+    "date": "Fri, 20 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "TAY YONG EN JEREMY",
+    "performer_id": "335d904e-0b6d-4b03-b2af-10a32543553f",
+    "date": "Fri, 20 September",
+    "time": "02:00:PM-03:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Fri, 20 September",
+    "time": "03:00:PM-05:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "ANTHONY WOO YEW LIAN",
+    "performer_id": "49595898-6df5-4bd6-839d-147be1b8460a",
+    "date": "Fri, 20 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "LAU YIONG HOCK",
+    "performer_id": "4ed27a09-97ab-4b6b-af8f-7d2a87717c20",
+    "date": "Sat, 21 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sat, 21 September",
+    "time": "02:00:PM-04:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Fri, 20 September",
+    "time": "03:00:PM-05:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "ANTHONY WOO YEW LIAN",
+    "performer_id": "49595898-6df5-4bd6-839d-147be1b8460a",
+    "date": "Fri, 20 September",
+    "time": "05:00:PM-10:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "LAU YIONG HOCK",
+    "performer_id": "4ed27a09-97ab-4b6b-af8f-7d2a87717c20",
+    "date": "Sat, 21 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sat, 21 September",
+    "time": "02:00:PM-04:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "CHUA JEK MUI MARY",
+    "performer_id": "a05a97e6-dfcb-46b4-9201-c2fef398d9f3",
+    "date": "Sun, 22 September",
+    "time": "10:00:AM-03:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "ONG CHEE BOON",
+    "performer_id": "d481c518-d2a1-4b99-9e9d-8bbd1bf57328",
+    "date": "Sun, 22 September",
+    "time": "06:00:PM-09:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "TANG YUEN WAI",
+    "performer_id": "50337eb1-48ad-46a1-9cb9-d7325ad85529",
+    "date": "Fri, 27 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Fri, 27 September",
+    "time": "05:00:PM-09:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "T Junction 紅綠燈",
+    "performer_id": "e242c159-b8b0-4358-b1f7-8bf98692ee28",
+    "date": "Sat, 28 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sat, 28 September",
+    "time": "05:00:PM-08:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "YAP NYEE FONG",
+    "performer_id": "899bda24-c65e-47c6-82f2-0ad5bfbc1a6e",
+    "date": "Sun, 29 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 29 September",
+    "time": "03:00:PM-05:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "T Junction 紅綠燈",
+    "performer_id": "e242c159-b8b0-4358-b1f7-8bf98692ee28",
+    "date": "Sat, 28 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sat, 28 September",
+    "time": "05:00:PM-08:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "YAP NYEE FONG",
+    "performer_id": "899bda24-c65e-47c6-82f2-0ad5bfbc1a6e",
+    "date": "Sun, 29 September",
+    "time": "10:00:AM-02:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "BUSKINGROBIN",
+    "performer_id": "547b8ba7-7529-403a-9205-62667097e31e",
+    "date": "Sun, 29 September",
+    "time": "03:00:PM-05:00:PM"
+  },
+  {
+    "location": "CI YUAN HAWKER CENTRE",
+    "performer_name": "ANTHONY WOO YEW LIAN",
+    "performer_id": "49595898-6df5-4bd6-839d-147be1b8460a",
+    "date": "Sun, 29 September",
+    "time": "05:00:PM-10:00:PM"
+  }
+]
