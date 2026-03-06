@@ -250,77 +250,91 @@ export default function BuskerDetailPage({ params }) {
                   <div className="flex items-center justify-between">
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline"
+                      className="btn btn-xs sm:btn-sm btn-outline"
                       onClick={goToPreviousMonth}
                     >
                       Prev
                     </button>
-                    <h3 className="text-lg font-semibold">
+                    <h3 className="text-base sm:text-lg font-semibold">
                       {calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                     </h3>
                     <button
                       type="button"
-                      className="btn btn-sm btn-outline"
+                      className="btn btn-xs sm:btn-sm btn-outline"
                       onClick={goToNextMonth}
                     >
                       Next
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-7 gap-2 text-center text-xs font-semibold uppercase tracking-wide text-base-content/60">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                      <div key={day}>{day}</div>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-7 gap-2">
-                    {calendarCells.map((date, index) => {
-                      if (!date) {
-                        return <div key={`empty-${index}`} className="h-28 rounded-lg border border-transparent" />;
-                      }
-
-                      const dayEvents = sortedGroupedPerformances[date] || [];
-                      const isSelected = date === selectedDate;
-                      const isToday = date === todayDateKey;
-                      const dayNumber = parseDateKey(date).getDate();
-
-                      return (
-                        <button
-                          key={date}
-                          type="button"
-                          className={`h-28 rounded-lg border p-2 text-left transition ${
-                            dayEvents.length > 0
-                              ? 'border-primary/40 bg-primary/10 hover:bg-primary/20'
-                              : 'border-base-300 bg-base-100 hover:border-base-content/30'
-                          } ${isSelected ? 'ring-2 ring-primary ring-offset-1' : ''}`}
-                          onClick={() => setSelectedDate(date)}
+                  <div className="rounded-xl border border-base-300 overflow-hidden">
+                    <div className="grid grid-cols-7 border-b border-base-300 bg-base-200/40">
+                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+                        <div
+                          key={`${day}-${index}`}
+                          className="py-2 text-center text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-base-content/60"
                         >
-                          <div className="flex items-start justify-between">
-                            <span className={`text-sm font-semibold ${isToday ? 'text-primary' : 'text-base-content'}`}>
+                          {day}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-7 divide-x divide-y divide-base-300">
+                      {calendarCells.map((date, index) => {
+                        if (!date) {
+                          return (
+                            <div
+                              key={`empty-${index}`}
+                              className="min-h-[72px] sm:min-h-[108px] bg-base-200/20"
+                            />
+                          );
+                        }
+
+                        const dayEvents = sortedGroupedPerformances[date] || [];
+                        const isSelected = date === selectedDate;
+                        const isToday = date === todayDateKey;
+                        const dayNumber = parseDateKey(date).getDate();
+                        const previewEvents = dayEvents.slice(0, 2);
+                        const remainingEventsCount = dayEvents.length - previewEvents.length;
+
+                        return (
+                          <button
+                            key={date}
+                            type="button"
+                            className={`min-h-[72px] sm:min-h-[108px] p-1 sm:p-2 text-left align-top transition ${
+                              isSelected ? 'bg-primary/15' : 'bg-base-100 hover:bg-base-200/30'
+                            }`}
+                            onClick={() => setSelectedDate(date)}
+                            aria-label={`View events on ${date}`}
+                          >
+                            <span
+                              className={`inline-flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[11px] sm:text-xs font-semibold ${
+                                isSelected || isToday ? 'bg-primary text-primary-content' : 'text-base-content/80'
+                              }`}
+                            >
                               {dayNumber}
                             </span>
-                            {dayEvents.length > 0 ? (
-                              <span className="badge badge-primary badge-sm">{dayEvents.length}</span>
-                            ) : null}
-                          </div>
-                          {dayEvents.length > 0 ? (
-                            <div className="mt-2 space-y-1 max-h-16 overflow-y-auto pr-1">
-                              {dayEvents.map((performance) => (
+
+                            <div className="mt-1 space-y-0.5 sm:space-y-1">
+                              {previewEvents.map((performance) => (
                                 <p
                                   key={`${performance.event_id}-${performance.start_datetime}-${performance.location_id}`}
-                                  className="truncate text-[10px] leading-tight text-base-content/80"
+                                  className="truncate rounded bg-primary/20 px-1 py-0.5 text-[9px] sm:text-[10px] leading-tight text-base-content/85"
                                   title={`${toTimeLabel(performance.start_datetime)} - ${toTimeLabel(performance.end_datetime)} | ${performance.location_name ?? 'Location TBC'}`}
                                 >
-                                  {toTimeLabel(performance.start_datetime)}-{toTimeLabel(performance.end_datetime)} {performance.location_name ?? 'Location TBC'}
+                                  {toTimeLabel(performance.start_datetime)} {performance.location_name ?? 'Location TBC'}
                                 </p>
                               ))}
+                              {remainingEventsCount > 0 ? (
+                                <p className="truncate px-1 text-[9px] sm:text-[10px] leading-tight text-base-content/60">
+                                  +{remainingEventsCount} more
+                                </p>
+                              ) : null}
                             </div>
-                          ) : (
-                            <p className="mt-2 text-[10px] text-base-content/55">No bookings</p>
-                          )}
-                        </button>
-                      );
-                    })}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {selectedDate ? (
