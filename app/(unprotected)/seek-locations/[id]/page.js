@@ -22,6 +22,31 @@ const parseDateKey = (dateString) => {
     return new Date(year, month - 1, day);
 };
 
+const buildCalendarCells = (monthDate) => {
+    const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+    const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+
+    const gridStart = new Date(monthStart);
+    gridStart.setDate(monthStart.getDate() - monthStart.getDay());
+
+    const gridEnd = new Date(monthEnd);
+    gridEnd.setDate(monthEnd.getDate() + (6 - monthEnd.getDay()));
+
+    const cells = [];
+    const cursor = new Date(gridStart);
+
+    while (cursor <= gridEnd) {
+        const cellDate = new Date(cursor);
+        cells.push({
+            dateKey: toDateKey(cellDate),
+            inCurrentMonth: cellDate.getMonth() === monthDate.getMonth(),
+        });
+        cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return cells;
+};
+
 const toTimeLabel = (value) => String(value ?? '').substring(11, 16);
 
 const toMinutesFromDateTime = (value) => {
@@ -154,22 +179,13 @@ const LocationDetailPage = ({ params }) => {
         }
     };
 
+    const formatDateHeadline = (dateString) => parseDateKey(dateString).toLocaleDateString(
+        'en-US',
+        { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }
+    );
+
     const calendarCells = useMemo(() => {
-        const monthStart = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1);
-        const monthEnd = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 0);
-        const leadingEmptyCells = monthStart.getDay();
-        const daysInMonth = monthEnd.getDate();
-
-        const cells = [
-            ...Array.from({ length: leadingEmptyCells }, () => null),
-            ...Array.from({ length: daysInMonth }, (_, index) => {
-                const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), index + 1);
-                return toDateKey(date);
-            }),
-        ];
-
-        const trailingEmptyCells = (7 - (cells.length % 7)) % 7;
-        return [...cells, ...Array.from({ length: trailingEmptyCells }, () => null)];
+        return buildCalendarCells(calendarMonth);
     }, [calendarMonth]);
 
     const selectedDatePerformances = useMemo(() => {
@@ -185,8 +201,16 @@ const LocationDetailPage = ({ params }) => {
         setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
     };
 
+    const handleCalendarDateClick = (dateKey, inCurrentMonth) => {
+        setSelectedDate(dateKey);
+        if (!inCurrentMonth) {
+            const clickedDate = parseDateKey(dateKey);
+            setCalendarMonth(new Date(clickedDate.getFullYear(), clickedDate.getMonth(), 1));
+        }
+    };
+
     return (
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto px-3 py-4 sm:p-6">
             <div className="card rounded-lg shadow-lg p-6 mb-6">
                 <div className="grid grid-cols-1">
                     <h1 className="text-bold text-3xl">{location?.name}</h1>
@@ -201,17 +225,17 @@ const LocationDetailPage = ({ params }) => {
                     <h2 className="text-2xl font-semibold mb-4">Upcoming Events</h2>
                     {sortedPerformanceDates.length > 0 ? (
                         <>
-                            <div className="tabs tabs-boxed mb-4 w-fit">
+                            <div className="tabs tabs-boxed mb-4 w-full sm:w-fit">
                                 <button
                                     type="button"
-                                    className={`tab ${eventsView === 'calendar' ? 'tab-active' : ''}`}
+                                    className={`tab flex-1 sm:flex-none ${eventsView === 'calendar' ? 'tab-active' : ''}`}
                                     onClick={() => setEventsView('calendar')}
                                 >
                                     Calendar View
                                 </button>
                                 <button
                                     type="button"
-                                    className={`tab ${eventsView === 'list' ? 'tab-active' : ''}`}
+                                    className={`tab flex-1 sm:flex-none ${eventsView === 'list' ? 'tab-active' : ''}`}
                                     onClick={() => setEventsView('list')}
                                 >
                                     List View
@@ -220,24 +244,28 @@ const LocationDetailPage = ({ params }) => {
 
                             {eventsView === 'calendar' ? (
                                 <div className="space-y-5">
-                                    <div className="flex items-center justify-between">
-                                        <button
-                                            type="button"
-                                            className="btn btn-xs sm:btn-sm btn-outline"
-                                            onClick={goToPreviousMonth}
-                                        >
-                                            Prev
-                                        </button>
-                                        <h3 className="text-base sm:text-lg font-semibold">
-                                            {calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                                        </h3>
-                                        <button
-                                            type="button"
-                                            className="btn btn-xs sm:btn-sm btn-outline"
-                                            onClick={goToNextMonth}
-                                        >
-                                            Next
-                                        </button>
+                                    <div className="sticky top-2 z-20 rounded-xl border border-base-300 bg-base-100/95 p-2 backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-0">
+                                        <div className="flex items-center justify-between">
+                                            <button
+                                                type="button"
+                                                className="btn btn-xs sm:btn-sm btn-outline h-8 min-h-0 w-8 p-0 sm:h-auto sm:w-auto sm:px-3"
+                                                onClick={goToPreviousMonth}
+                                                aria-label="Previous month"
+                                            >
+                                                <span className="text-base leading-none" aria-hidden>‹</span>
+                                            </button>
+                                            <h3 className="text-base sm:text-lg font-semibold tracking-tight">
+                                                {calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                            </h3>
+                                            <button
+                                                type="button"
+                                                className="btn btn-xs sm:btn-sm btn-outline h-8 min-h-0 w-8 p-0 sm:h-auto sm:w-auto sm:px-3"
+                                                onClick={goToNextMonth}
+                                                aria-label="Next month"
+                                            >
+                                                <span className="text-base leading-none" aria-hidden>›</span>
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div className="rounded-xl border border-base-300 overflow-hidden">
@@ -245,7 +273,7 @@ const LocationDetailPage = ({ params }) => {
                                             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
                                                 <div
                                                     key={`${day}-${index}`}
-                                                    className="py-2 text-center text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-base-content/60"
+                                                    className="py-2 text-center text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-base-content/75"
                                                 >
                                                     {day}
                                                 </div>
@@ -253,37 +281,39 @@ const LocationDetailPage = ({ params }) => {
                                         </div>
 
                                         <div className="grid grid-cols-7 divide-x divide-y divide-base-300">
-                                            {calendarCells.map((date, index) => {
-                                                if (!date) {
-                                                    return (
-                                                        <div
-                                                            key={`empty-${index}`}
-                                                            className="min-h-[72px] sm:min-h-[108px] bg-base-200/20"
-                                                        />
-                                                    );
-                                                }
-
+                                            {calendarCells.map((cell) => {
+                                                const { dateKey, inCurrentMonth } = cell;
+                                                const date = dateKey;
                                                 const dayEvents = sortedGroupedPerformances[date] || [];
                                                 const isSelected = date === selectedDate;
                                                 const isToday = date === todayDateKey;
                                                 const dayNumber = parseDateKey(date).getDate();
-                                                const previewEvents = dayEvents.slice(0, 2);
+                                                const previewEvents = dayEvents.slice(0, 1);
                                                 const remainingEventsCount = dayEvents.length - previewEvents.length;
+                                                const dayNumberStyle = isSelected
+                                                    ? 'bg-primary text-primary-content'
+                                                    : isToday
+                                                        ? 'ring-1 ring-primary text-primary'
+                                                        : inCurrentMonth
+                                                            ? 'text-base-content/85'
+                                                            : 'text-base-content/35';
 
                                                 return (
                                                     <button
-                                                        key={date}
+                                                        key={dateKey}
                                                         type="button"
                                                         className={`min-h-[72px] sm:min-h-[108px] p-1 sm:p-2 text-left align-top transition ${
-                                                            isSelected ? 'bg-primary/15' : 'bg-base-100 hover:bg-base-200/30'
+                                                            isSelected
+                                                                ? 'bg-primary/12'
+                                                                : inCurrentMonth
+                                                                    ? 'bg-base-100 hover:bg-base-200/30'
+                                                                    : 'bg-base-200/35 hover:bg-base-200/55'
                                                         }`}
-                                                        onClick={() => setSelectedDate(date)}
+                                                        onClick={() => handleCalendarDateClick(date, inCurrentMonth)}
                                                         aria-label={`View events on ${date}`}
                                                     >
                                                         <span
-                                                            className={`inline-flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[11px] sm:text-xs font-semibold ${
-                                                                isSelected || isToday ? 'bg-primary text-primary-content' : 'text-base-content/80'
-                                                            }`}
+                                                            className={`inline-flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[11px] sm:text-xs font-semibold ${dayNumberStyle}`}
                                                         >
                                                             {dayNumber}
                                                         </span>
@@ -292,14 +322,14 @@ const LocationDetailPage = ({ params }) => {
                                                             {previewEvents.map((performance) => (
                                                                 <p
                                                                     key={`${performance.event_id}-${performance.start_datetime}-${performance.busker_id}`}
-                                                                    className="truncate rounded bg-primary/20 px-1 py-0.5 text-[9px] sm:text-[10px] leading-tight text-base-content/85"
+                                                                    className="truncate rounded bg-primary/30 px-1 py-0.5 text-[10px] leading-tight text-base-content"
                                                                     title={`${toTimeLabel(performance.start_datetime)} - ${toTimeLabel(performance.end_datetime)} | ${performance.busker_name ?? 'Busker TBC'}`}
                                                                 >
-                                                                    {toTimeLabel(performance.start_datetime)} {performance.busker_name ?? 'Busker TBC'}
+                                                                    {toTimeLabel(performance.start_datetime)} · {performance.busker_name ?? 'Busker TBC'}
                                                                 </p>
                                                             ))}
                                                             {remainingEventsCount > 0 ? (
-                                                                <p className="truncate px-1 text-[9px] sm:text-[10px] leading-tight text-base-content/60">
+                                                                <p className="truncate px-1 text-[10px] leading-tight text-base-content/75">
                                                                     +{remainingEventsCount} more
                                                                 </p>
                                                             ) : null}
@@ -311,10 +341,15 @@ const LocationDetailPage = ({ params }) => {
                                     </div>
 
                                     {selectedDate ? (
-                                        <div className="pt-2">
-                                            <h4 className="text-lg font-medium mb-3">
-                                                {selectedDate} ({formatDateLabel(selectedDate)})
-                                            </h4>
+                                        <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 sm:p-4">
+                                            <div className="mb-3 flex items-center justify-between gap-3">
+                                                <h4 className="text-sm sm:text-base font-semibold text-base-content">
+                                                    {formatDateHeadline(selectedDate)} ({formatDateLabel(selectedDate)})
+                                                </h4>
+                                                <span className="badge badge-primary badge-outline">
+                                                    {selectedDatePerformances.length}
+                                                </span>
+                                            </div>
                                             {selectedDatePerformances.length > 0 ? (
                                                 <ul className="space-y-4">
                                                     {selectedDatePerformances.map((performance) => (
