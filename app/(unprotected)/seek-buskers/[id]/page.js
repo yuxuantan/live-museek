@@ -321,8 +321,6 @@ export default function BuskerDetailPage({ params }) {
                         const isSelected = date === selectedDate;
                         const isToday = date === todayDateKey;
                         const dayNumber = parseDateKey(date).getDate();
-                        const previewEvents = dayEvents.slice(0, 1);
-                        const remainingEventsCount = dayEvents.length - previewEvents.length;
                         const dayNumberStyle = isSelected
                           ? 'bg-primary text-primary-content'
                           : isToday
@@ -351,8 +349,8 @@ export default function BuskerDetailPage({ params }) {
                               {dayNumber}
                             </span>
 
-                            <div className="mt-1 space-y-0.5 sm:space-y-1">
-                              {previewEvents.map((performance) => (
+                            <div className="mt-1 space-y-0.5 sm:space-y-1 max-h-11 sm:max-h-[74px] overflow-y-auto pr-0.5">
+                              {dayEvents.map((performance) => (
                                 <p
                                   key={`${performance.event_id}-${performance.start_datetime}-${performance.location_id}`}
                                   className="truncate rounded bg-primary/30 px-1 py-0.5 text-[10px] leading-tight text-base-content"
@@ -361,11 +359,6 @@ export default function BuskerDetailPage({ params }) {
                                   {toTimeLabel(performance.start_datetime)} · {performance.location_name ?? 'Location TBC'}
                                 </p>
                               ))}
-                              {remainingEventsCount > 0 ? (
-                                <p className="truncate px-1 text-[10px] leading-tight text-base-content/75">
-                                  +{remainingEventsCount} more
-                                </p>
-                              ) : null}
                             </div>
                           </button>
                         );
