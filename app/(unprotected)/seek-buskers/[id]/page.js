@@ -10,6 +10,7 @@ import {
   setRefreshCooldown,
   REFRESH_BUTTON_COOLDOWN_MS,
 } from '../../../refreshCooldown';
+import { downloadBuskerCalendarIcs } from '../../../calendarIcs';
 
 const toDateKey = (value) => {
   if (typeof value === 'string') {
@@ -244,6 +245,14 @@ export default function BuskerDetailPage({ params }) {
     window.location.assign(`/seek-buskers/${params.id}/refresh`);
   };
 
+  const handleCalendarDownload = () => {
+    downloadBuskerCalendarIcs({
+      busker,
+      performances,
+      siteUrl: window.location.origin,
+    });
+  };
+
   return (
     <div className="container mx-auto px-3 py-4 sm:p-6">
       <div className="card bg-base-100 shadow-xl mb-6">
@@ -274,12 +283,14 @@ export default function BuskerDetailPage({ params }) {
                   <p className="text-lg md:text-xl text-base-content mb-4">{busker?.art_form}</p>
                 </div>
                 <div className="flex w-full flex-col gap-2 sm:w-auto">
-                  <a
-                    href={`/api/seek-buskers/${params.id}/calendar`}
+                  <button
+                    type="button"
                     className="btn btn-outline btn-sm w-full sm:w-auto"
+                    onClick={handleCalendarDownload}
+                    disabled={!busker}
                   >
                     Import to Google Calendar (.ics)
-                  </a>
+                  </button>
                   <button
                     type="button"
                     className="btn btn-outline btn-sm w-full sm:w-auto"

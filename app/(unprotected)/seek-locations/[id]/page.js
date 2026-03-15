@@ -8,6 +8,7 @@ import {
     setRefreshCooldown,
     REFRESH_BUTTON_COOLDOWN_MS,
 } from '../../../refreshCooldown';
+import { downloadLocationCalendarIcs } from '../../../calendarIcs';
 
 const toDateKey = (value) => {
     if (typeof value === 'string') {
@@ -240,6 +241,14 @@ const LocationDetailPage = ({ params }) => {
         window.location.assign(`/seek-locations/${params.id}/refresh`);
     };
 
+    const handleCalendarDownload = () => {
+        downloadLocationCalendarIcs({
+            location,
+            performances,
+            siteUrl: window.location.origin,
+        });
+    };
+
     return (
         <div className="container mx-auto px-3 py-4 sm:p-6">
             <div className="card rounded-lg shadow-lg p-6 mb-6">
@@ -250,12 +259,14 @@ const LocationDetailPage = ({ params }) => {
                             <p className="text-gray-600">{location?.address}</p>
                         </div>
                         <div className="flex w-full flex-col gap-2 sm:w-auto">
-                            <a
-                                href={`/api/seek-locations/${params.id}/calendar`}
+                            <button
+                                type="button"
                                 className="btn btn-outline btn-sm w-full sm:w-auto"
+                                onClick={handleCalendarDownload}
+                                disabled={!location}
                             >
                                 Import to Google Calendar (.ics)
-                            </a>
+                            </button>
                             <button
                                 type="button"
                                 className="btn btn-outline btn-sm w-full sm:w-auto"
