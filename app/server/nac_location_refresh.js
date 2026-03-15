@@ -946,10 +946,44 @@ async function ensureLocationRows(supabase, locationRefs) {
     return { refreshedCount: 0, fallbackCount: 0, failedLocationIds: [] };
   }
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+  async function upsertFallbackLocations(locationsToFallback, failedLocationIds) {
+    let fallbackCount = 0;
+
+    for (const locationRef of locationsToFallback) {
+      const fallbackResponse = await supabase
+        .from('locations')
+        .upsert(
+          {
+            location_id: locationRef.location_id,
+            name: locationRef.name,
+          },
+          { onConflict: 'location_id' }
+        );
+
+      if (fallbackResponse.error) {
+        console.error(`Failed to save fallback location ${locationRef.location_id}:`, fallbackResponse.error);
+        failedLocationIds.push(locationRef.location_id);
+        continue;
+      }
+
+      fallbackCount += 1;
+    }
+
+    return fallbackCount;
+  }
+
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+  } catch (error) {
+    console.error('Failed to launch Puppeteer for referenced busker locations. Falling back to minimal location rows.', error);
+    const failedLocationIds = [];
+    const fallbackCount = await upsertFallbackLocations(missingLocations, failedLocationIds);
+    return { refreshedCount: 0, fallbackCount, failedLocationIds };
+  }
 
   let refreshedCount = 0;
   let fallbackCount = 0;
@@ -979,23 +1013,7 @@ async function ensureLocationRows(supabase, locationRefs) {
         refreshedCount += 1;
       } catch (error) {
         console.error(`Failed to refresh referenced location ${locationRef.location_id}:`, error);
-
-        const fallbackResponse = await supabase
-          .from('locations')
-          .upsert(
-            {
-              location_id: locationRef.location_id,
-              name: locationRef.name,
-            },
-            { onConflict: 'location_id' }
-          );
-
-        if (fallbackResponse.error) {
-          failedLocationIds.push(locationRef.location_id);
-          continue;
-        }
-
-        fallbackCount += 1;
+        fallbackCount += await upsertFallbackLocations([locationRef], failedLocationIds);
       }
     }
   } finally {
