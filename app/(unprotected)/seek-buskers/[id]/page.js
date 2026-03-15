@@ -4,6 +4,12 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../../supabaseClient';
 import { mergeBackToBackPerformances } from '../../../utils';
 import { QRCodeSVG } from 'qrcode.react';
+import {
+  getBuskerRefreshCooldownKey,
+  getRefreshCooldownRemainingMs,
+  setRefreshCooldown,
+  REFRESH_BUTTON_COOLDOWN_MS,
+} from '../../../refreshCooldown';
 
 const toDateKey = (value) => {
   if (typeof value === 'string') {
@@ -86,11 +92,13 @@ export default function BuskerDetailPage({ params }) {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
+  const [refreshCooldownRemainingMs, setRefreshCooldownRemainingMs] = useState(0);
 
   const currentEpochTime = Math.floor(new Date().getTime() / 1000);
   const qrCodeUrl = `livemuseek.com/seek-buskers/${params.id}`;
   const storagePublicBaseUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;
   const todayDateKey = toDateKey(new Date());
+  const refreshCooldownKey = getBuskerRefreshCooldownKey(params.id);
 
   useEffect(() => {
     const fetchPerformances = async () => {
@@ -125,6 +133,19 @@ export default function BuskerDetailPage({ params }) {
     fetchPerformances();
     fetchBusker();
   }, [params.id]);
+
+  useEffect(() => {
+    const syncCooldown = () => {
+      setRefreshCooldownRemainingMs(getRefreshCooldownRemainingMs(refreshCooldownKey));
+    };
+
+    syncCooldown();
+    const intervalId = window.setInterval(syncCooldown, 250);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [refreshCooldownKey]);
 
   const groupedPerformances = useMemo(
     () => performances.reduce((acc, performance) => {
@@ -213,6 +234,16 @@ export default function BuskerDetailPage({ params }) {
     }
   };
 
+  const handleRefreshClick = () => {
+    if (refreshCooldownRemainingMs > 0) {
+      return;
+    }
+
+    setRefreshCooldown(refreshCooldownKey, REFRESH_BUTTON_COOLDOWN_MS);
+    setRefreshCooldownRemainingMs(REFRESH_BUTTON_COOLDOWN_MS);
+    window.location.assign(`/seek-buskers/${params.id}/refresh`);
+  };
+
   return (
     <div className="container mx-auto px-3 py-4 sm:p-6">
       <div className="card bg-base-100 shadow-xl mb-6">
@@ -236,9 +267,31 @@ export default function BuskerDetailPage({ params }) {
               </button>
             </div>
             <div className="self-center col-span-2">
-              <h1 className="text-2xl md:text-3xl font-bold mb-4">{busker?.name}</h1>
-              <p className="text-lg md:text-xl text-base-content mb-4">{busker?.act}</p>
-              <p className="text-lg md:text-xl text-base-content mb-4">{busker?.art_form}</p>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold mb-4">{busker?.name}</h1>
+                  <p className="text-lg md:text-xl text-base-content mb-4">{busker?.act}</p>
+                  <p className="text-lg md:text-xl text-base-content mb-4">{busker?.art_form}</p>
+                </div>
+                <div className="flex w-full flex-col gap-2 sm:w-auto">
+                  <a
+                    href={`/api/seek-buskers/${params.id}/calendar`}
+                    className="btn btn-outline btn-sm w-full sm:w-auto"
+                  >
+                    Import to Google Calendar (.ics)
+                  </a>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm w-full sm:w-auto"
+                    onClick={handleRefreshClick}
+                    disabled={refreshCooldownRemainingMs > 0}
+                  >
+                    {refreshCooldownRemainingMs > 0
+                      ? `Refresh in ${Math.ceil(refreshCooldownRemainingMs / 1000)}s`
+                      : 'Refresh from NAC'}
+                  </button>
+                </div>
+              </div>
               {showQR && (
                 <div className="mt-4">
                   <QRCodeSVG value={qrCodeUrl} size={128} />
