@@ -7,14 +7,27 @@ import {
   setRefreshCooldown,
   REFRESH_BUTTON_COOLDOWN_MS,
 } from '../../../../refreshCooldown';
+import { isLocalhostHostname } from '../../../../refreshAccess';
 
 export default function RefreshBuskerPage({ params }) {
   const hasStartedRef = useRef(false);
   const [status, setStatus] = useState('Starting refresh...');
   const [error, setError] = useState('');
+  const [isLocalRefreshEnabled, setIsLocalRefreshEnabled] = useState(false);
+  const [hasResolvedEnvironment, setHasResolvedEnvironment] = useState(false);
 
   useEffect(() => {
     if (hasStartedRef.current) {
+      return;
+    }
+
+    const isAllowed = isLocalhostHostname(window.location.hostname);
+    setIsLocalRefreshEnabled(isAllowed);
+    setHasResolvedEnvironment(true);
+
+    if (!isAllowed) {
+      setStatus('Refresh from NAC is only available on localhost.');
+      setError('Refresh from NAC is disabled in production.');
       return;
     }
 
@@ -65,7 +78,12 @@ export default function RefreshBuskerPage({ params }) {
         <h1 className="text-2xl font-semibold mb-3">Refreshing busker</h1>
         <p className="text-gray-600 mb-4">{status}</p>
 
-        {error ? (
+        {!hasResolvedEnvironment ? (
+          <div className="flex items-center gap-3 text-gray-600">
+            <span className="loading loading-spinner loading-md" aria-hidden />
+            <span>Checking refresh availability...</span>
+          </div>
+        ) : error ? (
           <div className="space-y-4">
             <p className="text-red-600">{error}</p>
             <Link
@@ -75,12 +93,12 @@ export default function RefreshBuskerPage({ params }) {
               Back to busker
             </Link>
           </div>
-        ) : (
+        ) : isLocalRefreshEnabled ? (
           <div className="flex items-center gap-3 text-gray-600">
             <span className="loading loading-spinner loading-md" aria-hidden />
             <span>This page will redirect when the refresh finishes.</span>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

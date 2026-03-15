@@ -1,10 +1,18 @@
 import { LocationRefreshError, refreshLocationById } from '../../../../server/nac_location_refresh.js';
+import { getRequestHostname, isLocalhostHostname } from '../../../../refreshAccess.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function POST(request, { params }) {
+  if (!isLocalhostHostname(getRequestHostname(request))) {
+    return Response.json(
+      { error: 'Refresh from NAC is only available on localhost.' },
+      { status: 403 }
+    );
+  }
+
   try {
     const result = await refreshLocationById(params.id);
 
