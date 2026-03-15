@@ -129,6 +129,125 @@ function normalizeJsonValue(value) {
   return JSON.stringify(value);
 }
 
+function summarizeErrorMessage(error) {
+  return [
+    error?.message,
+    error?.details,
+    error?.hint,
+    error?.code,
+    error?.error_description,
+  ]
+    .filter((value) => typeof value === 'string' && value.trim().length > 0)
+    .join(' ')
+    .toLowerCase();
+}
+
+function isMissingColumnError(error, columnName) {
+  const message = summarizeErrorMessage(error);
+  if (!message || !message.includes(String(columnName).toLowerCase())) {
+    return false;
+  }
+
+  return message.includes('column') || message.includes('schema cache') || message.includes('does not exist');
+}
+
+function buildSupportedBuskerColumns(error = null) {
+  return {
+    bio: !isMissingColumnError(error, 'bio'),
+    socials: !isMissingColumnError(error, 'socials'),
+  };
+}
+
+function buildBuskerSelectColumns(supportedColumns = { bio: true, socials: true }) {
+  return [
+    'busker_id',
+    'name',
+    'act',
+    'art_form',
+    supportedColumns.bio ? 'bio' : null,
+    supportedColumns.socials ? 'socials' : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
+function filterBuskerForStorage(busker, supportedColumns = { bio: true, socials: true }) {
+  if (!busker) {
+    return busker;
+  }
+
+  const nextBusker = {
+    busker_id: busker.busker_id,
+    name: busker.name,
+    act: busker.act,
+    art_form: busker.art_form,
+  };
+
+  if ('updated_at' in busker) {
+    nextBusker.updated_at = busker.updated_at;
+  }
+
+  if (supportedColumns.bio && 'bio' in busker) {
+    nextBusker.bio = busker.bio;
+  }
+
+  if (supportedColumns.socials && 'socials' in busker) {
+    nextBusker.socials = busker.socials;
+  }
+
+  return nextBusker;
+}
+
+function buildBuskerUpsertAttempts(buskers, initialSupportedColumns = { bio: true, socials: true }) {
+  const attempts = [];
+  const seenKeys = new Set();
+  const supportVariants = [
+    initialSupportedColumns,
+    { ...initialSupportedColumns, socials: false },
+    { ...initialSupportedColumns, bio: false },
+    { bio: false, socials: false },
+  ];
+
+  for (const supportedColumns of supportVariants) {
+    const key = JSON.stringify(supportedColumns);
+    if (seenKeys.has(key)) {
+      continue;
+    }
+
+    seenKeys.add(key);
+    attempts.push(buskers.map((busker) => filterBuskerForStorage(busker, supportedColumns)));
+  }
+
+  return attempts;
+}
+
+async function upsertBuskersWithFallback(
+  supabase,
+  buskers,
+  failureMessage,
+  supportedColumns = { bio: true, socials: true }
+) {
+  let lastError = null;
+
+  for (const payload of buildBuskerUpsertAttempts(buskers, supportedColumns)) {
+    const upsertResponse = await supabase
+      .from('buskers')
+      .upsert(payload, { onConflict: 'busker_id' });
+
+    if (!upsertResponse.error) {
+      return;
+    }
+
+    lastError = upsertResponse.error;
+    if (!isMissingColumnError(lastError, 'bio') && !isMissingColumnError(lastError, 'socials')) {
+      break;
+    }
+  }
+
+  console.error('Busker upsert failed:', lastError);
+  throw new LocationRefreshError(failureMessage);
+}
+
 function stableStringify(value) {
   if (Array.isArray(value)) {
     return `[${value.map((item) => stableStringify(item)).join(',')}]`;
@@ -222,11 +341,23 @@ async function readCurrentLocationSnapshot(supabase, locationId) {
 }
 
 async function readCurrentBuskerSnapshot(supabase, buskerId) {
-  const { data: buskerData, error: buskerError } = await supabase
+  let supportedColumns = { bio: true, socials: true };
+  let buskerQuery = await supabase
     .from('buskers')
-    .select('busker_id, name, act, art_form, bio, socials')
+    .select(buildBuskerSelectColumns(supportedColumns))
     .eq('busker_id', buskerId)
     .maybeSingle();
+
+  if (buskerQuery.error && (isMissingColumnError(buskerQuery.error, 'bio') || isMissingColumnError(buskerQuery.error, 'socials'))) {
+    supportedColumns = buildSupportedBuskerColumns(buskerQuery.error);
+    buskerQuery = await supabase
+      .from('buskers')
+      .select(buildBuskerSelectColumns(supportedColumns))
+      .eq('busker_id', buskerId)
+      .maybeSingle();
+  }
+
+  const { data: buskerData, error: buskerError } = buskerQuery;
 
   if (buskerError) {
     throw new LocationRefreshError('Failed to read current busker data.');
@@ -242,8 +373,9 @@ async function readCurrentBuskerSnapshot(supabase, buskerId) {
   }
 
   return {
-    busker: buskerData,
+    busker: filterBuskerForStorage(buskerData, supportedColumns),
     performances: performanceData ?? [],
+    supportedColumns,
   };
 }
 
@@ -645,13 +777,11 @@ async function scrapeMissingBuskers(supabase, page, performances) {
     return { upsertedCount: 0, failedBuskerIds };
   }
 
-  const upsertResponse = await supabase
-    .from('buskers')
-    .upsert(buskersToUpsert, { onConflict: 'busker_id' });
-
-  if (upsertResponse.error) {
-    throw new LocationRefreshError('Failed to save refreshed buskers.');
-  }
+  await upsertBuskersWithFallback(
+    supabase,
+    buskersToUpsert,
+    'Failed to save refreshed buskers.'
+  );
 
   return { upsertedCount: buskersToUpsert.length, failedBuskerIds };
 }
@@ -973,6 +1103,7 @@ export async function refreshBuskerById(buskerId) {
     const supabase = createScraperSupabaseClient();
     const currentSnapshot = await readCurrentBuskerSnapshot(supabase, normalizedBuskerId);
     const { busker, imageUrl } = await fetchBuskerProfile(normalizedBuskerId);
+    const nextBusker = filterBuskerForStorage(busker, currentSnapshot.supportedColumns);
     if (!busker.name || !busker.act || !busker.art_form) {
       throw new LocationRefreshError('Failed to parse the busker profile from NAC.');
     }
@@ -983,7 +1114,7 @@ export async function refreshBuskerById(buskerId) {
 
     const buskerChanged = !areSnapshotsEqual(
       normalizeBuskerForCompare(currentSnapshot.busker),
-      normalizeBuskerForCompare(busker)
+      normalizeBuskerForCompare(nextBusker)
     );
     const performancesChanged = !areSnapshotsEqual(
       normalizePerformancesForCompare(currentSnapshot.performances),
@@ -991,13 +1122,12 @@ export async function refreshBuskerById(buskerId) {
     );
 
     if (buskerChanged) {
-      const buskerUpsertResponse = await supabase
-        .from('buskers')
-        .upsert(busker, { onConflict: 'busker_id' });
-
-      if (buskerUpsertResponse.error) {
-        throw new LocationRefreshError('Failed to save refreshed busker.');
-      }
+      await upsertBuskersWithFallback(
+        supabase,
+        [nextBusker],
+        'Failed to save refreshed busker.',
+        currentSnapshot.supportedColumns
+      );
 
       if (imageUrl) {
         await uploadImageFromUrl(
@@ -1028,7 +1158,7 @@ export async function refreshBuskerById(buskerId) {
     }
 
     return {
-      busker,
+      busker: nextBusker,
       performanceCount: performances.length,
       locationsRefreshed: locationRefreshSummary.refreshedCount,
       fallbackLocations: locationRefreshSummary.fallbackCount,
