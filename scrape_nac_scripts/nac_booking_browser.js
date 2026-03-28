@@ -931,6 +931,70 @@ export async function installNacPageHelpers(page) {
         return monthIndex == null ? null : { monthIndex, year: Number(monthMatch[2]) };
       },
 
+      getDatePickerMonthContext(root, fallbackDateValue = '') {
+        if (!root) {
+          return null;
+        }
+
+        const fallbackDateKey = helpers.parseDateKey(fallbackDateValue);
+        const fallbackDate = fallbackDateKey
+          ? {
+              year: Number(fallbackDateKey.slice(0, 4)),
+              monthIndex: Number(fallbackDateKey.slice(5, 7)) - 1,
+            }
+          : null;
+
+        const explicitMonthNodes = [
+          ...root.querySelectorAll(
+            [
+              '.ui-datepicker-title',
+              '.ui-datepicker-header',
+              '.react-datepicker__current-month',
+              '.flatpickr-current-month',
+              '.flatpickr-month',
+              '.p-datepicker-title',
+              '.datepicker-switch',
+              '[class*="datepicker"][class*="title"]',
+              '[class*="datepicker"][class*="header"]',
+              '[class*="calendar"][class*="header"]',
+            ].join(', ')
+          ),
+        ]
+          .filter((element) => helpers.isVisible(element))
+          .map((element) => {
+            const rect = element.getBoundingClientRect();
+            return {
+              text: helpers.getText(element),
+              top: rect.top,
+              left: rect.left,
+              area: rect.width * rect.height,
+            };
+          })
+          .filter(({ text }) => Boolean(helpers.parseMonthYearContext(text)))
+          .sort((left, right) => {
+            if (Math.abs(left.top - right.top) > 12) {
+              return left.top - right.top;
+            }
+            return left.area - right.area || left.left - right.left;
+          });
+
+        if (explicitMonthNodes.length > 0) {
+          return helpers.parseMonthYearContext(explicitMonthNodes[0].text);
+        }
+
+        const headerMonth = root.querySelector(
+          '.ui-datepicker-month, .flatpickr-monthDropdown-months, [class*="month"]'
+        );
+        const headerYear = root.querySelector('.ui-datepicker-year, [class*="year"]');
+        const combinedHeaderText = `${helpers.getText(headerMonth)} ${helpers.getText(headerYear)}`.trim();
+        const combinedHeaderContext = helpers.parseMonthYearContext(combinedHeaderText);
+        if (combinedHeaderContext) {
+          return combinedHeaderContext;
+        }
+
+        return helpers.parseMonthYearContext(helpers.getText(root)) ?? fallbackDate;
+      },
+
       isDisabledDateTarget(element) {
         if (!element) {
           return true;
@@ -946,6 +1010,106 @@ export async function installNacPageHelpers(page) {
           className.includes('ui-datepicker-other-month') ||
           className.split(/\s+/).some((token) => token === 'old' || token === 'new')
         );
+      },
+
+      getDateKeyParts(dateKey) {
+        const parsedKey = helpers.parseDateKey(dateKey);
+        if (!parsedKey) {
+          return null;
+        }
+
+        return {
+          dateKey: parsedKey,
+          year: Number(parsedKey.slice(0, 4)),
+          monthIndex: Number(parsedKey.slice(5, 7)) - 1,
+          day: Number(parsedKey.slice(8, 10)),
+          dayLabel: String(Number(parsedKey.slice(8, 10))),
+        };
+      },
+
+      getClickableDateTarget(element) {
+        if (!element) {
+          return null;
+        }
+
+        const directTarget = element.matches?.('a, button, [role="button"]') ? element : null;
+        if (directTarget && helpers.isVisible(directTarget)) {
+          return directTarget;
+        }
+
+        const nestedTarget =
+          element.querySelector?.('a, button, [role="button"], [data-handler="selectDay"] a, [data-handler="selectDay"] button') ??
+          null;
+        if (nestedTarget && helpers.isVisible(nestedTarget)) {
+          return nestedTarget;
+        }
+
+        return element;
+      },
+
+      findExactDatePickerTarget(root, targetDateKey, fallbackDateValue) {
+        const parts = helpers.getDateKeyParts(targetDateKey);
+        if (!root || !parts) {
+          return null;
+        }
+
+        const directMetadataTargets = [...root.querySelectorAll('[data-year][data-month], [data-date], [data-day]')]
+          .filter((element) => helpers.isVisible(element))
+          .map((element) => {
+            const clickTarget = helpers.getClickableDateTarget(element);
+            const label = helpers.getText(clickTarget) || helpers.getText(element);
+            const dateKey = helpers.resolveDateKeyForTarget(root, fallbackDateValue, element, label, clickTarget ?? element);
+            return {
+              element,
+              clickTarget,
+              label,
+              dateKey,
+              selectable: !helpers.isDisabledDateTarget(element) && !helpers.isDisabledDateTarget(clickTarget),
+            };
+          })
+          .filter(({ dateKey, label }) => {
+            if (dateKey === targetDateKey) {
+              return true;
+            }
+
+            return label === parts.dayLabel;
+          })
+          .sort((left, right) => {
+            const leftExact = left.dateKey === targetDateKey ? 0 : 1;
+            const rightExact = right.dateKey === targetDateKey ? 0 : 1;
+            return leftExact - rightExact;
+          });
+
+        if (directMetadataTargets.length > 0) {
+          return directMetadataTargets[0];
+        }
+
+        const rawNodes = helpers.getDatePickerRawNodes(root);
+        const seenTargets = new Set();
+        for (const node of rawNodes) {
+          const target = node.closest('button, td, a, [role="button"], [data-date], [data-day]') ?? node;
+          if (!helpers.isVisible(target) || seenTargets.has(target)) {
+            continue;
+          }
+
+          seenTargets.add(target);
+          const clickTarget = helpers.getClickableDateTarget(target);
+          const label = helpers.getText(clickTarget) || helpers.getText(node) || helpers.getText(target);
+          const dateKey = helpers.resolveDateKeyForTarget(root, fallbackDateValue, target, label, node);
+          if (dateKey !== targetDateKey) {
+            continue;
+          }
+
+          return {
+            element: target,
+            clickTarget,
+            label,
+            dateKey,
+            selectable: !helpers.isDisabledDateTarget(target) && !helpers.isDisabledDateTarget(clickTarget),
+          };
+        }
+
+        return null;
       },
 
       getDatePickerRawNodes(root) {
@@ -981,7 +1145,7 @@ export async function installNacPageHelpers(page) {
               monthIndex: Number(fallbackDateKey.slice(5, 7)) - 1,
             }
           : null;
-        const monthYearContext = helpers.parseMonthYearContext(helpers.getText(root)) ?? fallbackDate;
+        const monthYearContext = helpers.getDatePickerMonthContext(root, fallbackDateValue) ?? fallbackDate;
 
         const metadataSources = [sourceNode, target].filter(Boolean);
         for (const source of metadataSources) {
@@ -1045,14 +1209,7 @@ export async function installNacPageHelpers(page) {
           return null;
         }
 
-        const fallbackDateKey = helpers.parseDateKey(fallbackDateValue);
-        const fallbackDate = fallbackDateKey
-          ? {
-              year: Number(fallbackDateKey.slice(0, 4)),
-              monthIndex: Number(fallbackDateKey.slice(5, 7)) - 1,
-            }
-          : null;
-        return helpers.parseMonthYearContext(helpers.getText(root)) ?? fallbackDate;
+        return helpers.getDatePickerMonthContext(root, fallbackDateValue);
       },
 
       getDatePickerCandidates(fallbackDateValue) {
@@ -1138,6 +1295,17 @@ export async function installNacPageHelpers(page) {
           return { exists: false, selectable: false };
         }
 
+        const exactTarget = helpers.findExactDatePickerTarget(root, targetDateKey, fallbackDateValue);
+        if (exactTarget) {
+          return {
+            exists: true,
+            selectable: exactTarget.selectable,
+            label: exactTarget.label,
+            className: String((exactTarget.clickTarget ?? exactTarget.element)?.className || ''),
+            tagName: (exactTarget.clickTarget ?? exactTarget.element)?.tagName,
+          };
+        }
+
         const rawNodes = helpers.getDatePickerRawNodes(root);
         const seenTargets = new Set();
 
@@ -1170,6 +1338,32 @@ export async function installNacPageHelpers(page) {
         const root = helpers.findDatePickerRoot();
         if (!root) {
           return { clicked: false, exists: false, selectable: false };
+        }
+
+        const exactTarget = helpers.findExactDatePickerTarget(root, targetDateKey, fallbackDateValue);
+        if (exactTarget) {
+          if (!exactTarget.selectable) {
+            return {
+              clicked: false,
+              exists: true,
+              selectable: false,
+              label: exactTarget.label,
+              className: String((exactTarget.clickTarget ?? exactTarget.element)?.className || ''),
+              tagName: (exactTarget.clickTarget ?? exactTarget.element)?.tagName,
+            };
+          }
+
+          const clickTarget = exactTarget.clickTarget ?? exactTarget.element;
+          clickTarget.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' });
+          clickTarget.click();
+          return {
+            clicked: true,
+            exists: true,
+            selectable: true,
+            label: exactTarget.label,
+            className: String(clickTarget.className || ''),
+            tagName: clickTarget.tagName,
+          };
         }
 
         const rawNodes = helpers.getDatePickerRawNodes(root);
@@ -1507,27 +1701,51 @@ export async function selectBookingDate(page, targetDateInput) {
 
   for (let monthAttempt = 0; monthAttempt < 12; monthAttempt += 1) {
     const currentSnapshot = await getBookingSnapshot(page);
-    const [monthContext, candidates] = await Promise.all([
+    const [monthContext, candidates, targetInspection] = await Promise.all([
       page.evaluate((fallbackDateValue) => {
         return window.__liveMuseekNacHelpers?.getDatePickerMonthContextData?.(fallbackDateValue) ?? null;
       }, currentSnapshot?.dateValue ?? ''),
       page.evaluate((fallbackDateValue) => {
         return window.__liveMuseekNacHelpers?.getDatePickerCandidates?.(fallbackDateValue) ?? [];
       }, currentSnapshot?.dateValue ?? ''),
+      page.evaluate(
+        ({ expectedDateKey, fallbackDateValue }) => {
+          return window.__liveMuseekNacHelpers?.inspectDatePickerDateKey?.(expectedDateKey, fallbackDateValue) ?? null;
+        },
+        {
+          expectedDateKey: targetDateKey,
+          fallbackDateValue: currentSnapshot?.dateValue ?? '',
+        }
+      ),
     ]);
 
     const exactCandidate = candidates.find((candidate) => candidate.dateKey === targetDateKey);
-    if (exactCandidate) {
+    if (exactCandidate || targetInspection?.exists) {
       const clickedCandidate = await page.evaluate(
-        ({ candidateIndex, fallbackDateValue }) =>
-          window.__liveMuseekNacHelpers?.clickDatePickerCandidate?.(candidateIndex, fallbackDateValue) ?? null,
+        ({ candidateIndex, expectedDateKey, fallbackDateValue }) => {
+          if (expectedDateKey) {
+            const clickedByKey = window.__liveMuseekNacHelpers?.clickDatePickerDateKey?.(expectedDateKey, fallbackDateValue);
+            if (clickedByKey?.exists) {
+              return clickedByKey;
+            }
+          }
+
+          return window.__liveMuseekNacHelpers?.clickDatePickerCandidate?.(candidateIndex, fallbackDateValue) ?? null;
+        },
         {
-          candidateIndex: exactCandidate.index,
+          candidateIndex: exactCandidate?.index ?? -1,
+          expectedDateKey: targetDateKey,
           fallbackDateValue: currentSnapshot?.dateValue ?? '',
         }
       );
 
-      if (!clickedCandidate) {
+      if (!clickedCandidate?.clicked && clickedCandidate?.exists && clickedCandidate?.selectable === false) {
+        throw new Error(
+          `The requested booking date ${targetDateKey} is visible in the NAC calendar but not selectable.`
+        );
+      }
+
+      if (!clickedCandidate?.clicked) {
         throw new Error(`Date picker found ${targetDateKey}, but clicking it failed.`);
       }
 
@@ -1548,6 +1766,11 @@ export async function selectBookingDate(page, targetDateInput) {
       ? monthContext.year * 12 + monthContext.monthIndex
       : Number.NEGATIVE_INFINITY;
     const targetMonthComparable = targetYear * 12 + targetMonthIndex;
+    if (currentMonthComparable === targetMonthComparable && !targetInspection?.exists) {
+      throw new Error(
+        `The requested booking date ${targetDateKey} was not found in the visible NAC calendar month.`
+      );
+    }
     if (currentMonthComparable >= targetMonthComparable) {
       break;
     }
