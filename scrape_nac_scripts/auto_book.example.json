@@ -1,0 +1,26 @@
+{
+  "stop_on_failure": false,
+  "bookings": [
+    {
+      "label": "Sunday morning set",
+      "date": "2026-03-29",
+      "time": "10:00-12:00",
+      "location_priority": [
+        { "location_name": "*SCAPE" },
+        { "location_name": "SHAW HOUSE" },
+        { "location_name": "TRAS LINK PARK" }
+      ]
+    },
+    {
+      "label": "Sunday evening set",
+      "date": "2026-03-29",
+      "from": "18:00",
+      "to": "20:00",
+      "location_priority": [
+        { "location_name": "TRAS LINK PARK" },
+        { "location_name": "SOMERSET YOUTH PARK" },
+        { "location_id": "74d5f785-8441-4d3d-9b26-d61e90475026" }
+      ]
+    }
+  ]
+}

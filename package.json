@@ -7,7 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "nac:auto-book": "node scrape_nac_scripts/auto_book.js",
+    "nac:availability": "node scrape_nac_scripts/check_nac_availability.js"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
