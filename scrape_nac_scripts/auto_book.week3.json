@@ -1,0 +1,30 @@
+{
+  "stop_on_failure": false,
+  "bookings": [
+
+    {
+      "label": "Thursday AM set",
+      "date": "2026-04-30",
+      "time": "11:00-14:00",
+      "location_priority": [
+        { "location_name": "ZION RIVERSIDE FOOD CENTRE" },
+        { "location_name": "BEO CRESCENT MARKET" },
+        { "location_name": "TANJONG PAGAR PLAZA" }
+      ]
+    },
+  
+
+
+    {
+      "label": "Thurs PM set",
+      "date": "2026-04-30",
+      "time": "11:00-14:00",
+      "location_priority": [
+        { "location_name": "MANDARIN GALLERY" },
+        { "location_name": "NGEE ANN CITY B" },
+        { "location_name": "TANJONG PAGAR PLAZA" }
+      ]
+    }
+
+  ]
+}

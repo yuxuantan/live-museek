@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "nac:auto-book": "node scrape_nac_scripts/auto_book.js",
-    "nac:availability": "node scrape_nac_scripts/check_nac_availability.js"
+    "nac:availability": "node scrape_nac_scripts/check_nac_availability.js",
+    "nac:slot-universe": "node scrape_nac_scripts/snapshot_nac_slot_universe.js"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.6.0",

@@ -2,7 +2,9 @@ export function isLocalhostHostname(hostname) {
   const normalizedHostname = String(hostname ?? '').trim().toLowerCase();
   return (
     normalizedHostname === 'localhost' ||
+    normalizedHostname.endsWith('.localhost') ||
     normalizedHostname === '127.0.0.1' ||
+    normalizedHostname === '0.0.0.0' ||
     normalizedHostname === '::1' ||
     normalizedHostname === '[::1]'
   );
