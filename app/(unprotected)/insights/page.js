@@ -53,6 +53,11 @@ const InsightsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState('bookingRate');
   const [selectedLocationId, setSelectedLocationId] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState('');
+  const [refreshStatus, setRefreshStatus] = useState('');
 
   useEffect(() => {
     setIsLocalhost(isLocalhostHostname(window.location.hostname));
@@ -103,6 +108,64 @@ const InsightsPage = () => {
     };
   }, [isLocalhost]);
 
+  const handleRefresh = async (event) => {
+    event.preventDefault();
+    setRefreshing(true);
+    setRefreshError('');
+    setRefreshStatus(
+      fromDate && toDate
+        ? `Refreshing ${fromDate} to ${toDate}. This can take several minutes...`
+        : 'Refreshing the latest rolling window. This can take several minutes...'
+    );
+
+    try {
+      const response = await fetch('/api/insights', {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fromDate, toDate }),
+      });
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(payload?.error || 'Failed to refresh Insights.');
+      }
+
+      const nextSnapshot = payload?.snapshot;
+      if (!nextSnapshot) {
+        throw new Error('The refresh completed without returning a snapshot.');
+      }
+
+      const nextRankingRows = nextSnapshot?.rankings?.byBookingRate ?? [];
+      setSnapshot(nextSnapshot);
+      setError('');
+      setSelectedLocationId((currentLocationId) =>
+        nextSnapshot?.aggregateByLocationId?.[currentLocationId]
+          ? currentLocationId
+          : nextRankingRows[0]?.locationId ?? ''
+      );
+      setRefreshStatus(
+        `Updated ${nextSnapshot.window?.startDateKey} to ${nextSnapshot.window?.endDateKey}.`
+      );
+    } catch (refreshRequestError) {
+      setRefreshStatus('');
+      setRefreshError(
+        refreshRequestError instanceof Error
+          ? refreshRequestError.message
+          : 'Failed to refresh Insights.'
+      );
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const hasIncompleteCustomWindow = Boolean(fromDate) !== Boolean(toDate);
+  const hasReversedCustomWindow = Boolean(fromDate && toDate && toDate < fromDate);
+  const refreshDisabled =
+    loading || refreshing || hasIncompleteCustomWindow || hasReversedCustomWindow;
+
   const rankingRows = [...(snapshot?.rankings?.byBookingRate ?? [])]
     .filter((row) =>
       row.locationName.toLowerCase().includes(searchQuery.trim().toLowerCase())
@@ -139,6 +202,76 @@ const InsightsPage = () => {
           Bookable universe = NAC available slots + booked slots from Supabase.
         </p>
       </div>
+
+      <form className="card p-6 space-y-4" onSubmit={handleRefresh}>
+        <div>
+          <h2 className="text-2xl font-semibold">Refresh data</h2>
+          <p className="text-gray-500">
+            Leave both dates blank to use the latest rolling window, or choose a custom window of up to 62 days.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
+          <label className="form-control w-full">
+            <span className="label-text mb-2">Start date</span>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(event) => setFromDate(event.target.value)}
+              className="input-box"
+              disabled={refreshing}
+            />
+          </label>
+          <label className="form-control w-full">
+            <span className="label-text mb-2">End date</span>
+            <input
+              type="date"
+              value={toDate}
+              min={fromDate || undefined}
+              onChange={(event) => setToDate(event.target.value)}
+              className="input-box"
+              disabled={refreshing}
+            />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button type="submit" className="btn btn-primary" disabled={refreshDisabled}>
+              {refreshing && <span className="loading loading-spinner loading-sm" aria-hidden />}
+              {refreshing ? 'Refreshing...' : 'Refresh data'}
+            </button>
+            {(fromDate || toDate) && (
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => {
+                  setFromDate('');
+                  setToDate('');
+                  setRefreshError('');
+                }}
+                disabled={refreshing}
+              >
+                Use latest window
+              </button>
+            )}
+          </div>
+        </div>
+
+        {hasIncompleteCustomWindow && (
+          <p className="text-amber-600">Choose both dates for a custom window.</p>
+        )}
+        {hasReversedCustomWindow && (
+          <p className="text-amber-600">The end date must be on or after the start date.</p>
+        )}
+        {refreshStatus && (
+          <p className="text-green-700" role="status" aria-live="polite">
+            {refreshStatus}
+          </p>
+        )}
+        {refreshError && (
+          <p className="text-red-600" role="alert">
+            {refreshError}
+          </p>
+        )}
+      </form>
 
       {loading && (
         <div className="card p-6">
