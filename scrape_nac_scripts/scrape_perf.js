@@ -2,6 +2,7 @@
 import puppeteer from 'puppeteer';
 import cheerio from 'cheerio';
 import { createScraperSupabaseClient } from './supabase_client.js';
+import { filterCurrentOrFuturePerformances } from './performance_retention.js';
 
 function parseCsvArg(value) {
     return value
@@ -253,22 +254,36 @@ async function scrapeWebsite() {
         await browser.close();
         return;
     }
-    // clear the db table 'performances'
-    console.log('Done scraping all locations. Clearing performances table');
-    const response = await supabase.from('performances').delete().gt('event_id', 0) // delete all event_id > 0 means delete all
+    const refreshCutoff = new Date();
+    const refreshCutoffIso = refreshCutoff.toISOString();
+    const currentOrFuturePerformances = filterCurrentOrFuturePerformances(
+        performances_list,
+        refreshCutoff
+    );
+
+    // Preserve completed bookings for analytics and replace only current/future rows.
+    console.log(`Done scraping all locations. Replacing performances ending on or after ${refreshCutoffIso}`);
+    const response = await supabase
+        .from('performances')
+        .delete()
+        .gte('end_datetime', refreshCutoffIso);
     if (response.error != null) {
         throw response.error;
     }
     else {
-        console.log('Cleared performances table');
+        console.log('Cleared current and future performances; historical rows were retained');
     }
 
-    const { error } = await supabase.from('performances').insert(performances_list)
-    if (error == null) {
-        console.log('Done writing all performances to supabase');
-    }
-    else {
-        throw error;
+    if (currentOrFuturePerformances.length > 0) {
+        const { error } = await supabase.from('performances').insert(currentOrFuturePerformances)
+        if (error == null) {
+            console.log(`Done writing ${currentOrFuturePerformances.length} current/future performances to Supabase`);
+        }
+        else {
+            throw error;
+        }
+    } else {
+        console.log('No current or future performances to insert');
     }
     await browser.close();
 }
@@ -284,8 +299,8 @@ scrapeWebsite();
 // 4. for each performance element, 
 // create an performance object with (busker_id, location_id, location_name, location_address, start_datetime, end_datetime, created_at)
 // add the performance object to the performances_list array
-// 5. clear the db table 'performances'
-// 6. write all event objects in performances_list to the database 'events' table. (busker_id, location_id, location_name, location_address, start_datetime, end_datetime, created_at)
+// 5. preserve completed performances and clear only current/future rows
+// 6. write refreshed current/future event objects to the database. (busker_id, location_id, start_datetime, end_datetime)
 // 7. get list of unique busker IDs from the performances_list array. create a buskers_list array
 // 8. for each busker id, 
 // navigate to busker page.

@@ -109,7 +109,11 @@ export default function BuskerDetailPage({ params }) {
 
   useEffect(() => {
     const fetchPerformances = async () => {
-      const { data, error } = await supabase.from('performances').select('*').eq('busker_id', params.id);
+      const { data, error } = await supabase
+        .from('performances')
+        .select('*')
+        .eq('busker_id', params.id)
+        .gte('end_datetime', new Date().toISOString());
       if (error) {
         console.error('Error fetching performances:', error);
       } else {

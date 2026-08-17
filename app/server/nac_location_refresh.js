@@ -3,6 +3,10 @@ import cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
 import { Client } from '@googlemaps/google-maps-services-js';
 import { createScraperSupabaseClient } from '../../scrape_nac_scripts/supabase_client.js';
+import {
+  countHistoricalPerformances,
+  filterCurrentOrFuturePerformances,
+} from '../../scrape_nac_scripts/performance_retention.js';
 
 const ROOT_URL = 'https://eservices.nac.gov.sg';
 const BUSKING_BASE_URL = `${ROOT_URL}/Busking`;
@@ -1031,6 +1035,8 @@ export async function refreshLocationById(locationId) {
 
   return withRefreshGuard(`location:${normalizedLocationId}`, async () => {
     const supabase = createScraperSupabaseClient();
+    const refreshCutoff = new Date();
+    const refreshCutoffIso = refreshCutoff.toISOString();
     const locationName = await fetchLocationName(normalizedLocationId);
 
     if (!locationName) {
@@ -1046,14 +1052,23 @@ export async function refreshLocationById(locationId) {
     try {
       const page = await browser.newPage();
       const { location, performances } = await scrapeLocationSnapshot(page, normalizedLocationId, locationName);
+      const currentOrFuturePerformances = filterCurrentOrFuturePerformances(performances, refreshCutoff);
+      const existingCurrentOrFuturePerformances = filterCurrentOrFuturePerformances(
+        currentSnapshot.performances,
+        refreshCutoff
+      );
+      const historicalPerformanceCountPreserved = countHistoricalPerformances(
+        currentSnapshot.performances,
+        refreshCutoff
+      );
 
       const locationChanged = !areSnapshotsEqual(
         normalizeLocationForCompare(currentSnapshot.location),
         normalizeLocationForCompare(location)
       );
       const performancesChanged = !areSnapshotsEqual(
-        normalizePerformancesForCompare(currentSnapshot.performances),
-        normalizePerformancesForCompare(performances)
+        normalizePerformancesForCompare(existingCurrentOrFuturePerformances),
+        normalizePerformancesForCompare(currentOrFuturePerformances)
       );
 
       if (!locationChanged) {
@@ -1079,25 +1094,27 @@ export async function refreshLocationById(locationId) {
         const deleteResponse = await supabase
           .from('performances')
           .delete()
-          .eq('location_id', normalizedLocationId);
+          .eq('location_id', normalizedLocationId)
+          .gte('end_datetime', refreshCutoffIso);
 
         if (deleteResponse.error) {
           throw new LocationRefreshError('Failed to clear existing performances for this location.');
         }
 
-        if (performances.length > 0) {
-          const insertResponse = await supabase.from('performances').insert(performances);
+        if (currentOrFuturePerformances.length > 0) {
+          const insertResponse = await supabase.from('performances').insert(currentOrFuturePerformances);
           if (insertResponse.error) {
             throw new LocationRefreshError('Failed to save refreshed performances.');
           }
         }
       }
 
-      const buskerRefreshSummary = await scrapeMissingBuskers(supabase, page, performances);
+      const buskerRefreshSummary = await scrapeMissingBuskers(supabase, page, currentOrFuturePerformances);
 
       return {
         location,
-        performanceCount: performances.length,
+        performanceCount: currentOrFuturePerformances.length,
+        historicalPerformanceCountPreserved,
         buskersUpserted: buskerRefreshSummary.upsertedCount,
         failedBuskerIds: buskerRefreshSummary.failedBuskerIds,
         changed: {
@@ -1119,6 +1136,8 @@ export async function refreshBuskerById(buskerId) {
 
   return withRefreshGuard(`busker:${normalizedBuskerId}`, async () => {
     const supabase = createScraperSupabaseClient();
+    const refreshCutoff = new Date();
+    const refreshCutoffIso = refreshCutoff.toISOString();
     const currentSnapshot = await readCurrentBuskerSnapshot(supabase, normalizedBuskerId);
     const { busker, imageUrl } = await fetchBuskerProfile(normalizedBuskerId);
     const nextBusker = filterBuskerForStorage(busker, currentSnapshot.supportedColumns);
@@ -1128,6 +1147,15 @@ export async function refreshBuskerById(buskerId) {
 
     const eventsHtml = await fetchBuskerEventsHtml(normalizedBuskerId);
     const { performances, locationRefs } = extractBuskerPerformances(eventsHtml, normalizedBuskerId);
+    const currentOrFuturePerformances = filterCurrentOrFuturePerformances(performances, refreshCutoff);
+    const existingCurrentOrFuturePerformances = filterCurrentOrFuturePerformances(
+      currentSnapshot.performances,
+      refreshCutoff
+    );
+    const historicalPerformanceCountPreserved = countHistoricalPerformances(
+      currentSnapshot.performances,
+      refreshCutoff
+    );
     const locationRefreshSummary = await ensureLocationRows(supabase, locationRefs);
 
     const buskerChanged = !areSnapshotsEqual(
@@ -1135,8 +1163,8 @@ export async function refreshBuskerById(buskerId) {
       normalizeBuskerForCompare(nextBusker)
     );
     const performancesChanged = !areSnapshotsEqual(
-      normalizePerformancesForCompare(currentSnapshot.performances),
-      normalizePerformancesForCompare(performances)
+      normalizePerformancesForCompare(existingCurrentOrFuturePerformances),
+      normalizePerformancesForCompare(currentOrFuturePerformances)
     );
 
     if (buskerChanged) {
@@ -1161,14 +1189,15 @@ export async function refreshBuskerById(buskerId) {
       const deleteResponse = await supabase
         .from('performances')
         .delete()
-        .eq('busker_id', normalizedBuskerId);
+        .eq('busker_id', normalizedBuskerId)
+        .gte('end_datetime', refreshCutoffIso);
 
       if (deleteResponse.error) {
         throw new LocationRefreshError('Failed to clear existing performances for this busker.');
       }
 
-      if (performances.length > 0) {
-        const insertResponse = await supabase.from('performances').insert(performances);
+      if (currentOrFuturePerformances.length > 0) {
+        const insertResponse = await supabase.from('performances').insert(currentOrFuturePerformances);
         if (insertResponse.error) {
           throw new LocationRefreshError('Failed to save refreshed busker performances.');
         }
@@ -1177,7 +1206,8 @@ export async function refreshBuskerById(buskerId) {
 
     return {
       busker: nextBusker,
-      performanceCount: performances.length,
+      performanceCount: currentOrFuturePerformances.length,
+      historicalPerformanceCountPreserved,
       locationsRefreshed: locationRefreshSummary.refreshedCount,
       fallbackLocations: locationRefreshSummary.fallbackCount,
       failedLocationIds: locationRefreshSummary.failedLocationIds,

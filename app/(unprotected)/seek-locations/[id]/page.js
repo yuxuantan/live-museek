@@ -106,7 +106,11 @@ const LocationDetailPage = ({ params }) => {
 
     useEffect(() => {
         const fetchPerformances = async () => {
-            const { data: performanceData, error: performanceError } = await supabase.from('performances').select('*').eq('location_id', params.id);
+            const { data: performanceData, error: performanceError } = await supabase
+                .from('performances')
+                .select('*')
+                .eq('location_id', params.id)
+                .gte('end_datetime', new Date().toISOString());
             if (performanceError) {
                 console.error('Error fetching performances:', performanceError);
             } else {

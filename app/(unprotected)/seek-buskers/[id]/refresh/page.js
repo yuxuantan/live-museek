@@ -54,7 +54,7 @@ export default function RefreshBuskerPage({ params }) {
         }
 
         setStatus(
-          `Updated ${payload?.busker?.name || 'this busker'} with ${payload?.performanceCount ?? 0} performances. Redirecting...`
+          `Updated ${payload?.busker?.name || 'this busker'} with ${payload?.performanceCount ?? 0} current or upcoming performances. Past bookings were retained for analytics. Redirecting...`
         );
 
         window.setTimeout(() => {

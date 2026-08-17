@@ -273,7 +273,8 @@ export async function createLocationCalendarResponse(locationId) {
   const { data: performances, error: performancesError } = await supabase
     .from('performances')
     .select('busker_id, location_id, start_datetime, end_datetime')
-    .eq('location_id', locationId);
+    .eq('location_id', locationId)
+    .gte('end_datetime', new Date().toISOString());
 
   if (performancesError) {
     throw performancesError;
@@ -337,7 +338,8 @@ export async function createBuskerCalendarResponse(buskerId) {
   const { data: performances, error: performancesError } = await supabase
     .from('performances')
     .select('busker_id, location_id, start_datetime, end_datetime')
-    .eq('busker_id', buskerId);
+    .eq('busker_id', buskerId)
+    .gte('end_datetime', new Date().toISOString());
 
   if (performancesError) {
     throw performancesError;

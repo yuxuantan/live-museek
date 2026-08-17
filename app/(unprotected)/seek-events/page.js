@@ -65,7 +65,10 @@ export default function PerformancesPage() {
     }
 
     const fetchPerformances = async () => {
-      const { data, error } = await supabase.from('performances').select('*')
+      const { data, error } = await supabase
+        .from('performances')
+        .select('*')
+        .gte('end_datetime', new Date().toISOString())
       if (error) {
         console.error('Error fetching performances:', error)
       } else {
