@@ -5,7 +5,7 @@ import { main as refreshInsightsSnapshot } from '../../../scrape_nac_scripts/sna
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 const SNAPSHOT_PATH = path.resolve(process.cwd(), '.local/nac-slot-universe-snapshot.json');
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
