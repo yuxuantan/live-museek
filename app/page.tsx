@@ -1,166 +1,158 @@
-'use client';
-import React from 'react';
+import Link from 'next/link';
+import {
+  ArrowRight,
+  CalendarDays,
+  Mail,
+  MapPin,
+  Mic2,
+  Music2,
+  Sparkles,
+} from 'lucide-react';
 
-const HomePage = () => {
-  const [email, setEmail] = React.useState('');
-  const [message, setMessage] = React.useState('');
+const discoveryLinks = [
+  {
+    href: '/seek-events',
+    title: 'Find a performance',
+    description: 'See who is playing, when they start, and where to catch them.',
+    icon: CalendarDays,
+    accent: 'from-fuchsia-500/20 to-pink-400/5',
+  },
+  {
+    href: '/seek-buskers',
+    title: 'Meet the musicians',
+    description: 'Explore local performers and follow their upcoming schedules.',
+    icon: Mic2,
+    accent: 'from-violet-500/20 to-indigo-400/5',
+  },
+  {
+    href: '/seek-locations',
+    title: 'Explore live music spots',
+    description: 'Browse busking locations and plan your next live music stop.',
+    icon: MapPin,
+    accent: 'from-cyan-500/20 to-sky-400/5',
+  },
+];
 
-  // Handle email input change
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-  };
-  // Handle form submission
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // Send email to backend
-    console.log(email);
-    const res = await fetch('/api/subscribe', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      setMessage(data.message);
-      setEmail('');
-    } else {
-      setMessage(data.error);
-    }
-  };
-
+export default function HomePage() {
   return (
-    <div>
+    <div className="overflow-hidden">
+      <section className="hero-section relative isolate min-h-[calc(100svh-5rem)] overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/hero-image.jpg')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,10,23,0.96)_0%,rgba(13,16,38,0.88)_48%,rgba(16,19,39,0.55)_100%)]" />
+        <div className="absolute -left-28 top-16 h-80 w-80 rounded-full bg-fuchsia-500/20 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-violet-500/20 blur-3xl" />
 
-      {/* Hero Section */}
-      <section className="relative bg-cover bg-center h-screen md:p-24 p-8 hero-section" style={{ backgroundImage: 'url("/hero-image.jpg")' }}>
-        <div className="absolute inset-0 bg-black opacity-90 hero-overlay"></div>
-        <div className="container mx-auto flex flex-col items-center justify-center h-full relative">
-          <h1 className="md:text-5xl text-4xl font-bold text-center mb-4 ">Discover Live Music Like Never Before</h1>
-          <p className="md:text-lg text-md mb-8 text-center">Your ultimate destination to find, explore, and experience live music events near you.</p>
-          <a href="/seek-events" className="primary-btn">Seek Events</a>
-        </div>
-      </section>
-
-
-      {/* line */}
-      <div className="container mx-auto text-center">
-        <hr className="border-1 border-gray-300" />
-      </div>
-
-      {/* About Us Section */}
-      <section className="py-20">
-        <div className="container mx-auto text-center p-8">
-          <h2 className="md:text-4xl text-3xl font-bold mb-6">About LiveMuseek</h2>
-          <p className="md:text-lg text-md mb-6">
-            LiveMuseek is an inclusive platform that connects music enthusiasts with live performances happening in their area. We believe music is for everyone and strive to create opportunities for all performers, including disabled and visually impaired buskers, to showcase their talents. Whether you&apos;re a fan or a musician, our platform provides an accessible and welcoming space to discover and promote live music events.
-          </p>
-          <p className="md:text-lg text-md italic mb-6">
-            Please note: LiveMuseek is currently a work in progress. We are continuously improving our features and expanding our support to make the platform fully accessible for all artists and fans. Stay tuned for updates!
-          </p>
-          <div className="flex md:flex-row flex-col justify-center md:space-x-4 md:space-y-0 space-y-8">
-            <div className="card md:w-1/3 p-6 rounded-lg shadow">
-              <h3 className="text-2xl font-semibold mb-4">For Fans</h3>
-              <p>
-                Find live music events by genre, location, and date. Support your favorite artists and discover new talents, including diverse and underrepresented performers. Never miss a chance to experience live music near you.
-              </p>
+        <div className="site-container relative flex min-h-[calc(100svh-5rem)] items-center py-20 sm:py-24">
+          <div className="max-w-3xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-2 text-sm font-semibold text-white/90 backdrop-blur-md">
+              <Sparkles className="h-4 w-4 text-fuchsia-300" aria-hidden="true" />
+              Built for Singapore&apos;s live music community
             </div>
-            <div className="card md:w-1/3 p-6 rounded-lg shadow">
-              <h3 className="text-2xl font-semibold mb-4">For Musicians</h3>
-              <p>
-                Promote your gigs and connect with your audience. LiveMuseek is dedicated to empowering all musicians, regardless of their abilities, to reach new audiences and make their performances more accessible. Join us in making live music a shared experience for everyone.
-              </p>
+            <h1 className="max-w-3xl text-balance text-5xl font-black tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
+              Know where the music is.
+            </h1>
+            <p className="mt-6 max-w-2xl text-pretty text-lg leading-8 text-slate-200 sm:text-xl">
+              Discover live performances near you, explore local musicians, and find the next place worth stopping for.
+            </p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link href="/seek-events" className="button-primary group">
+                Explore live events
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </Link>
+              <Link href="/seek-buskers" className="button-secondary">
+                Browse musicians
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
+      <section aria-labelledby="discover-heading" className="relative py-20 sm:py-24">
+        <div className="site-container">
+          <div className="max-w-2xl">
+            <p className="eyebrow">Start exploring</p>
+            <h2 id="discover-heading" className="section-title">
+              Live music, without the guesswork
+            </h2>
+            <p className="section-copy">
+              Go straight to the schedule, the artist, or the place—whatever helps you decide what to see next.
+            </p>
+          </div>
 
-
-      {/* line */}
-      <div className="container mx-auto text-center">
-        <hr className="border-1 border-gray-300" />
-      </div>
-
-      {/* Featured Events Section */}
-      {/* <section id="events" className="py-20">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Featured Events</h2>
-          <p className="text-lg mb-8">Check out some of the top live music events happening soon. Want to feature your event here? <a href="/payment" className="text-blue-500 hover:underline">Learn More</a></p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            Example Event
-            <div className="card p-6 rounded-lg shadow">
-              <h3 className="text-2xl font-semibold mb-4">Rock Night at Esplanade</h3>
-              <p className="text-gray-700 mb-2">Date: 20th May 2024</p>
-              <p className="text-gray-700 mb-2">Location: Esplanade Concert Hall, Singapore</p>
-              <p className="text-gray-700 mb-2">Genres: Rock, English</p>
-              <a href="#" className="text-blue-500 hover:underline">Learn More</a>
-            </div>
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {discoveryLinks.map(({ href, title, description, icon: Icon, accent }) => (
+              <Link key={href} href={href} className="feature-card group">
+                <div className={`absolute inset-0 bg-gradient-to-br ${accent} opacity-70 transition-opacity group-hover:opacity-100`} />
+                <div className="relative">
+                  <span className="mb-8 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-fuchsia-200">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <h3 className="text-xl font-bold text-white">{title}</h3>
+                  <p className="mt-3 leading-7 text-slate-300">{description}</p>
+                  <span className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-fuchsia-200">
+                    Explore <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
-      </section> */}
+      </section>
 
-      {/* line */}
-      <div className="container mx-auto text-center">
-        <hr className="border-1 border-gray-300" />
-      </div>
-
-      {/* How It Works Section */}
-      {/* <section className="py-20">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">How It Works</h2>
-          <div className="flex flex-wrap justify-center">
-            <div className="w-full md:w-1/3 p-4">
-              <div className="card p-6 rounded-lg shadow">
-                <h3 className="text-2xl font-semibold mb-4">Seek Events</h3>
-                <p className="text-gray-700">Browse through a curated list of live music events happening around you. Filter by genre, location, and date to find your perfect music experience.</p>
-              </div>
-            </div>
-            <div className="w-full md:w-1/3 p-4">
-              <div className="card p-6 rounded-lg shadow">
-                <h3 className="text-2xl font-semibold mb-4">Promote Your Gigs</h3>
-                <p className="text-gray-700">Are you a musician? List your gigs on LiveMuseek and reach a broader audience. Let your fans know where and when you are performing next.</p>
-              </div>
-            </div>
-            <div className="w-full md:w-1/3 p-4">
-              <div className="card p-6 rounded-lg shadow">
-                <h3 className="text-2xl font-semibold mb-4">Connect with Artists</h3>
-                <p className="text-gray-700">Follow your favorite artists and get notified about their upcoming performances. Engage with the community and never miss a beat.</p>
-              </div>
+      <section id="about" aria-labelledby="about-heading" className="scroll-mt-24 border-y border-white/10 bg-white/[0.035] py-20 sm:py-24">
+        <div className="site-container grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div>
+            <p className="eyebrow">About LiveMuseek</p>
+            <h2 id="about-heading" className="section-title">
+              A shared schedule for the live music community
+            </h2>
+            <p className="section-copy">
+              LiveMuseek connects audiences with live music and gives musicians a place to share when and where they are performing. The goal is simple: make local performances easier to find and help artists stay connected with the people who want to hear them.
+            </p>
+            <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-100">
+              <span className="h-2 w-2 rounded-full bg-amber-300" />
+              Work in progress — features and information may change
             </div>
           </div>
-        </div>
-      </section> */}
-      {/* line */}
-      <div className="container mx-auto text-center">
-        <hr className="border-1 border-gray-300" />
-      </div>
-      {/* Call to Action Section */}
-      {/* <section className="py-20">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Join LiveMuseek (For performers)</h2>
-          <p className="text-lg mb-8">Sign up now to start discovering amazing live music events and promoting your performances.</p>
-          <a href="/signup" className="primary-btn">Sign Up</a>
-        </div>
-      </section> */}
 
-
-
-      {/* Footer Section */}
-      {/* <footer className="py-6">
-        <div className="container mx-auto text-center">
-          <p className="mb-4">&copy; 2024 LiveMuseek. All rights reserved.</p>
-          <div className="flex justify-center space-x-4">
-            <a href="#" className="hover:text-gray-400">Privacy Policy</a>
-            <a href="#" className="hover:text-gray-400">Terms of Service</a>
-            <a href="#" className="hover:text-gray-400">Contact Us</a>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <article className="info-card">
+              <Music2 className="h-6 w-6 text-fuchsia-300" aria-hidden="true" />
+              <h3 className="mt-6 text-xl font-bold text-white">For audiences</h3>
+              <p className="mt-3 leading-7 text-slate-300">
+                Find performances by date, musician, or location and spend less time searching for what is happening nearby.
+              </p>
+            </article>
+            <article className="info-card">
+              <Mic2 className="h-6 w-6 text-violet-300" aria-hidden="true" />
+              <h3 className="mt-6 text-xl font-bold text-white">For musicians</h3>
+              <p className="mt-3 leading-7 text-slate-300">
+                Share your performance schedule in one discoverable place so audiences know where to find you next.
+              </p>
+            </article>
           </div>
         </div>
-      </footer> */}
+      </section>
+
+      <section aria-labelledby="creator-heading" className="py-20 sm:py-24">
+        <div className="site-container">
+          <div className="creator-panel">
+            <div className="max-w-2xl">
+              <p className="eyebrow">Behind the product</p>
+              <h2 id="creator-heading" className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
+                Created by Jace
+              </h2>
+              <p className="mt-4 max-w-xl text-lg leading-8 text-slate-300">
+                Interested in LiveMuseek, or in working together on Singapore&apos;s digital busking experience? I&apos;d be glad to hear from you.
+              </p>
+            </div>
+            <a href="mailto:jacetyx@gmail.com" className="button-primary shrink-0">
+              <Mail className="h-4 w-4" aria-hidden="true" />
+              Contact Jace
+            </a>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
-export default HomePage;

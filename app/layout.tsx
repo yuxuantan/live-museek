@@ -3,23 +3,23 @@ import Navbar from './components/ui/Navbar';
 import { ReactNode } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { Analytics } from "@vercel/analytics/react"
-import FeedbackForm from './components/ui/FeedbackForm'
+import Footer from './components/ui/Footer';
 export const metadata = {
-  title: 'LiveMuseek',
-  description: 'Discover live music events and musicians',
+  title: 'LiveMuseek — Find live music in Singapore',
+  description: 'Connect with live music, discover local musicians, and explore upcoming performance schedules in Singapore.',
 };
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
-      <body className="flex flex-col h-screen">
+      <body className="flex min-h-screen flex-col">
         <AuthProvider>
-          <main className="md:mt-16 mb-14 md:mb-0">{children}<Analytics /></main>
-          <header className="z-10">
+          <header>
             <Navbar />
           </header>
-          {/* <FeedbackForm /> */}
-
+          <main className="flex-1 pb-16 pt-0 md:pb-0 md:pt-20">{children}</main>
+          <Footer />
+          <Analytics />
         </AuthProvider>
       </body>
     </html>
