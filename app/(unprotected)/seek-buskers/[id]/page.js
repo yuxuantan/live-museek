@@ -11,6 +11,7 @@ import {
   REFRESH_BUTTON_COOLDOWN_MS,
 } from '../../../refreshCooldown';
 import { downloadBuskerCalendarIcs } from '../../../calendarIcs';
+import ScheduleStoryGenerator from './ScheduleStoryGenerator';
 
 const toDateKey = (value) => {
   if (typeof value === 'string') {
@@ -320,6 +321,15 @@ export default function BuskerDetailPage({ params }) {
           ) : null}
         </div>
       </div>
+
+      <ScheduleStoryGenerator
+        busker={busker}
+        performances={performances}
+        imageUrls={busker ? [
+          `${storagePublicBaseUrl}/busker_custom_images/${busker.busker_id}.jpg?${currentEpochTime}`,
+          `${storagePublicBaseUrl}/busker_images/${busker.busker_id}.jpg?${currentEpochTime}`,
+        ] : []}
+      />
 
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
