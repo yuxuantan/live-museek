@@ -1,38 +1,46 @@
 import { LocationRefreshError, refreshLocationById } from '../../../../server/nac_location_refresh.js';
-import { getRequestHostname, isLocalhostHostname } from '../../../../refreshAccess.js';
+import {
+  PublicRefreshGuardError,
+  withPublicRefreshGuard,
+} from '../../../../server/public_refresh_guard.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function POST(request, { params }) {
-  if (!isLocalhostHostname(getRequestHostname(request))) {
-    return Response.json(
-      { error: 'Refresh from NAC is only available on localhost.' },
-      { status: 403 }
-    );
-  }
-
   try {
-    const result = await refreshLocationById(params.id);
+    const result = await withPublicRefreshGuard(request, () =>
+      refreshLocationById(params.id)
+    );
 
     return Response.json({
       ok: true,
       location: result.location,
       performanceCount: result.performanceCount,
+      historicalPerformanceCountPreserved:
+        result.historicalPerformanceCountPreserved,
       buskersUpserted: result.buskersUpserted,
       failedBuskerIds: result.failedBuskerIds,
       changed: result.changed,
+    }, {
+      headers: { 'Cache-Control': 'no-store' },
     });
   } catch (error) {
-    console.error('Location refresh failed:', error);
+    const isHandledError =
+      error instanceof LocationRefreshError ||
+      error instanceof PublicRefreshGuardError;
+    const status = isHandledError ? error.status : 500;
+    const message = isHandledError
+      ? error.message
+      : 'Failed to refresh location.';
+    const headers = { 'Cache-Control': 'no-store' };
 
-    const status = error instanceof LocationRefreshError ? error.status : 500;
-    const message =
-      error instanceof Error ? error.message : 'Failed to refresh location.';
-    const headers = {};
+    if (status >= 500) {
+      console.error('Location refresh failed:', error);
+    }
 
-    if (error instanceof LocationRefreshError && error.retryAfterSeconds) {
+    if (isHandledError && error.retryAfterSeconds) {
       headers['Retry-After'] = String(error.retryAfterSeconds);
     }
 

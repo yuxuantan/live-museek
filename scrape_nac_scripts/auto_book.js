@@ -358,7 +358,7 @@ async function runBookingFlow(page, location, request) {
   const dateSnapshot = await getBookingSnapshot(page);
   console.log(`Selected booking date: ${dateSnapshot?.dateValue || request.date}`);
 
-  await loadSlotsForSelectedDate(page);
+  await loadSlotsForSelectedDate(page, request.from, request.to);
   const renderedRows = await extractRenderedSlotRows(page);
   console.table(
     renderedRows.map((row) => ({

@@ -9,7 +9,6 @@ import {
     REFRESH_BUTTON_COOLDOWN_MS,
 } from '../../../refreshCooldown';
 import { downloadLocationCalendarIcs } from '../../../calendarIcs';
-import { isLocalhostHostname } from '../../../refreshAccess';
 
 const toDateKey = (value) => {
     if (typeof value === 'string') {
@@ -92,17 +91,12 @@ const LocationDetailPage = ({ params }) => {
         return new Date(now.getFullYear(), now.getMonth(), 1);
     });
     const [refreshCooldownRemainingMs, setRefreshCooldownRemainingMs] = useState(0);
-    const [isLocalRefreshEnabled, setIsLocalRefreshEnabled] = useState(false);
 
     // Get current epoch time to avoid image caching issues
     const currentEpochTime = Math.floor(new Date().getTime() / 1000);
     const storagePublicBaseUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;
     const todayDateKey = toDateKey(new Date());
     const refreshCooldownKey = getLocationRefreshCooldownKey(params.id);
-
-    useEffect(() => {
-        setIsLocalRefreshEnabled(isLocalhostHostname(window.location.hostname));
-    }, []);
 
     useEffect(() => {
         const fetchPerformances = async () => {
@@ -277,18 +271,16 @@ const LocationDetailPage = ({ params }) => {
                             >
                                 Import to Google Calendar (.ics)
                             </button>
-                            {isLocalRefreshEnabled ? (
-                                <button
-                                    type="button"
-                                    className="btn btn-outline btn-sm w-full sm:w-auto"
-                                    onClick={handleRefreshClick}
-                                    disabled={refreshCooldownRemainingMs > 0}
-                                >
-                                    {refreshCooldownRemainingMs > 0
-                                        ? `Refresh in ${Math.ceil(refreshCooldownRemainingMs / 1000)}s`
-                                        : 'Refresh from NAC'}
-                                </button>
-                            ) : null}
+                            <button
+                                type="button"
+                                className="btn btn-outline btn-sm w-full sm:w-auto"
+                                onClick={handleRefreshClick}
+                                disabled={refreshCooldownRemainingMs > 0}
+                            >
+                                {refreshCooldownRemainingMs > 0
+                                    ? `Refresh in ${Math.ceil(refreshCooldownRemainingMs / 1000)}s`
+                                    : 'Refresh from NAC'}
+                            </button>
                         </div>
                     </div>
                     <img src={`${storagePublicBaseUrl}/location_images/${location?.location_id}.jpg?${currentEpochTime}`} alt={location ? location.name : ''} className="rounded-lg shadow-lg md:w-1/2 my-4" />

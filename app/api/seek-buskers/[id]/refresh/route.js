@@ -1,39 +1,47 @@
 import { LocationRefreshError, refreshBuskerById } from '../../../../server/nac_location_refresh.js';
-import { getRequestHostname, isLocalhostHostname } from '../../../../refreshAccess.js';
+import {
+  PublicRefreshGuardError,
+  withPublicRefreshGuard,
+} from '../../../../server/public_refresh_guard.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function POST(request, { params }) {
-  if (!isLocalhostHostname(getRequestHostname(request))) {
-    return Response.json(
-      { error: 'Refresh from NAC is only available on localhost.' },
-      { status: 403 }
-    );
-  }
-
   try {
-    const result = await refreshBuskerById(params.id);
+    const result = await withPublicRefreshGuard(request, () =>
+      refreshBuskerById(params.id)
+    );
 
     return Response.json({
       ok: true,
       busker: result.busker,
       performanceCount: result.performanceCount,
+      historicalPerformanceCountPreserved:
+        result.historicalPerformanceCountPreserved,
       locationsRefreshed: result.locationsRefreshed,
       fallbackLocations: result.fallbackLocations,
       failedLocationIds: result.failedLocationIds,
       changed: result.changed,
+    }, {
+      headers: { 'Cache-Control': 'no-store' },
     });
   } catch (error) {
-    console.error('Busker refresh failed:', error);
+    const isHandledError =
+      error instanceof LocationRefreshError ||
+      error instanceof PublicRefreshGuardError;
+    const status = isHandledError ? error.status : 500;
+    const message = isHandledError
+      ? error.message
+      : 'Failed to refresh musician.';
+    const headers = { 'Cache-Control': 'no-store' };
 
-    const status = error instanceof LocationRefreshError ? error.status : 500;
-    const message =
-      error instanceof Error ? error.message : 'Failed to refresh busker.';
-    const headers = {};
+    if (status >= 500) {
+      console.error('Musician refresh failed:', error);
+    }
 
-    if (error instanceof LocationRefreshError && error.retryAfterSeconds) {
+    if (isHandledError && error.retryAfterSeconds) {
       headers['Retry-After'] = String(error.retryAfterSeconds);
     }
 

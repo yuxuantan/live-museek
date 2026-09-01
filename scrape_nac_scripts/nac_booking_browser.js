@@ -1805,11 +1805,63 @@ export async function selectBookingDate(page, targetDateInput) {
   throw new Error(`Unable to select the requested booking date ${targetDateKey}. NAC does not appear to allow it.`);
 }
 
-export async function loadSlotsForSelectedDate(page) {
-  console.log('Clicking Load for the selected booking date.');
-  await sleep(500);
-  await clickBookingModalButton(page, 'Load');
-  await sleep(1500);
+export async function loadSlotsForSelectedDate(
+  page,
+  from,
+  to,
+  { timeoutMs = 15_000, maxAttempts = 2 } = {}
+) {
+  const requestedSlotKeys = expandTimeRangeToSlotKeys(from, to);
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    console.log(
+      `Clicking Load for the selected booking date (attempt ${attempt}/${maxAttempts}).`
+    );
+
+    try {
+      const [availabilityResponse] = await Promise.all([
+        page.waitForResponse(
+          (response) => {
+            const url = String(response.url?.() ?? '').toLowerCase();
+            const method = String(response.request?.().method?.() ?? '').toUpperCase();
+            return method === 'GET' && url.includes('/availablities?date=');
+          },
+          { timeout: timeoutMs }
+        ),
+        clickBookingModalButton(page, 'Load'),
+      ]);
+
+      if (!availabilityResponse.ok()) {
+        throw new Error(
+          `NAC availability request returned ${availabilityResponse.status()} ${availabilityResponse.statusText()}.`
+        );
+      }
+
+      await page.waitForFunction(
+        (expectedSlotKeys) => {
+          const rows = window.__liveMuseekNacHelpers?.extractSlotRows?.() ?? [];
+          const renderedSlotKeys = new Set(rows.map((row) => row.key));
+          return expectedSlotKeys.every((slotKey) => renderedSlotKeys.has(slotKey));
+        },
+        { timeout: timeoutMs, polling: 200 },
+        requestedSlotKeys
+      );
+
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt < maxAttempts) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.log(`NAC slots did not finish loading: ${message}. Retrying Load once.`);
+      }
+    }
+  }
+
+  const message = lastError instanceof Error ? lastError.message : String(lastError ?? 'unknown error');
+  throw new Error(
+    `Unable to load requested NAC slots ${requestedSlotKeys.join(', ')} after ${maxAttempts} attempts: ${message}`
+  );
 }
 
 export async function extractRenderedSlotRows(page) {

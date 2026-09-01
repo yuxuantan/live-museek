@@ -12,7 +12,7 @@ const ROOT_URL = 'https://eservices.nac.gov.sg';
 const BUSKING_BASE_URL = `${ROOT_URL}/Busking`;
 const INVALID_LOCATION_ID = '00000000-0000-0000-0000-000000000000';
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyASRC3EeCzmTCsE_WjkDcywpCgZzSA395A';
-const REFRESH_COOLDOWN_MS = 20_000;
+const REFRESH_COOLDOWN_MS = 5 * 60 * 1000;
 
 const googleMapsClient = new Client({});
 const refreshStateStore =

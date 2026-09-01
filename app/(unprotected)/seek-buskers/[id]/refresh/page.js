@@ -7,27 +7,14 @@ import {
   setRefreshCooldown,
   REFRESH_BUTTON_COOLDOWN_MS,
 } from '../../../../refreshCooldown';
-import { isLocalhostHostname } from '../../../../refreshAccess';
 
 export default function RefreshBuskerPage({ params }) {
   const hasStartedRef = useRef(false);
   const [status, setStatus] = useState('Starting refresh...');
   const [error, setError] = useState('');
-  const [isLocalRefreshEnabled, setIsLocalRefreshEnabled] = useState(false);
-  const [hasResolvedEnvironment, setHasResolvedEnvironment] = useState(false);
 
   useEffect(() => {
     if (hasStartedRef.current) {
-      return;
-    }
-
-    const isAllowed = isLocalhostHostname(window.location.hostname);
-    setIsLocalRefreshEnabled(isAllowed);
-    setHasResolvedEnvironment(true);
-
-    if (!isAllowed) {
-      setStatus('Refresh from NAC is only available on localhost.');
-      setError('Refresh from NAC is disabled in production.');
       return;
     }
 
@@ -37,7 +24,7 @@ export default function RefreshBuskerPage({ params }) {
 
     const refreshBusker = async () => {
       try {
-        setStatus('Scraping NAC and updating this busker profile and events...');
+        setStatus('Scraping NAC and updating this musician profile and events...');
 
         const response = await fetch(`/api/seek-buskers/${params.id}/refresh`, {
           method: 'POST',
@@ -54,7 +41,7 @@ export default function RefreshBuskerPage({ params }) {
         }
 
         setStatus(
-          `Updated ${payload?.busker?.name || 'this busker'} with ${payload?.performanceCount ?? 0} current or upcoming performances. Past bookings were retained for analytics. Redirecting...`
+          `Updated ${payload?.busker?.name || 'this musician'} with ${payload?.performanceCount ?? 0} current or upcoming performances. Past bookings were retained for analytics. Redirecting...`
         );
 
         window.setTimeout(() => {
@@ -75,30 +62,25 @@ export default function RefreshBuskerPage({ params }) {
   return (
     <div className="container mx-auto px-3 py-4 sm:p-6">
       <div className="card rounded-lg shadow-lg p-6">
-        <h1 className="text-2xl font-semibold mb-3">Refreshing busker</h1>
+        <h1 className="text-2xl font-semibold mb-3">Refreshing musician</h1>
         <p className="text-gray-600 mb-4">{status}</p>
 
-        {!hasResolvedEnvironment ? (
-          <div className="flex items-center gap-3 text-gray-600">
-            <span className="loading loading-spinner loading-md" aria-hidden />
-            <span>Checking refresh availability...</span>
-          </div>
-        ) : error ? (
+        {error ? (
           <div className="space-y-4">
             <p className="text-red-600">{error}</p>
             <Link
               href={`/seek-buskers/${params.id}`}
               className="btn btn-outline btn-sm"
             >
-              Back to busker
+              Back to musician
             </Link>
           </div>
-        ) : isLocalRefreshEnabled ? (
+        ) : (
           <div className="flex items-center gap-3 text-gray-600">
             <span className="loading loading-spinner loading-md" aria-hidden />
             <span>This page will redirect when the refresh finishes.</span>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

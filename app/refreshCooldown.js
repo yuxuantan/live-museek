@@ -1,4 +1,4 @@
-export const REFRESH_BUTTON_COOLDOWN_MS = 20_000;
+export const REFRESH_BUTTON_COOLDOWN_MS = 5 * 60 * 1000;
 
 function isBrowser() {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
