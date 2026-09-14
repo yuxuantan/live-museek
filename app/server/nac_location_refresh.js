@@ -520,7 +520,7 @@ async function getLatLong(address) {
   }
 }
 
-async function uploadImageFromUrl(supabase, bucket, objectPath, imageUrl) {
+async function uploadImageFromUrl(supabase, bucket, objectPath, imageUrl, { required = false } = {}) {
   try {
     const absoluteUrl = toAbsoluteUrl(imageUrl);
     if (!absoluteUrl) {
@@ -530,18 +530,25 @@ async function uploadImageFromUrl(supabase, bucket, objectPath, imageUrl) {
     const response = await axios.get(absoluteUrl, {
       responseType: 'arraybuffer',
       timeout: 60000,
+      headers: { 'Cache-Control': 'no-cache' },
     });
 
     const contentType = response.headers['content-type'] || 'image/jpg';
+    if (!contentType.toLowerCase().startsWith('image/') || !response.data?.byteLength) {
+      throw new Error('NAC returned an empty or non-image response.');
+    }
     const uploadResponse = await supabase.storage
       .from(bucket)
       .upload(objectPath, Buffer.from(response.data), { contentType, upsert: true });
 
     if (uploadResponse.error) {
-      console.error(`Failed to upload ${bucket}/${objectPath}:`, uploadResponse.error);
+      throw uploadResponse.error;
     }
   } catch (error) {
-    console.error(`Failed to fetch image ${imageUrl}:`, error);
+    console.error(`Failed to refresh image ${bucket}/${objectPath}:`, error);
+    if (required) {
+      throw new LocationRefreshError('Failed to refresh the NAC profile image. Please try again later.');
+    }
   }
 }
 
@@ -1174,15 +1181,17 @@ export async function refreshBuskerById(buskerId) {
         'Failed to save refreshed busker.',
         currentSnapshot.supportedColumns
       );
+    }
 
-      if (imageUrl) {
-        await uploadImageFromUrl(
-          supabase,
-          'busker_images',
-          `${normalizedBuskerId}.jpg`,
-          imageUrl
-        );
-      }
+    // NAC can replace the image without changing any profile text (or its URL).
+    if (imageUrl) {
+      await uploadImageFromUrl(
+        supabase,
+        'busker_images',
+        `${normalizedBuskerId}.jpg`,
+        imageUrl,
+        { required: true }
+      );
     }
 
     if (performancesChanged) {
