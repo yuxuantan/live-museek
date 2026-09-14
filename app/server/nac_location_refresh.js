@@ -522,16 +522,23 @@ async function getLatLong(address) {
 
 async function uploadImageFromUrl(supabase, bucket, objectPath, imageUrl, { required = false } = {}) {
   try {
-    const absoluteUrl = toAbsoluteUrl(imageUrl);
-    if (!absoluteUrl) {
+    if (!trimText(imageUrl)) {
       return;
     }
 
-    const response = await axios.get(absoluteUrl, {
-      responseType: 'arraybuffer',
-      timeout: 60000,
-      headers: { 'Cache-Control': 'no-cache' },
-    });
+    // NAC embeds the current image in the profile HTML. Its GetAppImage URL
+    // can return an empty body when requested separately from that page.
+    const embeddedImage = imageUrl.match(/^data:(image\/(?:jpeg|jpg|png|gif|webp));base64,([A-Za-z0-9+/\s]+={0,2})$/i);
+    if (imageUrl.startsWith('data:') && !embeddedImage) {
+      throw new Error('Invalid embedded NAC profile image.');
+    }
+    const response = embeddedImage
+      ? { data: Buffer.from(embeddedImage[2], 'base64'), headers: { 'content-type': embeddedImage[1] } }
+      : await axios.get(toAbsoluteUrl(imageUrl), {
+        responseType: 'arraybuffer',
+        timeout: 60000,
+        headers: { 'Cache-Control': 'no-cache' },
+      });
 
     const contentType = response.headers['content-type'] || 'image/jpg';
     if (!contentType.toLowerCase().startsWith('image/') || !response.data?.byteLength) {
@@ -828,7 +835,7 @@ async function fetchBuskerProfile(buskerId) {
 
     return {
       busker,
-      imageUrl: $('#profileImage').first().attr('src') ?? '',
+      imageUrl: trimText($('#profileImageHidden').first().val()) || $('#profileImage').first().attr('src') || '',
     };
   } catch (error) {
     const status = error?.response?.status;
