@@ -263,18 +263,20 @@ export default function BuskerDetailPage({ params }) {
       <div className="card bg-base-100 shadow-xl mb-6">
         <div className="card-body">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="relative">
-              <img
-                src={`${storagePublicBaseUrl}/busker_custom_images/${busker?.busker_id}.jpg?${currentEpochTime}`}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = `${storagePublicBaseUrl}/busker_images/${busker?.busker_id}.jpg?${currentEpochTime}`;
-                }}
-                className="w-full aspect-square object-cover object-center rounded-full"
-                alt={busker?.name}
-              />
+            <div className="flex flex-col items-end gap-3 self-start">
+              <div className="flex w-full aspect-square items-center justify-center overflow-hidden rounded-full bg-base-200">
+                <img
+                  src={`${storagePublicBaseUrl}/busker_custom_images/${busker?.busker_id}.jpg?${currentEpochTime}`}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `${storagePublicBaseUrl}/busker_images/${busker?.busker_id}.jpg?${currentEpochTime}`;
+                  }}
+                  className="w-full h-full object-contain"
+                  alt={busker?.name}
+                />
+              </div>
               <button
-                className="btn btn-primary btn-sm absolute bottom-0 right-0 m-2"
+                className="btn btn-primary btn-sm"
                 onClick={() => setShowQR(!showQR)}
               >
                 {showQR ? 'Hide QR' : 'Generate Sharing QR'}
