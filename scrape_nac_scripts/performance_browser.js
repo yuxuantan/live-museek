@@ -7,6 +7,8 @@ export const DEFAULT_LIMITS = {
   navigationTimeoutMs: 60_000,
   readyTimeoutMs: 15_000,
   responseTimeoutMs: 30_000,
+  downloadTimeoutMs: 60_000,
+  locationAttempts: 3,
   retryDelayMs: 1_000,
   locationTimeoutMs: 300_000,
   maxPages: 250,
@@ -60,13 +62,23 @@ export async function navigateReady(page, url, kind, locationId, options = {}) {
   throw new Error(`Failed to load validated ${kind} page: ${url}`, { cause: lastError });
 }
 
-export async function createEventPage(browser) {
+export async function createEventPage(browser, label = 'directory') {
   const page = await browser.newPage();
   try {
+    const blocked = new WeakSet();
+    page.on('pageerror', (error) => {
+      console.warn(`NAC page error [${label}] ${page.url()}: ${error.message}`);
+    });
+    page.on('requestfailed', (request) => {
+      if (!blocked.has(request)) {
+        console.warn(`NAC request failed [${label}] ${request.url()}: ${request.failure()?.errorText ?? 'unknown failure'}`);
+      }
+    });
     // Event text and pagination do not require media. Keep scripts and CSS for the UI.
     await page.setRequestInterception(true);
     page.on('request', (request) => {
-      const action = ['image', 'media', 'font'].includes(request.resourceType())
+      if (['image', 'media', 'font'].includes(request.resourceType())) blocked.add(request);
+      const action = blocked.has(request)
         ? request.abort() : request.continue();
       action.catch(() => {}); // A tab can close while a request is being handled.
     });
@@ -124,9 +136,110 @@ function rowKey(row) {
   return JSON.stringify([row.href, row.date, row.time]);
 }
 
+// Subscribe before the click so even an immediately completed request is observed.
+// requestfinished means the body has arrived; response alone only supplies headers.
+function waitForPaginationDownload(page, url, previous, limits, deadline) {
+  const expected = new URL(`${url}/more`);
+  let request;
+  let timer;
+  let status;
+  let resolve;
+  let reject;
+  const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+  const dispose = () => {
+    clearTimeout(timer);
+    page.off('request', onRequest);
+    page.off('response', onResponse);
+    page.off('requestfinished', onFinished);
+    page.off('requestfailed', onFailed);
+    page.off('close', onClose);
+  };
+  const fail = (message) => {
+    dispose();
+    reject(new Error(`${message} (${expected.href}, skip=${previous.skip}, take=${previous.take}, status=${status ?? 'none'})`));
+  };
+  const armTimeout = (phase, timeout) => {
+    clearTimeout(timer);
+    const duration = remaining(deadline, timeout);
+    timer = setTimeout(() => fail(`Pagination ${phase} timeout after ${duration}ms`), duration);
+  };
+  const onRequest = (candidate) => {
+    const candidateUrl = new URL(candidate.url());
+    if (!request && candidate.method() === 'GET' && candidateUrl.origin === expected.origin &&
+      candidateUrl.pathname === expected.pathname && candidateUrl.searchParams.get('skip') === previous.skip &&
+      candidateUrl.searchParams.get('take') === previous.take) request = candidate;
+  };
+  const onResponse = (response) => {
+    if (!request || response.request() !== request) return;
+    status = response.status();
+    if (!response.ok()) return fail(`Pagination HTTP ${status}`);
+    try { armTimeout('download', limits.downloadTimeoutMs); } catch (error) { fail(error.message); }
+  };
+  const onFinished = (candidate) => {
+    if (candidate !== request) return;
+    const response = candidate.response();
+    if (!response?.ok()) return fail(`Pagination HTTP ${response?.status() ?? 'no response'}`);
+    dispose();
+    resolve();
+  };
+  const onFailed = (candidate) => {
+    if (candidate === request) fail(`Pagination request failed: ${candidate.failure()?.errorText ?? 'unknown failure'}`);
+  };
+  const onClose = () => fail('Pagination page closed');
+  armTimeout('response', limits.responseTimeoutMs);
+  page.on('request', onRequest);
+  page.on('response', onResponse);
+  page.on('requestfinished', onFinished);
+  page.on('requestfailed', onFailed);
+  page.on('close', onClose);
+  return { promise, dispose };
+}
+
+export async function loadNextEventPage(page, url, previous, limits, deadline) {
+  const download = waitForPaginationDownload(page, url, previous, limits, deadline);
+  try {
+    await Promise.all([download.promise, Promise.resolve().then(() => page.click(MORE))]);
+    try {
+      const rendered = await page.waitForFunction((skip, selector) => {
+        const button = document.querySelector(selector);
+        return document.querySelector('#skip')?.value !== skip && button && !button.disabled;
+      }, { timeout: remaining(deadline, limits.readyTimeoutMs) }, previous.skip, MORE);
+      await rendered.dispose();
+    } catch (error) {
+      throw new Error(`Pagination render failed (${url}, skip=${previous.skip}): ${error.message}`, { cause: error });
+    }
+  } finally {
+    download.dispose();
+  }
+}
+
+export async function readLocationEventsWithRetries(browser, locationId, options = {}) {
+  const limits = { ...DEFAULT_LIMITS, ...options };
+  // All fresh-tab attempts share this deadline; retries cannot reset the budget.
+  const deadline = Date.now() + limits.locationTimeoutMs;
+  let lastError;
+  for (let attempt = 1; attempt <= limits.locationAttempts; attempt++) {
+    remaining(deadline, 1);
+    let page;
+    try {
+      page = await createEventPage(browser, `${locationId}, attempt=${attempt}`);
+      return await readLocationEvents(page, locationId, { ...limits, deadline });
+    } catch (error) {
+      lastError = error;
+      console.warn(`Location ${locationId} attempt ${attempt}/${limits.locationAttempts} failed: ${error.message}`);
+    } finally {
+      await page?.close();
+    }
+    if (attempt < limits.locationAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, remaining(deadline, limits.retryDelayMs * attempt)));
+    }
+  }
+  throw new Error(`Location ${locationId} failed after ${limits.locationAttempts} attempts`, { cause: lastError });
+}
+
 export async function readLocationEvents(page, locationId, options = {}) {
   const limits = { ...DEFAULT_LIMITS, ...options };
-  const deadline = Date.now() + limits.locationTimeoutMs;
+  const deadline = options.deadline ?? Date.now() + limits.locationTimeoutMs;
   const url = `${BASE_URL}/locations/${locationId}/events`;
   await navigateReady(page, url, 'events', locationId, { ...limits, deadline });
   let state = await readEventState(page, limits.maxEvents);
@@ -139,26 +252,7 @@ export async function readLocationEvents(page, locationId, options = {}) {
       throw new Error(`Invalid pagination state for ${locationId}`);
     }
     const previous = state;
-    const controller = new AbortController();
-    try {
-      // Arm before clicking. Matching skip/take prevents unrelated responses satisfying the wait.
-      const responsePromise = page.waitForResponse((response) => {
-        const responseUrl = new URL(response.url());
-        return responseUrl.origin === new URL(url).origin &&
-          responseUrl.pathname === `${new URL(url).pathname}/more` &&
-          responseUrl.searchParams.get('skip') === previous.skip &&
-          responseUrl.searchParams.get('take') === previous.take;
-      }, { timeout: remaining(deadline, limits.responseTimeoutMs), signal: controller.signal });
-      const [response] = await Promise.all([responsePromise, page.click(MORE)]);
-      if (!response.ok()) throw new Error(`Pagination HTTP ${response.status()}`);
-      const rendered = await page.waitForFunction((skip, selector) => {
-        const button = document.querySelector(selector);
-        return document.querySelector('#skip')?.value !== skip && button && !button.disabled;
-      }, { timeout: remaining(deadline, limits.readyTimeoutMs) }, previous.skip, MORE);
-      await rendered.dispose();
-    } finally {
-      controller.abort();
-    }
+    await loadNextEventPage(page, url, previous, limits, deadline);
     state = await readEventState(page, limits.maxEvents);
     if (Number(state.skip) <= Number(previous.skip)) throw new Error('Pagination cursor did not advance');
     const next = new Map(state.rows.map((row) => [rowKey(row), row]));

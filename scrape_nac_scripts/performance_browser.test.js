@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
+import { createServer } from 'node:http';
+import { EventEmitter } from 'node:events';
 import puppeteer from 'puppeteer';
-import { navigateReady, readLocationEvents, readLocations, parsePerformances } from './performance_browser.js';
+import { DEFAULT_LIMITS, createEventPage, loadNextEventPage, navigateReady, readLocationEvents, readLocations, parsePerformances } from './performance_browser.js';
 
 const locationId = '50781054-7da9-427a-b76a-090113f0e463';
 const base = 'https://eservices.nac.gov.sg/Busking';
 const limits = { navigationAttempts: 2, navigationTimeoutMs: 2_000, readyTimeoutMs: 300,
-  responseTimeoutMs: 500, retryDelayMs: 1, locationTimeoutMs: 5_000 };
+  responseTimeoutMs: 500, downloadTimeoutMs: 500, retryDelayMs: 1, locationTimeoutMs: 5_000 };
 let browser;
 before(async () => { browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }); });
 after(async () => { await browser?.close(); });
@@ -141,4 +143,112 @@ test('malformed event text cannot silently remove a booking', () => {
   for (const date of ['bad date', '31 February', '0 September']) {
     assert.throws(() => parsePerformances([{ href: '/profile/id', date, time: '10:00:AM-12:00:PM' }], locationId), /Invalid event/);
   }
+});
+
+// Real HTTP streaming is needed here: request.respond() sends headers and body together.
+async function streamingFixture(t, scenario) {
+  const timers = new Set();
+  const server = createServer((request, response) => {
+    if (request.url.startsWith('/events/more')) {
+      response.writeHead(200, { 'Content-Type': 'text/html', 'X-Content-Type-Options': 'nosniff' });
+      response.flushHeaders();
+      response.write(' '); // Deliver successful headers while the body is still incomplete.
+      if (scenario === 'stalled') return;
+      const timer = setTimeout(() => {
+        if (scenario === 'interrupted') response.destroy();
+        else response.end(card(2));
+      }, scenario === 'interrupted' ? 50 : 500);
+      timers.add(timer);
+    } else if (request.url === '/noise') {
+      response.end('unrelated request completed');
+    } else {
+      response.writeHead(200, { 'Content-Type': 'text/html' });
+      response.end(`<input id="skip" value="12"><div id="div-booking-result-view">${card(1)}</div>
+        <button id="div-load-booking-grid-more">Load more</button><script>
+          document.querySelector('button').onclick = async () => {
+            const button = document.querySelector('button');
+            button.disabled = true;
+            fetch('/noise');
+            try {
+              const response = await fetch('/events/more?skip=12&take=12');
+              const body = await response.text();
+              setTimeout(() => {
+                document.querySelector('#div-booking-result-view').insertAdjacentHTML('beforeend', body);
+                document.querySelector('#skip').value = '24';
+                button.disabled = false;
+              }, 20);
+            } catch (_) { /* Keep the UI stuck, as a failed NAC callback can do. */ }
+          };
+        </script>`);
+    }
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const page = await browser.newPage();
+  t.after(async () => {
+    await page.close();
+    for (const timer of timers) clearTimeout(timer);
+    server.closeAllConnections();
+    await new Promise((resolve) => server.close(resolve));
+  });
+  const url = `http://127.0.0.1:${server.address().port}/events`;
+  await page.goto(url);
+  return { page, url };
+}
+
+for (const scenario of ['slow-body', 'stalled', 'interrupted']) {
+  test(`pagination handles ${scenario} after successful HTTP headers`, async (t) => {
+    const { page, url } = await streamingFixture(t, scenario);
+    let headersAt;
+    let finishedAt;
+    page.on('response', (response) => {
+      if (response.url().includes('/events/more')) headersAt = Date.now();
+    });
+    page.on('requestfinished', (request) => {
+      if (request.url().includes('/events/more')) finishedAt = Date.now();
+    });
+    const watched = ['request', 'response', 'requestfinished', 'requestfailed', 'close'];
+    const beforeCounts = watched.map((event) => page.listenerCount(event));
+    const operation = loadNextEventPage(page, url, { skip: '12', take: '12' }, {
+      ...DEFAULT_LIMITS, readyTimeoutMs: 200, responseTimeoutMs: 2_000,
+      downloadTimeoutMs: scenario === 'stalled' ? 150 : 2_000,
+    }, Date.now() + 5_000);
+    if (scenario === 'slow-body') {
+      await operation;
+      assert.ok(finishedAt - headersAt > 200, 'body takes longer than the render timeout after headers arrive');
+      assert.equal(await page.$$eval('.col-cuttor', (cards) => cards.length), 2);
+    } else {
+      await assert.rejects(operation, scenario === 'stalled' ? /Pagination download timeout/ : /Pagination request failed/);
+    }
+    assert.deepEqual(watched.map((event) => page.listenerCount(event)), beforeCounts, 'temporary watchers are removed');
+  });
+}
+
+test('a failed click removes pagination watchers without waiting for their timeout', async (t) => {
+  const { page, url } = await streamingFixture(t, 'slow-body');
+  await page.$eval('button', (button) => button.remove());
+  const watched = ['request', 'response', 'requestfinished', 'requestfailed', 'close'];
+  const beforeCounts = watched.map((event) => page.listenerCount(event));
+  await assert.rejects(loadNextEventPage(page, url, { skip: '12', take: '12' }, DEFAULT_LIMITS, Date.now() + 5_000));
+  assert.deepEqual(watched.map((event) => page.listenerCount(event)), beforeCounts);
+});
+
+test('page diagnostics report real failures and suppress intentionally blocked media', async (t) => {
+  const messages = [];
+  t.mock.method(console, 'warn', (message) => messages.push(message));
+  const page = Object.assign(new EventEmitter(), {
+    setRequestInterception: async () => {}, url: () => `${base}/events`,
+  });
+  await createEventPage({ newPage: async () => page }, 'test-location, attempt=2');
+  const image = {
+    resourceType: () => 'image', url: () => `${base}/photo.jpg`,
+    failure: () => ({ errorText: 'net::ERR_FAILED' }),
+    abort: async () => page.emit('requestfailed', image),
+  };
+  page.emit('request', image);
+  assert.deepEqual(messages, []);
+  page.emit('requestfailed', { url: () => `${base}/events/more`, failure: () => ({ errorText: 'net::ERR_CONNECTION_RESET' }) });
+  page.emit('pageerror', new Error('NAC callback failed'));
+  assert.equal(messages.length, 2);
+  assert.match(messages[0], /test-location, attempt=2.*ERR_CONNECTION_RESET/);
+  assert.match(messages[1], /test-location, attempt=2.*NAC callback failed/);
 });

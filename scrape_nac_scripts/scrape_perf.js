@@ -1,7 +1,7 @@
 // get list of all locations from main page drop downlist, navigates to each location page, clicking more button until all events are loaded, then scrapes all events
 import puppeteer from 'puppeteer';
 import { pathToFileURL } from 'node:url';
-import { createEventPage, readLocations, readLocationEvents, parsePerformances } from './performance_browser.js';
+import { createEventPage, readLocations, readLocationEventsWithRetries, parsePerformances } from './performance_browser.js';
 import { createScraperSupabaseClient } from './supabase_client.js';
 import { filterCurrentOrFuturePerformances } from './performance_retention.js';
 
@@ -113,9 +113,8 @@ export async function scrapeWebsite({
         const performances_list = [];
         for (const [index, location] of targetLocations.entries()) {
             console.log(`Scraping location #${index + 1}/${targetLocations.length}: ${location.location_name}`);
-            const page = await createEventPage(browser);
             try {
-                const rows = await readLocationEvents(page, location.location_id, browserOptions);
+                const rows = await readLocationEventsWithRetries(browser, location.location_id, browserOptions);
                 const performances = parsePerformances(rows, location.location_id);
                 performances_list.push(...performances);
                 if (performances_list.length > 100_000) throw new Error('Total event limit exceeded');
@@ -123,8 +122,6 @@ export async function scrapeWebsite({
                     `total=${performances_list.length}, heapMB=${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}`);
             } catch (error) {
                 throw new Error(`Incomplete scrape at ${location.location_name}; database refresh aborted`, { cause: error });
-            } finally {
-                await page.close();
             }
         }
         // Every selected location must complete and every event must parse before any write.
