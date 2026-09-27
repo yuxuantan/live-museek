@@ -34,3 +34,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Maps and address lookup
+
+The events map uses Google Maps and loads only after **Show map** is clicked. Address lookups run only for new/changed addresses or missing coordinates; unchanged locations reuse their saved coordinates. See [maps setup and cost controls](docs/maps-cost-reduction.md) for configuration and validation. No database migration or coordinate backfill is required.

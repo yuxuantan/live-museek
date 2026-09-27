@@ -1,42 +1,46 @@
-'use client'; // Ensures this component only renders on the client
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+import { hasCoordinates } from '../../locationCoordinates';
 
-
-const Map = ({ center, markers, containerStyle, onMarkerClick }) => {
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '', // Replace with your API key
-  });
-
+function LoadedMap({ apiKey, center, markers = [], containerStyle, onMarkerClick, visible }) {
+  const { isLoaded, loadError } = useLoadScript({ googleMapsApiKey: apiKey });
+  const [map, setMap] = useState(null);
   const [activeMarker, setActiveMarker] = useState(null);
+  const uniqueMarkers = useMemo(() => {
+    const seen = new Set();
+    return markers.filter((marker) => {
+      const id = marker.location_id ?? marker.event_id;
+      if (!hasCoordinates(marker) || seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+  }, [markers]);
 
-  if (loadError) return <div>Error loading maps</div>;
-  if (!isLoaded) return <div>Loading Maps</div>;
+  useEffect(() => {
+    if (visible && map) window.google.maps.event.trigger(map, 'resize');
+  }, [visible, map]);
+
+  if (loadError) return <p role="status" className="p-4 text-slate-100">The map could not load. You can still use the list and directions links.</p>;
+  if (!isLoaded) return <p role="status" className="p-4 text-slate-100">Loading map…</p>;
 
   return (
-    <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg">
-      <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={11}>
-        {markers?.map(marker => (
-          <Marker
-            key={marker.event_id ?? marker.location_id}
-            position={{ lat: marker.lat, lng: marker.lng }}
-            icon={{
-              url: (marker.event_id === activeMarker || marker.location_id === activeMarker) ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png' : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-              scaledSize: new window.google.maps.Size(40, 40), // Increase the size of the marker
-            }}
-            onClick={() => {
-              if (marker.event_id ===activeMarker || marker.location_id === activeMarker) {
-                setActiveMarker(null); // Make it inactive
-              } else {
-                setActiveMarker(marker.event_id ?? marker.location_id);
-              }
-              onMarkerClick(marker);
-            }}
-          />
-        ))}
-      </GoogleMap>
-    </div>
+    <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={11} onLoad={setMap}>
+      {uniqueMarkers.map((marker) => {
+        const id = marker.location_id ?? marker.event_id;
+        return <Marker key={id} position={{ lat: Number(marker.lat), lng: Number(marker.lng) }}
+          title={marker.location_name || marker.name}
+          icon={{ path: window.google.maps.SymbolPath.CIRCLE, scale: 9, fillOpacity: 1,
+            fillColor: activeMarker === id ? '#16a34a' : '#2563eb', strokeColor: '#ffffff', strokeWeight: 2 }}
+          onClick={() => { setActiveMarker(id); onMarkerClick?.(marker) }} />;
+      })}
+    </GoogleMap>
   );
-};
+}
 
-export default Map;
+export default function Map(props) {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (!apiKey) return <p role="status" className="p-4 text-slate-100">The map is unavailable. You can still use the list and directions links.</p>;
+  return <LoadedMap {...props} apiKey={apiKey} />;
+}

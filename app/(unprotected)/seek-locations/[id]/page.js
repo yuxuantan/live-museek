@@ -8,6 +8,7 @@ import {
     setRefreshCooldown,
     REFRESH_BUTTON_COOLDOWN_MS,
 } from '../../../refreshCooldown';
+import { directionsUrl } from '../../../locationCoordinates';
 import { downloadLocationCalendarIcs } from '../../../calendarIcs';
 
 const toDateKey = (value) => {
@@ -261,6 +262,7 @@ const LocationDetailPage = ({ params }) => {
                         <div>
                             <h1 className="text-bold text-3xl">{location?.name}</h1>
                             <p className="text-gray-600">{location?.address}</p>
+                            <a href={directionsUrl(location)} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-blue-700 underline">Get directions</a>
                         </div>
                         <div className="flex w-full flex-col gap-2 sm:w-auto">
                             <button

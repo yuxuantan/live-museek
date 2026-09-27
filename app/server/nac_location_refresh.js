@@ -1,7 +1,7 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
-import { Client } from '@googlemaps/google-maps-services-js';
+import { resolveLocationCoordinatesForRefresh } from './location_geocoding.js';
 import { createScraperSupabaseClient } from '../../scrape_nac_scripts/supabase_client.js';
 import {
   countHistoricalPerformances,
@@ -11,10 +11,8 @@ import {
 const ROOT_URL = 'https://eservices.nac.gov.sg';
 const BUSKING_BASE_URL = `${ROOT_URL}/Busking`;
 const INVALID_LOCATION_ID = '00000000-0000-0000-0000-000000000000';
-const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyASRC3EeCzmTCsE_WjkDcywpCgZzSA395A';
 const REFRESH_COOLDOWN_MS = 5 * 60 * 1000;
 
-const googleMapsClient = new Client({});
 const refreshStateStore =
   globalThis.__liveMuseekRefreshStateStore ??
   (globalThis.__liveMuseekRefreshStateStore = new Map());
@@ -500,26 +498,6 @@ function buildUtcTimestamp(dateText, timeText) {
   ).toISOString();
 }
 
-async function getLatLong(address) {
-  if (!trimText(address) || !GOOGLE_MAPS_API_KEY) {
-    return null;
-  }
-
-  try {
-    const response = await googleMapsClient.geocode({
-      params: {
-        address,
-        key: GOOGLE_MAPS_API_KEY,
-      },
-    });
-
-    return response.data.results?.[0]?.geometry?.location ?? null;
-  } catch (error) {
-    console.error('Failed to geocode location address:', address, error);
-    return null;
-  }
-}
-
 async function uploadImageFromUrl(supabase, bucket, objectPath, imageUrl, { required = false } = {}) {
   try {
     if (!trimText(imageUrl)) {
@@ -663,7 +641,7 @@ function extractLocationIdFromHref(href) {
   return match?.[1] ?? '';
 }
 
-async function scrapeLocationDetails(page, locationId, locationName) {
+async function scrapeLocationDetails(page, locationId, locationName, existingLocation) {
   const locationUrl = `${BUSKING_BASE_URL}/locations/${locationId}/events`;
   await page.goto(locationUrl, { timeout: 60000, waitUntil: 'domcontentloaded' });
 
@@ -679,7 +657,7 @@ async function scrapeLocationDetails(page, locationId, locationName) {
   const fallbackName = trimText(
     locationHeader.find('h1').first().text() || locationHeader.find('h2').first().text()
   );
-  const latLong = await getLatLong(locationAddress);
+  const coordinates = await resolveLocationCoordinatesForRefresh(locationAddress, existingLocation);
 
   if (!initialHtml.includes('No Records found')) {
     await expandAllPerformances(page);
@@ -695,20 +673,19 @@ async function scrapeLocationDetails(page, locationId, locationName) {
       address: locationAddress,
       description: locationDescription,
       area: locationArea,
-      lat: latLong?.lat ?? null,
-      lng: latLong?.lng ?? null,
+      ...coordinates,
     },
     performances: extractPerformances(finalPage, locationId),
   };
 }
 
-async function scrapeLocationSnapshot(page, locationId, locationName) {
+async function scrapeLocationSnapshot(page, locationId, locationName, existingLocation) {
   const resolvedLocationName = trimText(locationName) || await fetchLocationName(locationId);
   if (!resolvedLocationName) {
     throw new LocationRefreshError('Location not found in NAC directory.', 404);
   }
 
-  return scrapeLocationDetails(page, locationId, resolvedLocationName);
+  return scrapeLocationDetails(page, locationId, resolvedLocationName, existingLocation);
 }
 
 async function scrapeMissingBuskers(supabase, page, performances) {
@@ -1065,7 +1042,7 @@ export async function refreshLocationById(locationId) {
 
     try {
       const page = await browser.newPage();
-      const { location, performances } = await scrapeLocationSnapshot(page, normalizedLocationId, locationName);
+      const { location, performances } = await scrapeLocationSnapshot(page, normalizedLocationId, locationName, currentSnapshot.location);
       const currentOrFuturePerformances = filterCurrentOrFuturePerformances(performances, refreshCutoff);
       const existingCurrentOrFuturePerformances = filterCurrentOrFuturePerformances(
         currentSnapshot.performances,

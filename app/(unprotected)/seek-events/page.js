@@ -3,9 +3,10 @@
 import { useMemo, useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { supabase } from '../../supabaseClient'
-import { Calendar, Clock, MapPin, Filter } from 'lucide-react'
+import { Clock, MapPin } from 'lucide-react'
 import { format } from "date-fns"
 import { mergeBackToBackPerformances } from '../../utils';
+import { hasCoordinates, directionsUrl } from '../../locationCoordinates';
 
 const DynamicMap = dynamic(() => import('../../components/ui/Map'), {
   ssr: false,
@@ -18,6 +19,8 @@ const containerStyle = {
 
 export default function PerformancesPage() {
   const [userLocation, setUserLocation] = useState(null)
+  const [showMap, setShowMap] = useState(false)
+  const [mapOpened, setMapOpened] = useState(false)
   const [performances, setPerformances] = useState([])
   const [buskers, setBuskers] = useState({})
   const [locations, setLocations] = useState([])
@@ -32,24 +35,6 @@ export default function PerformancesPage() {
   const storagePublicBaseUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;
 
   useEffect(() => {
-    const getUserLocation = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setUserLocation({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            })
-          },
-          (error) => {
-            console.error('Error getting user location:', error)
-          }
-        )
-      } else {
-        console.error('Geolocation is not supported by this browser.')
-      }
-    }
-
     const fetchBuskers = async () => {
       const { data, error } = await supabase.from('buskers').select('*')
       if (error) {
@@ -81,8 +66,8 @@ export default function PerformancesPage() {
             performance.location_address = locationsData.find(location => location.location_id === performance.location_id)?.address
             performance.lat = locationsData.find(location => location.location_id === performance.location_id)?.lat
             performance.lng = locationsData.find(location => location.location_id === performance.location_id)?.lng
+
           })
-          console.log('Performances:', data)
           setPerformances(mergeBackToBackPerformances(data))
           setLocations(locationsData)
         }
@@ -92,8 +77,16 @@ export default function PerformancesPage() {
 
     fetchPerformances()
     fetchBuskers()
-    getUserLocation()
   }, [])
+
+  useEffect(() => {
+    if (showMap && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude }),
+        () => {}, { timeout: 10000, maximumAge: 300000 }
+      )
+    }
+  }, [showMap])
 
   const filterPerformances = (performance) => {
     const start_datetime_date = new Date(performance.start_datetime);
@@ -116,51 +109,49 @@ export default function PerformancesPage() {
   }
 
   const handleDateChange = (e) => {
-    setSelectedDate(new Date(e.target.value))
+    if (e.target.value) setSelectedDate(new Date(`${e.target.value}T00:00:00`))
   }
 
   const handleLocationChange = (e) => {
-    window.location.href = `/seek-locations/${e.target.value}`;
+    if (e.target.value !== 'All Locations') window.location.href = `/seek-locations/${e.target.value}`;
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="grow relative rounded-lg overflow-hidden shadow-lg">
-        {filterType === 'time' && (
-          <DynamicMap
-            center={center}
-            markers={filteredPerformances}
+    <div className="flex flex-col gap-4 p-4 text-gray-900">
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold text-slate-100">Find performances</h1>
+        <button type="button" className="btn border-slate-600 bg-slate-800 text-slate-100 hover:bg-slate-700" aria-expanded={showMap} aria-controls="events-map"
+          onClick={() => { setMapOpened(true); setShowMap((visible) => !visible) }}>{showMap ? 'Hide map' : 'Show map'}</button>
+      </div>
+      {mapOpened && (
+        <div id="events-map" hidden={!showMap} className="relative isolate h-[50vh] min-h-80 rounded-lg overflow-hidden shadow-lg">
+          <DynamicMap center={center} visible={showMap}
+            markers={(filterType === 'time' ? filteredPerformances : locations).filter(hasCoordinates)}
             containerStyle={containerStyle}
-            onMarkerClick={setSelectedPerformanceLocation}
-          />
-        )}
-        {filterType === 'location' && (
-          <DynamicMap
-            center={center}
-            markers={locations}
-            containerStyle={containerStyle}
-            onMarkerClick={setSelectedLocation}
-          />
-        )}
-
-
-        {/* Filter Box */}
-        <div className="absolute m-4 top-8 w-5/6 md:w-1/3 md:right-4 bg-white rounded-lg shadow-md overflow-hidden">
+            onMarkerClick={filterType === 'time' ? setSelectedPerformanceLocation : setSelectedLocation} />
+        </div>
+      )}
+      {showMap && (filterType === 'time' ? filteredPerformances : locations).some((location) => !hasCoordinates(location)) && (
+        <p className="text-sm text-slate-300">Some locations do not yet have a map pin. You can still view them below and get directions.</p>
+      )}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="tabs tabs-boxed bg-gray-100">
-            <a
+            <button
+              type="button"
               className={`tab flex-1 ${filterType === 'time' ? 'bg-gray-600 text-white' : 'text-gray-600'}`}
               onClick={() => setFilterType('time')}
             >
               <Clock className="w-4 h-4 mr-2" />
               Time
-            </a>
-            <a
+            </button>
+            <button
+              type="button"
               className={`tab flex-1 ${filterType === 'location' ? 'bg-gray-600 text-white' : 'text-gray-600'}`}
               onClick={() => setFilterType('location')}
             >
               <MapPin className="w-4 h-4 mr-2" />
               Location
-            </a>
+            </button>
           </div>
           <div className="p-4 pt-0">
             {filterType === 'time' && (
@@ -200,7 +191,7 @@ export default function PerformancesPage() {
                   <span className="label-text">Location</span>
                 </label>
                 <select
-                  value={selectedLocation}
+                  value={selectedLocation?.location_id ?? 'All Locations'}
                   onChange={handleLocationChange}
                   className="select select-bordered w-full text-sm text-black bg-white"
                 >
@@ -214,12 +205,29 @@ export default function PerformancesPage() {
               </div>
             )}
           </div>
-        </div>
       </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {filterType === 'time' ? filteredPerformances.map((performance, index) => (
+          <article key={performance.performance_id ?? `${performance.location_id}-${performance.busker_id}-${index}`}
+            className="rounded-lg border bg-white p-4">
+            <h2 className="font-semibold"><a className="text-blue-700 hover:underline" href={`/seek-buskers/${performance.busker_id}`}>{buskers[performance.busker_id]?.name || 'Musician'}</a></h2>
+            <a className="text-blue-700 hover:underline" href={`/seek-locations/${performance.location_id}`}>{performance.location_name}</a>
+            <p className="text-sm text-gray-600">{String(performance.start_datetime).substring(11, 16)} – {String(performance.end_datetime).substring(11, 16)}</p>
+            <a className="inline-block mt-2 text-blue-700 underline" href={directionsUrl(performance)} target="_blank" rel="noopener noreferrer">Get directions</a>
+          </article>
+        )) : locations.map((location) => (
+          <article key={location.location_id} className="rounded-lg border bg-white p-4">
+            <h2 className="font-semibold"><a className="text-blue-700 hover:underline" href={`/seek-locations/${location.location_id}`}>{location.name}</a></h2>
+            <p className="text-sm text-gray-600">{location.address}</p>
+            <a className="inline-block mt-2 text-blue-700 underline" href={directionsUrl(location)} target="_blank" rel="noopener noreferrer">Get directions</a>
+          </article>
+        ))}
+      </div>
+      {filterType === 'time' && !filteredPerformances.length && <p className="text-slate-300">No performances found for this date and time.</p>}
 
       {/* Popup to show performance details */}
       {filterType === 'time' && selectedPerformanceLocation && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedPerformanceLocation(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedPerformanceLocation(null)}>
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-2">
               <a href={`/seek-locations/${selectedPerformanceLocation.location_id}`} className="text-blue-600 hover:underline">
@@ -232,6 +240,7 @@ export default function PerformancesPage() {
               alt={selectedPerformanceLocation.location_id}
               className="w-5/6 object-cover object-center rounded-lg mb-4"
             />
+            <a className="inline-block mb-3 text-blue-700 underline" href={directionsUrl(selectedPerformanceLocation)} target="_blank" rel="noopener noreferrer">Get directions</a>
             {/* get number of performances happening and who are performing at this time range */}
             <p className="text-gray-700 mb-2 text-sm">
               {filteredPerformances.filter(performance => performance.location_id === selectedPerformanceLocation.location_id).length} performances
@@ -255,7 +264,7 @@ export default function PerformancesPage() {
       )}
       {/* popup to show the location details */}
       {filterType === 'location' && selectedLocation && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedLocation(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" onClick={() => setSelectedLocation(null)}>
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-2">
               <a href={`/seek-locations/${selectedLocation.location_id}`} className="text-blue-600 hover:underline">
@@ -267,6 +276,7 @@ export default function PerformancesPage() {
               {selectedLocation.address}
             </p>
             <p className="text-gray-600 text-sm">{selectedLocation.description}</p>
+            <a className="inline-block mt-3 text-blue-700 underline" href={directionsUrl(selectedLocation)} target="_blank" rel="noopener noreferrer">Get directions</a>
           </div>
         </div>
       )}

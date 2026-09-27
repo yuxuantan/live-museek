@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import axios from 'axios';
-import { LocationRefreshError, refreshBuskerById } from './nac_location_refresh.js';
+import puppeteer from 'puppeteer';
+import { Client } from '@googlemaps/google-maps-services-js';
+import { LocationRefreshError, refreshBuskerById, refreshLocationById } from './nac_location_refresh.js';
 
 // Exercise the real refresh flow with mocked NAC and Supabase network boundaries.
 for (const scenario of ['image-only', 'embedded-image', 'invalid-embedded-image', 'upload-failure', 'download-failure', 'html-response', 'empty-image', 'no-image']) {
@@ -60,3 +62,36 @@ for (const scenario of ['image-only', 'embedded-image', 'invalid-embedded-image'
     if (uploads.length) assert.deepEqual(Buffer.from(uploads[0].body), imageBytes);
   });
 }
+
+
+test('location schedule refresh reuses saved coordinates and preserves historical performances without geocoding', async (t) => {
+  const location = {
+    location_id: 'location-reuse-regression', name: 'Test venue', address: '1 Example Road',
+    area: 'Central', description: 'Busking spot', lat: 1.3, lng: 103.8,
+  };
+  t.mock.method(Client.prototype, 'geocode', () => assert.fail('unchanged address must not be geocoded'));
+  const html = `<div id="div-header"><h1>Test venue</h1><ul><li class="dash-bx-times">1 Example Road</li></ul><p>Busking spot</p><span>Central</span></div>No Records found`;
+  let closed = false;
+  t.mock.method(puppeteer, 'launch', async () => ({
+    newPage: async () => ({ goto: async () => {}, content: async () => html }),
+    close: async () => { closed = true; },
+  }));
+  t.mock.method(axios, 'get', async (url) => {
+    assert.equal(url, 'https://eservices.nac.gov.sg/Busking');
+    return { data: `<select id="Location"><option value="${location.location_id}">Test venue</option></select>` };
+  });
+  t.mock.method(globalThis, 'fetch', async (input, options) => {
+    const url = new URL(input);
+    assert.ok(url.pathname.startsWith('/rest/v1/'), 'must never call a geocoding service for an unchanged address');
+    assert.equal(options.method, 'GET', 'must not rewrite unchanged location or delete historical bookings');
+    return Response.json(url.pathname.endsWith('/locations') ? [location] : [{
+      busker_id: 'past-busker', location_id: location.location_id,
+      start_datetime: '2020-01-01T12:00:00Z', end_datetime: '2020-01-01T13:00:00Z',
+    }]);
+  });
+  const result = await refreshLocationById(location.location_id);
+  assert.deepEqual(result.changed, { location: false, performances: false });
+  assert.equal(result.historicalPerformanceCountPreserved, 1);
+  assert.equal(result.location.lat, location.lat);
+  assert.equal(closed, true);
+});
