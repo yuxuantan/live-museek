@@ -11,7 +11,8 @@
     "nac:auto-book": "node scrape_nac_scripts/auto_book.js",
     "nac:availability": "node scrape_nac_scripts/check_nac_availability.js",
     "nac:slot-universe": "node scrape_nac_scripts/snapshot_nac_slot_universe.js",
-    "test:maps": "node --test app/server/location_geocoding.test.js app/server/nac_location_refresh.test.js scrape_nac_scripts/scrape_locations.test.js"
+    "test:maps": "node --test app/server/location_geocoding.test.js app/server/nac_location_refresh.test.js scrape_nac_scripts/scrape_locations.test.js",
+    "test:events": "node --test scrape_nac_scripts/performance_browser.test.js scrape_nac_scripts/scrape_perf.test.js scrape_nac_scripts/performance_retention.test.js"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
