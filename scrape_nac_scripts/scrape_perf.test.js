@@ -8,6 +8,7 @@ const ids = ['11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-22
 function harness(scenario = 'success') {
   const writes = [];
   const pages = [];
+  const batchRequests = [];
   let browserClosed = false;
   const visits = new Map();
   const launch = async () => ({
@@ -29,21 +30,24 @@ function harness(scenario = 'success') {
         url: () => url,
         waitForFunction: async () => ({ dispose: async () => {} }),
         $$eval: async () => scenario === 'directory' ? [] : ids.map((id, i) => ({ location_id: id, location_name: `Location ${i}` })),
-        evaluate: async () => ({
-          rows: scenario === 'empty' ? [] : [{ href: scenario === 'retry-pagination' && attempt === 1 && url.includes(ids[1])
-            ? '/profile/discard-this-attempt' : '/profile/busker', date: '31 December',
-            time: scenario === 'parse' && url.includes(ids[1]) ? 'invalid' : '10:00:AM-12:00:PM' }],
-          empty: scenario === 'empty', more: url.includes(ids[1]) &&
-            (scenario === 'pagination' || (scenario === 'retry-pagination' && attempt === 1)),
-          disabled: false, skip: '12', take: '12',
-        }),
-        click: async () => {
-          const request = {
-            url: () => `${url}/more?skip=12&take=12`, method: () => 'GET',
-            resourceType: () => 'xhr', continue: async () => {},
+        evaluate: async (_fn, argument) => {
+          if (argument.startsWith('https:')) {
+            batchRequests.push(argument);
+            if (scenario === 'pagination' || batchRequests.length === 1) {
+              return { error: 'Pagination response failed: HTTP 503', status: 503, bytes: 0 };
+            }
+            if (new URL(argument).searchParams.get('skip') === '12') {
+              return { rows: [{ href: '/profile/extra-busker', date: '31 December', time: '10:00:AM-12:00:PM' }], terminal: false };
+            }
+            return { rows: [], terminal: true };
+          }
+          return {
+            rows: scenario === 'empty' ? [] : [{ href: '/profile/busker', date: '31 December',
+              time: scenario === 'parse' && url.includes(ids[1]) ? 'invalid' : '10:00:AM-12:00:PM' }],
+            empty: scenario === 'empty', more: url.includes(ids[1]) &&
+              (scenario === 'pagination' || scenario === 'retry-pagination'),
+            disabled: false, skip: '12', take: '12',
           };
-          page.emit('request', request);
-          page.emit('response', { request: () => request, ok: () => false, status: () => 503 });
         },
       });
       pages.push(page);
@@ -57,7 +61,7 @@ function harness(scenario = 'success') {
       insert: async (rows) => { writes.push({ type: 'insert', rows }); return { error: null }; },
     };
   } };
-  return { writes, pages, closed: () => browserClosed,
+  return { writes, pages, batchRequests, closed: () => browserClosed,
     options: { argv: [], supabase, launch, browserOptions: { navigationAttempts: 1, retryDelayMs: 1 } } };
 }
 
@@ -65,25 +69,29 @@ for (const scenario of ['navigation', 'pagination', 'parse', 'directory', 'empty
   test(`${scenario} failure prevents ALL database writes and closes every tab`, async () => {
     const h = harness(scenario);
     await assert.rejects(scrapeWebsite(h.options), (error) => {
-      if (scenario === 'pagination') assert.match(error.cause.cause.message, /Pagination HTTP 503/);
+      if (scenario === 'pagination') assert.match(error.cause.cause.cause.message, /HTTP 503/);
       return true;
     });
     assert.deepEqual(h.writes, []);
     assert.ok(h.closed());
     assert.ok(h.pages.every((page) => page.closed));
-    if (scenario === 'pagination' || scenario === 'navigation') {
+    if (scenario === 'pagination') {
+      assert.equal(h.pages.length, 3, 'exhausted batches never restart the entire location');
+      assert.equal(h.batchRequests.length, 3);
+    }
+    if (scenario === 'navigation') {
       assert.equal(h.pages.length, 5, 'directory, first location, then three fresh attempts for the failed location');
     }
   });
 }
 
-test('transient pagination failure restarts the location in a fresh tab without partial rows', async () => {
+test('transient pagination failure retries the batch without discarding earlier rows', async () => {
   const h = harness('retry-pagination');
   await scrapeWebsite(h.options);
-  assert.equal(h.pages.length, 4);
+  assert.equal(h.pages.length, 3);
   assert.ok(h.pages.every((page) => page.closed));
-  assert.equal(h.writes[1].rows.length, 2);
-  assert.ok(h.writes[1].rows.every((row) => row.busker_id === 'busker'));
+  assert.equal(h.writes[1].rows.length, 3);
+  assert.deepEqual(h.batchRequests.map((url) => new URL(url).searchParams.get('skip')), ['12', '12', '24']);
 });
 
 test('location retry backoff consumes the shared deadline instead of resetting it', async () => {

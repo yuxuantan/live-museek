@@ -9,6 +9,8 @@ export const DEFAULT_LIMITS = {
   responseTimeoutMs: 30_000,
   downloadTimeoutMs: 60_000,
   locationAttempts: 3,
+  batchAttempts: 3,
+  maxBatchBytes: 2 * 1024 * 1024,
   retryDelayMs: 1_000,
   locationTimeoutMs: 300_000,
   maxPages: 250,
@@ -70,6 +72,11 @@ export async function createEventPage(browser, label = 'directory') {
       console.warn(`NAC page error [${label}] ${page.url()}: ${error.message}`);
     });
     page.on('requestfailed', (request) => {
+      // Controlled pagination fetches report their own completed-body outcome below.
+      // Chromium can also emit ERR_ABORTED after a usable body has been consumed.
+      const url = new URL(request.url());
+      if (request.resourceType?.() === 'fetch' && url.origin === new URL(BASE_URL).origin &&
+        /\/events\/more$/.test(url.pathname)) return;
       if (!blocked.has(request)) {
         console.warn(`NAC request failed [${label}] ${request.url()}: ${request.failure()?.errorText ?? 'unknown failure'}`);
       }
@@ -136,81 +143,110 @@ function rowKey(row) {
   return JSON.stringify([row.href, row.date, row.time]);
 }
 
-// Subscribe before the click so even an immediately completed request is observed.
-// requestfinished means the body has arrived; response alone only supplies headers.
-function waitForPaginationDownload(page, url, previous, limits, deadline) {
-  const expected = new URL(`${url}/more`);
-  let request;
-  let timer;
-  let status;
-  let resolve;
-  let reject;
-  const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
-  const dispose = () => {
-    clearTimeout(timer);
-    page.off('request', onRequest);
-    page.off('response', onResponse);
-    page.off('requestfinished', onFinished);
-    page.off('requestfailed', onFailed);
-    page.off('close', onClose);
-  };
-  const fail = (message) => {
-    dispose();
-    reject(new Error(`${message} (${expected.href}, skip=${previous.skip}, take=${previous.take}, status=${status ?? 'none'})`));
-  };
-  const armTimeout = (phase, timeout) => {
-    clearTimeout(timer);
-    const duration = remaining(deadline, timeout);
-    timer = setTimeout(() => fail(`Pagination ${phase} timeout after ${duration}ms`), duration);
-  };
-  const onRequest = (candidate) => {
-    const candidateUrl = new URL(candidate.url());
-    if (!request && candidate.method() === 'GET' && candidateUrl.origin === expected.origin &&
-      candidateUrl.pathname === expected.pathname && candidateUrl.searchParams.get('skip') === previous.skip &&
-      candidateUrl.searchParams.get('take') === previous.take) request = candidate;
-  };
-  const onResponse = (response) => {
-    if (!request || response.request() !== request) return;
-    status = response.status();
-    if (!response.ok()) return fail(`Pagination HTTP ${status}`);
-    try { armTimeout('download', limits.downloadTimeoutMs); } catch (error) { fail(error.message); }
-  };
-  const onFinished = (candidate) => {
-    if (candidate !== request) return;
-    const response = candidate.response();
-    if (!response?.ok()) return fail(`Pagination HTTP ${response?.status() ?? 'no response'}`);
-    dispose();
-    resolve();
-  };
-  const onFailed = (candidate) => {
-    if (candidate === request) fail(`Pagination request failed: ${candidate.failure()?.errorText ?? 'unknown failure'}`);
-  };
-  const onClose = () => fail('Pagination page closed');
-  armTimeout('response', limits.responseTimeoutMs);
-  page.on('request', onRequest);
-  page.on('response', onResponse);
-  page.on('requestfinished', onFinished);
-  page.on('requestfailed', onFailed);
-  page.on('close', onClose);
-  return { promise, dispose };
-}
-
-export async function loadNextEventPage(page, url, previous, limits, deadline) {
-  const download = waitForPaginationDownload(page, url, previous, limits, deadline);
-  try {
-    await Promise.all([download.promise, Promise.resolve().then(() => page.click(MORE))]);
+// Read the same endpoint as NAC's Load more button, but own the abort controller.
+// Only a completely downloaded and parsed batch can advance the caller's cursor.
+export async function fetchEventBatch(page, url, cursor, options = {}, deadline = Infinity) {
+  const limits = { ...DEFAULT_LIMITS, ...options };
+  const batchUrl = new URL(`${url}/more`);
+  batchUrl.searchParams.set('skip', cursor.skip);
+  batchUrl.searchParams.set('take', cursor.take);
+  let lastError;
+  let attempts = 0;
+  for (let attempt = 1; attempt <= limits.batchAttempts; attempt++) {
+    if (Date.now() >= deadline) break;
+    attempts = attempt;
     try {
-      const rendered = await page.waitForFunction((skip, selector) => {
-        const button = document.querySelector(selector);
-        return document.querySelector('#skip')?.value !== skip && button && !button.disabled;
-      }, { timeout: remaining(deadline, limits.readyTimeoutMs) }, previous.skip, MORE);
-      await rendered.dispose();
+      const result = await page.evaluate(async (requestUrl, config) => {
+        const controller = new AbortController();
+        const started = Date.now();
+        let timer;
+        let phase = 'response';
+        let bytes = 0;
+        let status = null;
+        let timedOut = false;
+        let downloaded = false;
+        const arm = (nextPhase, timeout) => {
+          phase = nextPhase;
+          clearTimeout(timer);
+          const duration = Math.min(timeout, config.budgetMs - (Date.now() - started));
+          timer = setTimeout(() => { timedOut = true; controller.abort(); }, Math.max(0, duration));
+        };
+        try {
+          arm('response', config.responseTimeoutMs);
+          const response = await fetch(requestUrl, {
+            signal: controller.signal, credentials: 'same-origin', redirect: 'error', cache: 'no-store',
+            // NAC embeds base64 photos for X-Requested-With: XMLHttpRequest.
+            // A normal GET returns the same events with small image URLs instead.
+            headers: { Accept: 'application/json' },
+          });
+          status = response.status;
+          if (!response.ok) throw new Error(`HTTP ${status}`);
+          arm('download', config.downloadTimeoutMs);
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let text = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            bytes += value.byteLength;
+            if (bytes > config.maxBatchBytes) throw new Error('Batch byte limit exceeded');
+            text += decoder.decode(value, { stream: true });
+          }
+          text += decoder.decode();
+          downloaded = true;
+          clearTimeout(timer);
+          phase = 'parse';
+          // NAC serves a JSON-encoded HTML string (including "" at the end).
+          const contentType = response.headers.get('content-type') ?? '';
+          if (contentType.split(';')[0].trim().toLowerCase() !== 'application/json') {
+            throw new Error(`Unexpected pagination content type: ${contentType}`);
+          }
+          const html = JSON.parse(text);
+          if (typeof html !== 'string') throw new Error('Expected an HTML string');
+          if (!html.trim()) return { rows: [], terminal: true, bytes };
+          // Template contents are inert: no images are fetched and scripts do not run.
+          const template = document.createElement('template');
+          template.innerHTML = html;
+          const cards = [...template.content.querySelectorAll('.col-cuttor')];
+          if (!cards.length || cards.length > config.take) throw new Error('Unrecognized pagination content');
+          const rows = cards.map((card) => {
+            const times = card.querySelector('.dash-bx-times')?.children;
+            const row = {
+              href: card.querySelector('a[href*="/profile/"]')?.getAttribute('href') ?? '',
+              date: times?.[0]?.textContent.trim() ?? '',
+              time: times?.[1]?.textContent.trim() ?? '',
+            };
+            if (Object.values(row).some((field) => !field || field.length > 512)) throw new Error('Invalid pagination event');
+            return row;
+          });
+          return { rows, terminal: false, bytes };
+        } catch (error) {
+          return { error: `Pagination ${phase} ${timedOut ? 'timeout' : 'failed'}: ${error.message}`, status, bytes };
+        } finally {
+          clearTimeout(timer);
+          // Abort and await the failed fetch before a retry can issue another request.
+          if (!downloaded) controller.abort();
+        }
+      }, batchUrl.href, {
+        responseTimeoutMs: limits.responseTimeoutMs, downloadTimeoutMs: limits.downloadTimeoutMs,
+        maxBatchBytes: limits.maxBatchBytes, take: Number(cursor.take),
+        budgetMs: Math.min(deadline - Date.now(), limits.responseTimeoutMs + limits.downloadTimeoutMs),
+      });
+      if (result.error) throw new Error(`${result.error}; status=${result.status ?? 'none'}, bytes=${result.bytes}`);
+      return result;
     } catch (error) {
-      throw new Error(`Pagination render failed (${url}, skip=${previous.skip}): ${error.message}`, { cause: error });
+      lastError = error;
+      console.warn(`Batch ${batchUrl.href} attempt ${attempt}/${limits.batchAttempts} failed: ${error.message}`);
+      const delay = limits.retryDelayMs * attempt;
+      if (attempt < limits.batchAttempts && Date.now() + delay < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      } else break;
     }
-  } finally {
-    download.dispose();
   }
+  const error = new Error(`Pagination batch failed after ${attempts} attempts (${batchUrl.href}); ` +
+    `location budget remaining=${Math.max(0, deadline - Date.now())}ms`, { cause: lastError });
+  error.pagination = true;
+  throw error;
 }
 
 export async function readLocationEventsWithRetries(browser, locationId, options = {}) {
@@ -218,8 +254,10 @@ export async function readLocationEventsWithRetries(browser, locationId, options
   // All fresh-tab attempts share this deadline; retries cannot reset the budget.
   const deadline = Date.now() + limits.locationTimeoutMs;
   let lastError;
+  let attempts = 0;
   for (let attempt = 1; attempt <= limits.locationAttempts; attempt++) {
-    remaining(deadline, 1);
+    if (Date.now() >= deadline) break;
+    attempts = attempt;
     let page;
     try {
       page = await createEventPage(browser, `${locationId}, attempt=${attempt}`);
@@ -230,11 +268,15 @@ export async function readLocationEventsWithRetries(browser, locationId, options
     } finally {
       await page?.close();
     }
-    if (attempt < limits.locationAttempts) {
-      await new Promise((resolve) => setTimeout(resolve, remaining(deadline, limits.retryDelayMs * attempt)));
-    }
+    // Exhausted batch retries must not discard earlier batches and start over again.
+    if (lastError?.pagination) break;
+    const delay = limits.retryDelayMs * attempt;
+    if (attempt < limits.locationAttempts && Date.now() + delay < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    } else break;
   }
-  throw new Error(`Location ${locationId} failed after ${limits.locationAttempts} attempts`, { cause: lastError });
+  throw new Error(`Location ${locationId} failed after ${attempts} tab attempts; ` +
+    `budget remaining=${Math.max(0, deadline - Date.now())}ms`, { cause: lastError });
 }
 
 export async function readLocationEvents(page, locationId, options = {}) {
@@ -251,16 +293,14 @@ export async function readLocationEvents(page, locationId, options = {}) {
     if (state.disabled || !/^\d+$/.test(state.skip ?? '') || !/^[1-9]\d*$/.test(state.take ?? '')) {
       throw new Error(`Invalid pagination state for ${locationId}`);
     }
-    const previous = state;
-    await loadNextEventPage(page, url, previous, limits, deadline);
-    state = await readEventState(page, limits.maxEvents);
-    if (Number(state.skip) <= Number(previous.skip)) throw new Error('Pagination cursor did not advance');
-    const next = new Map(state.rows.map((row) => [rowKey(row), row]));
-    if ([...unique.keys()].some((key) => !next.has(key))) throw new Error('Pagination lost previously loaded events');
-    if (next.size === unique.size && (state.more || state.rows.length !== previous.rows.length)) {
-      throw new Error('Pagination repeated events or made no progress');
-    }
+    const batch = await fetchEventBatch(page, url, state, limits, deadline);
+    if (batch.terminal) break;
+    const next = new Map(unique);
+    for (const row of batch.rows) next.set(rowKey(row), row);
+    if (next.size === unique.size) throw new Error('Pagination repeated events or made no progress');
+    if (next.size > limits.maxEvents) throw new Error(`Event limit exceeded: ${next.size}`);
     unique = next;
+    state = { ...state, skip: String(Number(state.skip) + Number(state.take)) };
     pages++;
     console.log(`Location ${locationId}: page=${pages}, events=${unique.size}, heapMB=${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}`);
     remaining(deadline, 1);

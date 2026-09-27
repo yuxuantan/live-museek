@@ -3,12 +3,12 @@ import { after, before, test } from 'node:test';
 import { createServer } from 'node:http';
 import { EventEmitter } from 'node:events';
 import puppeteer from 'puppeteer';
-import { DEFAULT_LIMITS, createEventPage, loadNextEventPage, navigateReady, readLocationEvents, readLocations, parsePerformances } from './performance_browser.js';
+import { DEFAULT_LIMITS, createEventPage, fetchEventBatch, navigateReady, readLocationEvents, readLocations, parsePerformances } from './performance_browser.js';
 
 const locationId = '50781054-7da9-427a-b76a-090113f0e463';
 const base = 'https://eservices.nac.gov.sg/Busking';
 const limits = { navigationAttempts: 2, navigationTimeoutMs: 2_000, readyTimeoutMs: 300,
-  responseTimeoutMs: 500, downloadTimeoutMs: 500, retryDelayMs: 1, locationTimeoutMs: 5_000 };
+  responseTimeoutMs: 500, downloadTimeoutMs: 500, batchAttempts: 1, retryDelayMs: 1, locationTimeoutMs: 5_000 };
 let browser;
 before(async () => { browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }); });
 after(async () => { await browser?.close(); });
@@ -22,6 +22,7 @@ async function fixture(t, scenario = 'success') {
   const page = await browser.newPage();
   t.after(() => page.close());
   const requests = [];
+  const requestHeaders = [];
   let documents = 0;
   await page.setRequestInterception(true);
   page.on('request', (request) => {
@@ -35,10 +36,18 @@ async function fixture(t, scenario = 'success') {
     let status = 200;
     if (url.pathname.endsWith('/events/more')) {
       requests.push(Number(url.searchParams.get('skip')));
-      if (scenario === 'http-error') status = 503;
-      body = scenario === 'duplicate' ? card(1) : scenario === 'stalled' ? '' : requests.length === 1 ? card(2) : '';
-      // Slow response plus delayed rendering exercises both waits, with only one click per request.
-      setTimeout(() => request.respond({ status, contentType: 'text/html', body }).catch(() => {}), 60);
+      requestHeaders.push(request.headers());
+      if (scenario === 'no-response') return;
+      if (scenario === 'http-error' || (scenario === 'recover-batch' && requests.length === 2)) status = 503;
+      body = scenario === 'duplicate' ? card(1) : requests.length === 1 ? card(2) :
+        scenario === 'recover-batch' && Number(url.searchParams.get('skip')) === 24 ? card(3) : '';
+      body = JSON.stringify(body);
+      if (scenario === 'invalid-json') body = '{';
+      if (scenario === 'error-json') body = JSON.stringify({ error: 'unavailable' });
+      if (scenario === 'unexpected-html') body = JSON.stringify('<h1>Service unavailable</h1>');
+      if (scenario === 'wrong-content') body = '';
+      // Match NAC's JSON-encoded HTML fragments, including the terminal empty string.
+      setTimeout(() => request.respond({ status, contentType: scenario === 'wrong-content' ? 'text/html' : 'application/json', body }).catch(() => {}), 60);
       return;
     }
     if (url.pathname.endsWith('/events')) {
@@ -74,16 +83,17 @@ async function fixture(t, scenario = 'success') {
     }
     request.respond({ status, contentType: 'text/html', body }).catch(() => {});
   });
-  return { page, requests, documents: () => documents };
+  return { page, requests, requestHeaders, documents: () => documents };
 }
 
-test('pagination waits for response AND DOM, including the terminal empty batch', async (t) => {
-  const { page, requests } = await fixture(t);
+test('pagination reads bounded JSON fragments without clicking the page UI', async (t) => {
+  const { page, requests, requestHeaders } = await fixture(t);
   const rows = await readLocationEvents(page, locationId, limits);
   assert.equal(rows.length, 2);
   assert.deepEqual(Object.keys(rows[0]).sort(), ['date', 'href', 'time']);
   assert.deepEqual(requests, [12, 24]);
-  assert.equal(await page.evaluate(() => window.clicks), 2);
+  assert.ok(requestHeaders.every((headers) => !headers['x-requested-with']), 'do not request NAC base64 photo payloads');
+  assert.equal(await page.evaluate(() => window.clicks), 0);
   assert.equal(parsePerformances(rows, locationId, 2026).length, 2);
 });
 
@@ -94,10 +104,13 @@ test('valid empty location completes without pagination', async (t) => {
 });
 
 for (const [scenario, error] of [
-  ['http-error', /Pagination HTTP 503/],
+  ['http-error', /Pagination batch failed/],
   ['duplicate', /repeated events/],
-  ['stalled', /no progress/],
-  ['no-render', /Waiting failed/],
+  ['no-response', /Pagination batch failed/],
+  ['invalid-json', /Pagination batch failed/],
+  ['error-json', /Pagination batch failed/],
+  ['unexpected-html', /Pagination batch failed/],
+  ['wrong-content', /Pagination batch failed/],
 ]) {
   test(`pagination fails closed for ${scenario}`, async (t) => {
     const { page, requests } = await fixture(t, scenario);
@@ -115,7 +128,7 @@ test('pagination page and event limits abort incomplete results', async (t) => {
 });
 
 test('location deadline bounds a stalled response/render', async (t) => {
-  const { page } = await fixture(t, 'no-render');
+  const { page } = await fixture(t, 'no-response');
   const start = Date.now();
   await assert.rejects(readLocationEvents(page, locationId, { ...limits, locationTimeoutMs: 200, readyTimeoutMs: 5_000 }));
   assert.ok(Date.now() - start < 2_000);
@@ -148,16 +161,20 @@ test('malformed event text cannot silently remove a booking', () => {
 // Real HTTP streaming is needed here: request.respond() sends headers and body together.
 async function streamingFixture(t, scenario) {
   const timers = new Set();
+  const requests = [];
+  let aborted = 0;
   const server = createServer((request, response) => {
     if (request.url.startsWith('/events/more')) {
-      response.writeHead(200, { 'Content-Type': 'text/html', 'X-Content-Type-Options': 'nosniff' });
+      requests.push(request.url);
+      response.on('close', () => { if (!response.writableFinished) aborted++; });
+      response.writeHead(200, { 'Content-Type': 'application/json', 'X-Content-Type-Options': 'nosniff' });
       response.flushHeaders();
-      response.write(' '); // Deliver successful headers while the body is still incomplete.
-      if (scenario === 'stalled') return;
+      response.write('"'); // Deliver successful headers while the body is still incomplete.
+      if (scenario === 'stalled' || (scenario === 'recover-stall' && requests.length === 1)) return;
       const timer = setTimeout(() => {
         if (scenario === 'interrupted') response.destroy();
-        else response.end(card(2));
-      }, scenario === 'interrupted' ? 50 : 500);
+        else response.end(JSON.stringify(card(2)).slice(1));
+      }, ['interrupted', 'recover-stall'].includes(scenario) ? 50 : 500);
       timers.add(timer);
     } else if (request.url === '/noise') {
       response.end('unrelated request completed');
@@ -192,8 +209,26 @@ async function streamingFixture(t, scenario) {
   });
   const url = `http://127.0.0.1:${server.address().port}/events`;
   await page.goto(url);
-  return { page, url };
+  return { page, url, requests, aborted: () => aborted };
 }
+
+test('a stalled body is cancelled before the same batch is retried successfully', async (t) => {
+  const fixture = await streamingFixture(t, 'recover-stall');
+  const batch = await fetchEventBatch(fixture.page, fixture.url, { skip: '204', take: '12' }, {
+    ...limits, batchAttempts: 3, downloadTimeoutMs: 150, retryDelayMs: 20,
+  }, Date.now() + 5_000);
+  assert.equal(batch.rows.length, 1);
+  assert.deepEqual(fixture.requests, ['/events/more?skip=204&take=12', '/events/more?skip=204&take=12']);
+  assert.equal(fixture.aborted(), 1, 'the stalled response was actually cancelled');
+});
+
+test('batch byte limits reject a response before it can grow without bounds', async (t) => {
+  const { page } = await fixture(t);
+  await assert.rejects(readLocationEvents(page, locationId, { ...limits, maxBatchBytes: 10 }), (error) => {
+    assert.match(error.cause.message, /Batch byte limit exceeded/);
+    return true;
+  });
+});
 
 for (const scenario of ['slow-body', 'stalled', 'interrupted']) {
   test(`pagination handles ${scenario} after successful HTTP headers`, async (t) => {
@@ -208,28 +243,32 @@ for (const scenario of ['slow-body', 'stalled', 'interrupted']) {
     });
     const watched = ['request', 'response', 'requestfinished', 'requestfailed', 'close'];
     const beforeCounts = watched.map((event) => page.listenerCount(event));
-    const operation = loadNextEventPage(page, url, { skip: '12', take: '12' }, {
-      ...DEFAULT_LIMITS, readyTimeoutMs: 200, responseTimeoutMs: 2_000,
+    const operation = fetchEventBatch(page, url, { skip: '12', take: '12' }, {
+      ...DEFAULT_LIMITS, batchAttempts: 1, readyTimeoutMs: 200, responseTimeoutMs: 2_000,
       downloadTimeoutMs: scenario === 'stalled' ? 150 : 2_000,
     }, Date.now() + 5_000);
     if (scenario === 'slow-body') {
-      await operation;
-      assert.ok(finishedAt - headersAt > 200, 'body takes longer than the render timeout after headers arrive');
-      assert.equal(await page.$$eval('.col-cuttor', (cards) => cards.length), 2);
+      const batch = await operation;
+      assert.ok(finishedAt - headersAt > 200, 'slow bodies are independent of the old render timeout');
+      assert.equal(batch.rows.length, 1);
+      assert.equal(batch.rows[0].href, '/Busking/busker/profile/busker-2');
+      assert.equal(await page.$$eval('.col-cuttor', (cards) => cards.length), 1, 'batch HTML is never appended to the page');
     } else {
-      await assert.rejects(operation, scenario === 'stalled' ? /Pagination download timeout/ : /Pagination request failed/);
+      await assert.rejects(operation, (error) => {
+        assert.match(error.cause.message, scenario === 'stalled' ? /Pagination download timeout/ : /Pagination download failed/);
+        return true;
+      });
     }
     assert.deepEqual(watched.map((event) => page.listenerCount(event)), beforeCounts, 'temporary watchers are removed');
   });
 }
 
-test('a failed click removes pagination watchers without waiting for their timeout', async (t) => {
-  const { page, url } = await streamingFixture(t, 'slow-body');
-  await page.$eval('button', (button) => button.remove());
-  const watched = ['request', 'response', 'requestfinished', 'requestfailed', 'close'];
-  const beforeCounts = watched.map((event) => page.listenerCount(event));
-  await assert.rejects(loadNextEventPage(page, url, { skip: '12', take: '12' }, DEFAULT_LIMITS, Date.now() + 5_000));
-  assert.deepEqual(watched.map((event) => page.listenerCount(event)), beforeCounts);
+test('a failed middle batch retries its cursor and retains all prior validated rows', async (t) => {
+  const { page, requests } = await fixture(t, 'recover-batch');
+  const rows = await readLocationEvents(page, locationId, { ...limits, batchAttempts: 3 });
+  assert.deepEqual(requests, [12, 24, 24, 36]);
+  assert.equal(rows.length, 3);
+  assert.equal(await page.evaluate(() => window.clicks), 0);
 });
 
 test('page diagnostics report real failures and suppress intentionally blocked media', async (t) => {
@@ -246,6 +285,11 @@ test('page diagnostics report real failures and suppress intentionally blocked m
   };
   page.emit('request', image);
   assert.deepEqual(messages, []);
+  page.emit('requestfailed', {
+    resourceType: () => 'fetch', url: () => `${base}/locations/id/events/more?skip=12&take=12`,
+    failure: () => ({ errorText: 'net::ERR_ABORTED' }),
+  });
+  assert.deepEqual(messages, [], 'controlled fetch failures use the batch outcome logger');
   page.emit('requestfailed', { url: () => `${base}/events/more`, failure: () => ({ errorText: 'net::ERR_CONNECTION_RESET' }) });
   page.emit('pageerror', new Error('NAC callback failed'));
   assert.equal(messages.length, 2);

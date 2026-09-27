@@ -11,21 +11,33 @@ node scrape_nac_scripts/scrape_perf.js --dry-run --location-id=50781054-7da9-427
 ```
 
 The scraper validates the directory and each location page after `domcontentloaded`.
-Navigation gets at most three attempts per tab. Each location gets at most three
-fresh-tab attempts, sharing one five-minute budget across attempts and backoff.
-Each attempt permits at most 250 pagination requests and 10,000 event cards. Pagination waits up
-to 30 seconds for the matching response headers, 60 seconds for its body download
-to finish, and then 15 seconds for the updated DOM,
-within the remaining location budget. It rejects stalled/repeated results,
-HTTP errors, unexpected page content, and malformed event rows.
+Navigation gets at most three attempts per tab, and at most three fresh tabs per
+location for page-loading failures. All work shares a five-minute location budget.
 
-Each location uses a separate tab, closed in `finally`. Images, fonts, and media
-are blocked. Only profile links, date text, and time text cross into Node; full
-page HTML and Cheerio trees are no longer allocated by this scraper. Progress
-logs include location, pagination count, event count, and Node heap usage.
-Failures identify response, download, or rendering stages. Request failures and
-uncaught page errors include location/attempt context; intentionally blocked
-media requests are excluded from failure logs. Incomplete attempts are discarded.
+Pagination requests NAC's same-origin `/events/more?skip=...&take=...` endpoint
+using the browser session. A stalled or failed batch is aborted and retried at the
+same cursor, up to three attempts, with backoff. Previously validated batches stay
+in memory; an exhausted batch never triggers a restart from the first page.
+Only complete, validated JSON-encoded HTML fragments advance the cursor. The
+terminal response must be a JSON-encoded empty string. Error pages, malformed
+JSON, repeated batches, and invalid events abort the refresh.
+
+Pagination deliberately omits `X-Requested-With: XMLHttpRequest`: NAC includes
+base64 profile photos when that header is present. A normal GET returns the same
+event fields with image URLs, avoiding multi-megabyte photo payloads.
+
+Each request has a 30-second response-header timeout and 60-second body timeout,
+clipped to the remaining location budget. Responses are capped at 2 MiB, with at
+most 250 pagination batches per tab (up to three request attempts each) and
+10,000 events per location. Fragments are
+parsed in an inert template inside Chromium, so their images and scripts do not
+load. Only event fields are returned to Node, and the page DOM does not grow.
+
+Tabs close in `finally`. Images, fonts, and media are blocked. Progress logs show
+location, page count, event count, and Node heap usage. Failure logs show cursor,
+attempt, HTTP status, bytes received, and whether the failure occurred while
+receiving headers, downloading, or parsing. The final error preserves the last
+failure as its cause when the budget prevents another retry.
 
 All selected locations must finish before database writes begin. An empty
 overall result also aborts the refresh. Dry runs and filtered runs suppress
