@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadSlotsForSelectedDate } from './nac_booking_browser.js';
+import { loadSlotsForSelectedDate, selectBookingDate } from './nac_booking_browser.js';
 
 function createResponse({ ok = true, status = 200, statusText = 'OK' } = {}) {
   return {
@@ -90,4 +90,30 @@ test('fails closed when the NAC availability response is unsuccessful', async ()
     }),
     /503 Service Unavailable/
   );
+});
+
+test('date picker timeout identifies the date and failed opening step', async () => {
+  let evaluations = 0;
+  const page = {
+    evaluate: async () => ++evaluations === 1 ? { dateKey: '2026-10-01' } : true,
+    waitForFunction: async () => { throw new Error('Waiting failed: 5000ms exceeded'); },
+  };
+  await assert.rejects(selectBookingDate(page, '2026-10-04'), /date picker did not open for 2026-10-04: Waiting failed/);
+});
+
+test('selected date timeout identifies the date-field update step', async () => {
+  const responses = [
+    { dateKey: '2026-10-01' }, true, { dateKey: '2026-10-01' },
+    { year: 2026, monthIndex: 9 }, [{ index: 0, dateKey: '2026-10-04' }],
+    { exists: true }, { exists: true, clicked: true },
+  ];
+  let waits = 0;
+  const page = {
+    evaluate: async () => responses.shift(),
+    waitForFunction: async (_callback, options) => {
+      assert.equal(options.polling, 100);
+      if (++waits === 2) throw new Error('Waiting failed: 5000ms exceeded');
+    },
+  };
+  await assert.rejects(selectBookingDate(page, '2026-10-04'), /date field did not change to 2026-10-04 after selection: Waiting failed/);
 });

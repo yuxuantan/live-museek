@@ -38,3 +38,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 ## Maps and address lookup
 
 The events map uses Google Maps and loads only after **Show map** is clicked. Address lookups run only for new/changed addresses or missing coordinates; unchanged locations reuse their saved coordinates. See [maps setup and cost controls](docs/maps-cost-reduction.md) for configuration and validation. No database migration or coordinate backfill is required.
+
+## NAC auto-booking
+
+See [auto-booking usage and verification](scrape_nac_scripts/README.auto-book.md) for sequential booking, parallel availability checks, and confirmation handling.

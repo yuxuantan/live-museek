@@ -179,16 +179,20 @@ async function waitForAuthenticatedSession(browser, args) {
 }
 
 export async function ensureAuthenticatedBuskingDetailsPage(browser, args) {
-  const page = await getOrCreatePage(browser);
-  await page.bringToFront();
-  await navigate(page, BUSKING_DETAILS_URL, args.navigationTimeoutMs ?? DEFAULT_NAVIGATION_TIMEOUT_MS);
-
   let sessionState = await detectBrowserSessionState(browser);
   if (sessionState?.state === 'blocked') {
     throw buildBlockedLoginError(sessionState.url);
   }
 
+  const page = sessionState?.page ?? await getOrCreatePage(browser);
+  await page.bringToFront();
+  if (sessionState?.state !== 'authenticated') {
+    await navigate(page, BUSKING_DETAILS_URL, args.navigationTimeoutMs ?? DEFAULT_NAVIGATION_TIMEOUT_MS);
+    sessionState = await detectBrowserSessionState(browser);
+  }
+  if (sessionState?.state === 'blocked') throw buildBlockedLoginError(sessionState.url);
   if (sessionState?.state === 'authenticated') {
+    await waitForBookingControls(sessionState.page, args.navigationTimeoutMs);
     return sessionState.page;
   }
 
@@ -200,14 +204,16 @@ export async function ensureAuthenticatedBuskingDetailsPage(browser, args) {
 
   const loginPage = sessionState?.page && !sessionState.page.isClosed() ? sessionState.page : page;
   await loginPage.bringToFront();
-  await navigate(loginPage, BEFORE_LOGIN_URL, args.navigationTimeoutMs ?? DEFAULT_NAVIGATION_TIMEOUT_MS);
+  if (!isBeforeLoginUrl(loginPage.url()) && !isSingpassUrl(loginPage.url())) {
+    await navigate(loginPage, BEFORE_LOGIN_URL, args.navigationTimeoutMs ?? DEFAULT_NAVIGATION_TIMEOUT_MS);
+  }
 
   console.log('No reusable NAC session found. Complete Singpass login in the opened browser window.');
   console.log(`The browser profile is persisted at: ${args.userDataDir}`);
 
   const authenticatedPage = await waitForAuthenticatedSession(browser, args);
   await authenticatedPage.bringToFront();
-  await navigate(authenticatedPage, BUSKING_DETAILS_URL, args.navigationTimeoutMs ?? DEFAULT_NAVIGATION_TIMEOUT_MS);
+  await waitForBookingControls(authenticatedPage, args.navigationTimeoutMs);
 
   sessionState = await detectPageSessionState(authenticatedPage);
   if (sessionState.state === 'blocked') {
@@ -218,6 +224,19 @@ export async function ensureAuthenticatedBuskingDetailsPage(browser, args) {
   }
 
   return authenticatedPage;
+}
+
+export async function waitForBookingControls(page, timeout = DEFAULT_NAVIGATION_TIMEOUT_MS) {
+  await installNacPageHelpers(page);
+  await page.waitForFunction(() => {
+    if (!location.pathname.toLowerCase().includes('/busking/busker/details')) return false;
+    const helpers = window.__liveMuseekNacHelpers;
+    if (helpers?.findBookingRoot?.()) return true;
+    return [...document.querySelectorAll('button, a, input, [role="button"]')].some((element) =>
+      /submit booking/i.test(element.innerText || element.value || element.textContent || '') &&
+      !element.disabled && element.getAttribute('aria-disabled') !== 'true' && helpers?.isVisible(element)
+    );
+  }, { timeout, polling: 100 });
 }
 
 export async function waitForVisibleText(page, expectedText, timeout = 30_000) {
@@ -244,7 +263,7 @@ export async function waitForVisibleText(page, expectedText, timeout = 30_000) {
         return isVisible(element) && text.includes(normalizedNeedle);
       });
     },
-    { timeout },
+    { timeout, polling: 100 },
     expectedText
   );
 }
@@ -1584,6 +1603,11 @@ export async function installNacPageHelpers(page) {
 
           const key = helpers.buildTimeSlotKey(cells[1], cells[2]);
           if (!requestedKeys.has(key)) {
+            // A reused form can retain the previous time range. Remove those
+            // selections so the next submission contains only its own slots.
+            if (checkbox?.checked && !checkbox.disabled && checkbox.getAttribute('aria-disabled') !== 'true') {
+              checkbox.click();
+            }
             continue;
           }
 
@@ -1601,10 +1625,16 @@ export async function installNacPageHelpers(page) {
         }
 
         const missingKeys = [...requestedKeys].filter((slotKey) => !seenKeys.has(slotKey));
+        const unexpectedKeys = tableRows.filter((row) => row.querySelector('input[type="checkbox"]')?.checked)
+          .map((row) => {
+            const cells = [...row.querySelectorAll('th, td')].map((cell) => helpers.getText(cell)).filter(Boolean);
+            return helpers.buildTimeSlotKey(cells[1], cells[2]);
+          }).filter((key) => !requestedKeys.has(key));
         return {
           selectedKeys,
           unavailableKeys,
           missingKeys,
+          unexpectedKeys,
         };
       },
     };
@@ -1619,7 +1649,7 @@ export async function waitForBookingModal(page) {
       const helpers = window.__liveMuseekNacHelpers;
       return Boolean(helpers?.findBookingRoot?.());
     },
-    { timeout: 30_000 }
+    { timeout: 30_000, polling: 100 }
   );
 }
 
@@ -1670,11 +1700,10 @@ export async function setBookingLocation(page, { locationId = '', locationName =
       const normalize = (value) => String(value ?? '').replace(/\s+/g, ' ').trim().toLowerCase().replace(/^\*+/, '').replace(/[^a-z0-9]+/g, '');
       return normalize(snapshot?.locationText).includes(normalize(expectedLocationName));
     },
-    { timeout: 10_000 },
+    { timeout: 10_000, polling: 100 },
     locationName
   );
 
-  await sleep(500);
   return getBookingSnapshot(page);
 }
 
@@ -1694,7 +1723,14 @@ export async function selectBookingDate(page, targetDateInput) {
     throw new Error('Unable to open the booking date picker.');
   }
 
-  await sleep(300);
+  try {
+    await page.waitForFunction(
+      () => Boolean(window.__liveMuseekNacHelpers?.findDatePickerRoot?.()),
+      { timeout: 5_000, polling: 100 }
+    );
+  } catch (error) {
+    throw new Error(`NAC date picker did not open for ${targetDateKey}: ${error.message}`);
+  }
 
   const targetYear = Number(targetDateKey.slice(0, 4));
   const targetMonthIndex = Number(targetDateKey.slice(5, 7)) - 1;
@@ -1749,16 +1785,19 @@ export async function selectBookingDate(page, targetDateInput) {
         throw new Error(`Date picker found ${targetDateKey}, but clicking it failed.`);
       }
 
-      await page.waitForFunction(
-        (expectedDateKey) => {
-          const snapshot = window.__liveMuseekNacHelpers?.getBookingSnapshot?.();
-          return snapshot?.dateKey === expectedDateKey;
-        },
-        { timeout: 5_000 },
-        targetDateKey
-      );
+      try {
+        await page.waitForFunction(
+          (expectedDateKey) => {
+            const snapshot = window.__liveMuseekNacHelpers?.getBookingSnapshot?.();
+            return snapshot?.dateKey === expectedDateKey;
+          },
+          { timeout: 5_000, polling: 100 },
+          targetDateKey
+        );
+      } catch (error) {
+        throw new Error(`NAC date field did not change to ${targetDateKey} after selection: ${error.message}`);
+      }
 
-      await sleep(500);
       return getBookingSnapshot(page);
     }
 
@@ -1794,11 +1833,11 @@ export async function selectBookingDate(page, targetDateInput) {
           const comparable = monthContext.year * 12 + monthContext.monthIndex;
           return comparable > previousComparable;
         },
-        { timeout: 3_000 },
+        { timeout: 3_000, polling: 100 },
         currentMonthComparable
       );
     } catch (error) {
-      await sleep(500);
+      throw new Error(`NAC calendar did not advance: ${error.message}`);
     }
   }
 
@@ -1880,182 +1919,256 @@ export async function selectBookingTimeRange(page, from, to) {
     slotKeys
   );
 
-  if (selectionResult.unavailableKeys.length > 0 || selectionResult.missingKeys.length > 0) {
+  if (selectionResult.unavailableKeys.length > 0 || selectionResult.missingKeys.length > 0 || selectionResult.unexpectedKeys?.length > 0) {
     throw new Error(
-      `Unable to select the requested slots. unavailable=${selectionResult.unavailableKeys.join(', ') || 'none'} missing=${selectionResult.missingKeys.join(', ') || 'none'}`
+      `Unable to select the requested slots. unavailable=${selectionResult.unavailableKeys.join(', ') || 'none'} missing=${selectionResult.missingKeys.join(', ') || 'none'} unexpected=${selectionResult.unexpectedKeys?.join(', ') || 'none'}`
     );
   }
 
   return selectionResult;
 }
 
-export async function submitBooking(page) {
-  await clickBookingModalButton(page, 'Submit');
-
-  try {
-    await page.waitForFunction(
-      () => {
-        const text = (document.body?.innerText ?? '').toLowerCase();
-        return text.includes('are you sure') && text.includes('create a booking');
-      },
-      { timeout: 5_000 }
-    );
-
-    const clickedConfirmation = await page.evaluate(() => {
-      const normalize = (value) => String(value ?? '').replace(/\s+/g, ' ').trim().toLowerCase();
-      const isVisible = (element) => {
-        if (!(element instanceof Element)) {
-          return false;
-        }
-
-        const style = window.getComputedStyle(element);
-        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
-          return false;
-        }
-
-        const rect = element.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
-      };
-
-      const dialogCandidates = [
-        ...document.querySelectorAll('[role="dialog"], dialog, .swal2-popup, .modal, .ui-dialog, .sweet-alert'),
-      ]
-        .filter((element) => isVisible(element))
-        .map((element) => ({
-          element,
-          text: normalize(element.innerText || element.textContent || ''),
-          area: (() => {
-            const rect = element.getBoundingClientRect();
-            return rect.width * rect.height;
-          })(),
-        }))
-        .filter(({ text }) => text.includes('are you sure') || text.includes('create a booking'))
-        .sort((left, right) => right.area - left.area);
-
-      const confirmationRoot = dialogCandidates[0]?.element ?? null;
-      if (!confirmationRoot) {
-        return false;
-      }
-
-      const buttonCandidates = [...confirmationRoot.querySelectorAll('button, a, input[type="button"], input[type="submit"], [role="button"]')]
-        .filter((element) => isVisible(element))
-        .map((element) => ({
-          element,
-          text: normalize(
-            element instanceof HTMLInputElement && ['button', 'submit'].includes(element.type)
-              ? element.value
-              : element.innerText || element.textContent || ''
-          ),
-        }))
-        .filter(({ text }) => text === 'yes' || text.includes('yes'))
-        .sort((left, right) => left.text.length - right.text.length);
-
-      const target = buttonCandidates[0]?.element ?? null;
-      if (!target) {
-        return false;
-      }
-
-      target.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' });
-      target.click();
-      return true;
-    });
-
-    if (!clickedConfirmation) {
-      await clickVisibleElementByText(page, 'Yes', 5_000);
-    }
-  } catch (error) {
-    // Some flows may submit immediately without a confirmation step.
+// Uncertain outcomes and failed cleanup stop the queue. A definite, dismissed
+// rejection is returned separately so the caller can move to another candidate.
+export class BookingSubmissionError extends Error {
+  constructor(message, outcome = 'unknown') {
+    super(message);
+    this.name = 'BookingSubmissionError';
+    this.outcome = outcome;
+    this.stopQueue = true;
   }
+}
 
-  try {
-    await Promise.race([
-      page.waitForFunction(
-        () => {
-          const text = (document.body?.innerText ?? '').toLowerCase();
-          return /success|submitted|confirmed|booked/i.test(text);
-        },
-        { timeout: 10_000 }
-      ),
-      page.waitForFunction(
-        () => {
-          const helpers = window.__liveMuseekNacHelpers;
-          return !helpers?.findBookingRoot?.();
-        },
-        { timeout: 10_000 }
-      ),
-    ]);
-  } catch (error) {
-    await sleep(3000);
-  }
-
-  const dismissTarget = await page.evaluate(() => {
-    const helpers = window.__liveMuseekNacHelpers;
-    const bookingRoot = helpers?.findBookingRoot?.() ?? null;
-    const isVisible = (element) => {
-      if (!(element instanceof Element)) {
-        return false;
-      }
-
-      const style = window.getComputedStyle(element);
-      if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
-        return false;
-      }
-
-      const rect = element.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0;
-    };
-
-    const popupCandidates = [...document.querySelectorAll('[role="dialog"], dialog, .swal2-popup, .sweet-alert, .modal, .ui-dialog')]
-      .filter((element) => isVisible(element))
-      .filter((element) => !bookingRoot || element !== bookingRoot)
-      .map((element) => {
-        const rect = element.getBoundingClientRect();
-        return {
-          text: String(element.innerText || element.textContent || '').toLowerCase(),
-          left: rect.left,
-          right: rect.right,
-          top: rect.top,
-          bottom: rect.bottom,
-          width: rect.width,
-          height: rect.height,
-          area: rect.width * rect.height,
-        };
-      })
-      .filter(({ text }) => /success|submitted|confirmed|booked|are you sure|create a booking/.test(text))
-      .sort((left, right) => right.area - left.area);
-
-    const popup = popupCandidates[0] ?? null;
-    if (!popup) {
-      return null;
+// Installed before clicking Submit so immediate and short-lived responses are captured.
+// Only new/changed visible feedback is eligible; historical page text is never evidence.
+export function observeBookingSubmission() {
+  window.__liveMuseekSubmission?.observer?.disconnect();
+  const selector = '[role="dialog"], dialog, .swal2-popup, .sweet-alert, .modal, .ui-dialog, [role="alert"], [role="status"], .alert';
+  const visible = (element) => {
+    if (!element?.isConnected || !element.getClientRects().length) return false;
+    for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
+      const style = getComputedStyle(ancestor);
+      if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
     }
-
-    const margin = 20;
-    if (popup.left > margin) {
-      return { x: Math.max(10, popup.left - margin), y: Math.max(10, popup.top + margin) };
-    }
-    if (window.innerWidth - popup.right > margin) {
-      return { x: Math.min(window.innerWidth - 10, popup.right + margin), y: Math.max(10, popup.top + margin) };
-    }
-    if (popup.top > margin) {
-      return { x: Math.max(10, popup.left + margin), y: Math.max(10, popup.top - margin) };
-    }
-
-    return { x: 10, y: 10 };
-  });
-
-  if (dismissTarget) {
-    await page.mouse.click(dismissTarget.x, dismissTarget.y);
-    await sleep(600);
-  }
-
-  const modalStillOpen = await page.evaluate(() => Boolean(window.__liveMuseekNacHelpers?.findBookingRoot?.()));
-  const pageText = normalizeText(await getPageText(page));
-  const lowerText = pageText.toLowerCase();
-  const success = !modalStillOpen || /success|submitted|confirmed|booked/.test(lowerText);
-
-  return {
-    success,
-    modalStillOpen,
-    textSnippet: pageText.slice(0, 500),
+    return true;
   };
+  const readText = (element) => {
+    // Keep button captions out of the message: some popups render their text
+    // and OK button inline, producing "not successfulOK" in innerText.
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    const parts = [];
+    while (walker.nextNode()) {
+      const parent = walker.currentNode.parentElement;
+      if (parent && visible(parent) && !parent.closest('button, input, [role="button"]')) {
+        parts.push(walker.currentNode.textContent);
+      }
+    }
+    return parts.join(' ').replace(/\s+/g, ' ').trim();
+  };
+  const baseline = new WeakMap();
+  document.querySelectorAll(selector).forEach((element) => {
+    if (visible(element)) baseline.set(element, readText(element));
+  });
+  const state = { outcome: null, confirmationHandled: false, element: null, text: '', isVisible: visible };
+  const scan = () => {
+    if (state.outcome === 'success' || state.outcome === 'rejected') return;
+    const bookingRoot = window.__liveMuseekNacHelpers?.findBookingRoot?.();
+    // Prefer the actual alert panel over a surrounding dialog/container that
+    // can remain visible after its nested success message has been dismissed.
+    const candidates = [...document.querySelectorAll(selector)].reverse();
+    for (const element of candidates) {
+      if (!visible(element) || element === bookingRoot || element.contains(bookingRoot)) continue;
+      const text = readText(element);
+      if (!text || baseline.get(element) === text) continue;
+      // Reject negated success wording before checking positive phrases.
+      const negative = /\b(fail(?:ed|ure)?|unsuccessful|unable|cannot|can't|could not|not|error|rejected|unavailable|already|exceeded)\b/i.test(text);
+      const success = !negative && (
+        /\bbooking (?:has been |was |is )?(?:created|submitted|confirmed|booked) successfully\b/i.test(text) ||
+        /\bbooking (?:has been |was |is )?successfully (?:created|submitted|confirmed|booked)\b/i.test(text) ||
+        /\bbooking (?:has been |was |is )?successful\b/i.test(text) ||
+        /\bsuccessfully (?:created|submitted|confirmed|booked) (?:your |the |a )?booking\b/i.test(text)
+      );
+      const rejected =
+        /\bevent creation (?:was |is )?(?:not successful|unsuccessful|failed)\b/i.test(text) ||
+        /\bbooking (?:(?:creation|submission) )?(?:has been |was |is )?(?:not successful|unsuccessful|failed|rejected)\b/i.test(text) ||
+        /\b(?:unable|failed|could not) to (?:create|submit) (?:your |the |a )?(?:booking|event)\b/i.test(text);
+      const confirmation = /are you sure/i.test(text) && /create a booking/i.test(text);
+      if (success || rejected || (confirmation && !state.confirmationHandled)) {
+        state.outcome = success ? 'success' : rejected ? 'rejected' : 'confirmation';
+        state.element = element;
+        state.text = text;
+        if (success || rejected) return;
+      }
+    }
+  };
+  state.scan = scan;
+  state.observer = new MutationObserver(scan);
+  state.observer.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true });
+  window.__liveMuseekSubmission = state;
+}
+
+export async function submitBooking(page, { timeoutMs = 15_000, cleanupTimeoutMs = 0, isStopped = () => false } = {}) {
+  await page.evaluate(observeBookingSubmission);
+  let confirmed = false;
+  let rejectionText = '';
+  let cleanupNoticeTimer;
+  const deadline = Date.now() + timeoutMs;
+  try {
+    if (isStopped()) throw new BookingSubmissionError('Queue stopped before submission.', 'not-submitted');
+    await clickBookingModalButton(page, 'Submit');
+    while (true) {
+      const handle = await page.waitForFunction(() => {
+        const state = window.__liveMuseekSubmission;
+        state?.scan();
+        return state?.outcome ? { outcome: state.outcome, text: state.text } : false;
+      }, { timeout: Math.max(1, deadline - Date.now()), polling: 100 });
+      const feedback = await handle.jsonValue();
+      await handle.dispose();
+      if (feedback.outcome === 'rejected') {
+        rejectionText = feedback.text;
+        const dismissed = await page.evaluate(() => {
+          const root = window.__liveMuseekSubmission?.element;
+          if (!root) return false;
+          const button = [...root.querySelectorAll('button, a, input[type="button"], input[type="submit"], [role="button"]')]
+            .find((element) => /^(ok|okay)$/i.test(String(element.value || element.innerText || element.textContent || '').trim()) &&
+              element.getClientRects().length > 0 && !element.disabled);
+          if (!button) return false;
+          button.click();
+          return true;
+        });
+        if (!dismissed) throw new Error('The rejection popup has no usable OK button.');
+        await page.waitForFunction(() => {
+          const state = window.__liveMuseekSubmission;
+          return state ? !state.isVisible(state.element) : false;
+        }, { timeout: cleanupTimeoutMs, polling: 100 });
+        return { success: false, outcome: 'rejected', textSnippet: rejectionText };
+      }
+      if (feedback.outcome === 'success') {
+        confirmed = true;
+        cleanupNoticeTimer = setTimeout(() => {
+          console.log('Booking confirmed. Still waiting for its success popup to close; remaining bookings stay queued. You can dismiss the popup manually.');
+        }, 5_000);
+        cleanupNoticeTimer.unref?.();
+        break;
+      }
+      // Mark handled before clicking; there is only one confirmation click per attempt.
+      if (isStopped()) throw new BookingSubmissionError('Queue stopped before booking confirmation.', 'unknown');
+      const clicked = await page.evaluate(() => {
+        const state = window.__liveMuseekSubmission;
+        const root = state?.element;
+        if (!root || state.confirmationHandled) return false;
+        state.confirmationHandled = true;
+        state.outcome = null;
+        const button = [...root.querySelectorAll('button, a, input[type="button"], input[type="submit"], [role="button"]')]
+          .find((element) => /^(yes|yes[,!]? (?:create|confirm)(?: booking)?)$/i.test(
+            String(element.value || element.innerText || element.textContent || '').trim()
+          ) && element.getClientRects().length > 0 && !element.disabled);
+        if (!button) return false;
+        button.click();
+        return true;
+      });
+      if (!clicked) throw new BookingSubmissionError('Unable to confirm the booking safely.');
+    }
+
+    const { textSnippet, dismissTarget, sweetAlert } = await page.evaluate(() => {
+      const state = window.__liveMuseekSubmission;
+      const root = state.element;
+      const container = root.matches('.swal2-popup') ? root.closest('.swal2-container') : null;
+      if (container) {
+        state.dismissal = { panel: root, container, attempts: 0, lastAttempt: 0 };
+        return { textSnippet: state.text, dismissTarget: null, sweetAlert: true };
+      }
+      // Dismiss confirmed feedback through its backdrop without resetting the form.
+      const rect = root.getBoundingClientRect();
+      const candidates = [
+        { x: rect.left - 10, y: rect.top + 10 },
+        { x: rect.right + 10, y: rect.top + 10 },
+        { x: rect.left + 10, y: rect.top - 10 },
+        { x: rect.left + 10, y: rect.bottom + 10 },
+      ];
+      const dismissTarget = root.isConnected && root.getClientRects().length
+        ? candidates.find(({ x, y }) => {
+            if (x <= 0 || y <= 0 || x >= innerWidth || y >= innerHeight) return false;
+            const target = document.elementFromPoint(x, y);
+            return target && !root.contains(target) &&
+              !target.closest('button, a, input, select, textarea, [role="button"]');
+          }) ?? null
+        : null;
+      return { textSnippet: state.text, dismissTarget, sweetAlert: false };
+    });
+    if (sweetAlert) {
+      // NAC reloads the page when success isConfirmed (OK). Its loaded
+      // SweetAlert handler dismisses only when event.target is the container.
+      // Click that exact backdrop, after its handler is ready. A second scoped
+      // click handles SweetAlert's ignore-next-click flag; neither can submit.
+      await page.waitForFunction(() => {
+        const dismissal = window.__liveMuseekSubmission?.dismissal;
+        if (!dismissal) return false;
+        const { panel, container } = dismissal;
+        const visible = (element) => {
+          if (!element?.isConnected || !element.getClientRects().length) return false;
+          for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
+            const style = getComputedStyle(ancestor);
+            if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+          }
+          return true;
+        };
+        if (!visible(panel) && !visible(container)) return true;
+        // Do not affect a replacement alert, or click again during closing.
+        if (!container.contains(panel) || !visible(panel) || panel.classList.contains('swal2-hide') ||
+            container.classList.contains('swal2-backdrop-hide')) return false;
+        if (typeof container.onclick === 'function' && dismissal.attempts < 2 &&
+            Date.now() - dismissal.lastAttempt >= 250) {
+          dismissal.attempts += 1;
+          dismissal.lastAttempt = Date.now();
+          container.click();
+        }
+        return !visible(panel) && !visible(container);
+      }, { timeout: cleanupTimeoutMs, polling: 100 });
+    }
+    if (dismissTarget) await page.mouse.click(dismissTarget.x, dismissTarget.y);
+    // Some dialogs disable backdrop dismissal. A scoped OK/Close remains safe
+    // after positive confirmation; never click Submit or a generic page button.
+    if (!sweetAlert) await page.evaluate(() => {
+      const root = window.__liveMuseekSubmission?.element;
+      if (!root?.isConnected || !root.getClientRects().length) return;
+      const button = [...root.querySelectorAll('button, a, input[type="button"], input[type="submit"], [role="button"]')].find((element) =>
+        /^(ok|okay|close|done)$/i.test(String(element.value || element.innerText || element.textContent || '').trim()) &&
+        element.getClientRects().length > 0 && !element.disabled
+      );
+      button?.click();
+    });
+    await page.waitForFunction(() => {
+      const state = window.__liveMuseekSubmission;
+      return state ? !state.isVisible(state.element) : false;
+    }, { timeout: cleanupTimeoutMs, polling: 100 });
+    const modalStillOpen = await page.evaluate(() => Boolean(window.__liveMuseekNacHelpers?.findBookingRoot?.()));
+    return { success: true, outcome: 'confirmed', modalStillOpen, textSnippet };
+  } catch (error) {
+    if (error instanceof BookingSubmissionError) throw error;
+    if (rejectionText) {
+      throw new BookingSubmissionError(
+        `NAC rejected the booking, but its popup could not be cleared: ${rejectionText}. ${error.message}`, 'rejected'
+      );
+    }
+    const dismissalDetails = confirmed ? await page.evaluate(() => {
+      const state = window.__liveMuseekSubmission;
+      const panel = state?.element;
+      const container = state?.dismissal?.container;
+      return panel ? `panel=${panel.tagName}.${String(panel.className)}; backdropClicks=${state.dismissal?.attempts ?? 0}; ` +
+        `panelConnected=${panel.isConnected}; backdropConnected=${container?.isConnected ?? false}` : 'feedback state unavailable';
+    }).catch(() => 'feedback page unavailable') : '';
+    throw new BookingSubmissionError(
+      confirmed
+        ? `Booking confirmed, but dismissing its success popup failed: ${error.message}. ${dismissalDetails}`
+        : `Booking outcome is unknown; inspect NAC before rerunning. ${error.message}`,
+      confirmed ? 'confirmed' : 'unknown'
+    );
+  } finally {
+    clearTimeout(cleanupNoticeTimer);
+    await page.evaluate(() => {
+      window.__liveMuseekSubmission?.observer?.disconnect();
+      delete window.__liveMuseekSubmission;
+    }).catch(() => {});
+  }
 }

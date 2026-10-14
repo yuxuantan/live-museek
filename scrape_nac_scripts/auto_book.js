@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  BookingSubmissionError,
   DEFAULT_MANUAL_LOGIN_TIMEOUT_MS,
   DEFAULT_NAVIGATION_TIMEOUT_MS,
   DEFAULT_USER_DATA_DIR,
@@ -16,8 +17,10 @@ import {
   selectBookingTimeRange,
   setBookingLocation,
   submitBooking,
+  waitForBookingControls,
 } from './nac_booking_browser.js';
 import {
+  BUSKING_DETAILS_URL,
   formatDateForNac,
   normalizeText,
   parseTimeRangeArg,
@@ -27,6 +30,8 @@ import {
   evaluateAvailabilityForRange,
   fetchLocationAvailability,
 } from './nac_availability_client.js';
+
+import { createLimiter, runBookingQueue, stopBookingQueue, summarizeBookingRun, validateBookingPlan } from './nac_booking_queue.js';
 
 function parseBooleanFlag(rawArg) {
   const [, rawValue = 'true'] = rawArg.split('=');
@@ -42,6 +47,7 @@ function parseCliArgs(argv) {
     locationId: '',
     locationName: '',
     headless: false,
+    concurrency: 1,
     keepOpen: true,
     keepOpenExplicitlySet: false,
     loginOnly: false,
@@ -60,6 +66,13 @@ function parseCliArgs(argv) {
 
     if (rawArg === '--login-only') {
       args.loginOnly = true;
+      continue;
+    }
+
+    if (rawArg.startsWith('--concurrency=')) {
+      const value = rawArg.substring('--concurrency='.length);
+      if (!['1', '2'].includes(value)) throw new Error('--concurrency must be 1 or 2.');
+      args.concurrency = Number(value);
       continue;
     }
 
@@ -179,6 +192,11 @@ Location:
   --location-name=<name>
 
 Session / browser options:
+  --concurrency=<1|2>
+      Number of booking tabs sharing one login. Defaults to 1.
+      Two-tab booking is experimental; use --concurrency=2 only to opt in.
+      Overlapping requests are rejected before browser startup.
+
   --login-only
       Validate or create the NAC session, then stop before booking.
 
@@ -336,7 +354,8 @@ async function precheckAvailability(location, request) {
   );
 }
 
-async function runBookingFlow(page, location, request) {
+async function runBookingFlow(page, location, request, control) {
+  const started = Date.now();
   await installNacPageHelpers(page);
   await openBookingModal(page);
 
@@ -345,18 +364,18 @@ async function runBookingFlow(page, location, request) {
     throw new Error('Booking modal opened, but its fields could not be read.');
   }
 
-  console.log(`Initial modal location: ${initialSnapshot.locationText || '(unknown)'}`);
+  console.log(`[${request.label}] Initial modal location: ${initialSnapshot.locationText || '(unknown)'}`);
   await setBookingLocation(page, {
     locationId: location.location_id,
     locationName: location.name,
   });
 
   const locationSnapshot = await getBookingSnapshot(page);
-  console.log(`Selected booking location: ${locationSnapshot?.locationText || location.name}`);
+  console.log(`[${request.label}] Selected booking location: ${locationSnapshot?.locationText || location.name}`);
 
   await selectBookingDate(page, request.date);
   const dateSnapshot = await getBookingSnapshot(page);
-  console.log(`Selected booking date: ${dateSnapshot?.dateValue || request.date}`);
+  console.log(`[${request.label}] Selected booking date: ${dateSnapshot?.dateValue || request.date}`);
 
   await loadSlotsForSelectedDate(page, request.from, request.to);
   const renderedRows = await extractRenderedSlotRows(page);
@@ -371,67 +390,79 @@ async function runBookingFlow(page, location, request) {
   );
 
   await selectBookingTimeRange(page, request.from, request.to);
-  console.log(`Selected booking time range: ${normalizeText(request.from)}-${normalizeText(request.to)}`);
+  console.log(`[${request.label}] Selected booking time range: ${normalizeText(request.from)}-${normalizeText(request.to)}`);
 
-  const submitResult = await submitBooking(page);
+  console.log(`[${request.label}] Prepared booking in ${Date.now() - started}ms.`);
+  if (control.stopped) throw new BookingSubmissionError('Queue stopped before submission.', 'not-submitted');
+  const submitStarted = Date.now();
+  const submitResult = await submitBooking(page, { isStopped: () => control.stopped });
+  if (submitResult.outcome === 'rejected') {
+    return submitResult;
+  }
   if (!submitResult.success) {
-    throw new Error(
+    throw new BookingSubmissionError(
       `Booking submit did not confirm success. Modal still open=${submitResult.modalStillOpen}. Page text: ${submitResult.textSnippet}`
     );
   }
+  console.log(`[${request.label}] Confirmed booking in ${Date.now() - submitStarted}ms.`);
 
   console.log(
     `Booking submitted for ${location.name} on ${formatDateForNac(request.date)} at ${request.from}-${request.to}.`
   );
 }
 
-async function attemptPriorityBooking(page, request, args) {
+export async function attemptPriorityBooking(page, request, {
+  control,
+  limit,
+  resolve = resolveLocationRecord,
+  precheck = precheckAvailability,
+  book = runBookingFlow,
+}) {
   const attemptErrors = [];
+  // Start bounded speculative checks together; consume results in priority order.
+  // Catch each result immediately so unused lower priorities cannot reject unhandled.
+  const candidates = request.locationPriority.map((entry) => limit(async () => {
+    if (control.stopped) throw new Error('Queue stopped.');
+    const location = await resolve(entry);
+    if (control.stopped) throw new Error('Queue stopped.');
+    await precheck(location, request);
+    return location;
+  }).then((location) => ({ location }), (error) => ({ error })));
 
-  for (const [priorityIndex, locationEntry] of request.locationPriority.entries()) {
-    const location = await resolveLocationRecord(locationEntry);
-    console.log(
-      `Attempting ${request.label} priority #${priorityIndex + 1}: ${location.name} (${location.location_id})`
-    );
-
-    try {
-      await precheckAvailability(location, request);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.log(`Skipping ${location.name}: ${message}`);
-      attemptErrors.push({
-        locationName: location.name,
-        locationId: location.location_id,
-        stage: 'availability-precheck',
-        error: message,
-      });
+  for (const [priorityIndex, candidate] of candidates.entries()) {
+    const { location, error } = await candidate;
+    if (control.stopped) {
+      return { success: false, request, outcome: 'not-submitted', skippedBecause: 'queue-stopped' };
+    }
+    if (error) {
+      attemptErrors.push({ priority: priorityIndex + 1, stage: 'availability-precheck', error: error.message });
       continue;
     }
-
+    console.log(`[${request.label}] Attempting priority #${priorityIndex + 1}: ${location.name}`);
     try {
-      await runBookingFlow(page, location, request);
-      return {
-        success: true,
-        request,
-        location,
-      };
+      const result = await book(page, location, request, control);
+      if (result?.outcome === 'rejected') {
+        attemptErrors.push({ locationName: location.name, stage: 'submission-rejected', error: result.textSnippet });
+        console.log(`[${request.label}] NAC rejected ${location.name}: ${result.textSnippet}. Trying the next candidate.`);
+        continue;
+      }
+      return { success: true, outcome: 'confirmed', request, location };
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.log(`Booking attempt failed for ${location.name}: ${message}`);
-      attemptErrors.push({
-        locationName: location.name,
-        locationId: location.location_id,
-        stage: 'booking-flow',
-        error: message,
-      });
+      attemptErrors.push({ locationName: location.name, stage: 'booking-flow', error: error.message });
+      if (error.stopQueue) {
+        if (error.outcome === 'not-submitted' && control.stopped) {
+          return { success: false, request, outcome: 'not-submitted', skippedBecause: 'queue-stopped' };
+        }
+        const result = { success: error.outcome === 'confirmed', stopQueue: true, outcome: error.outcome, request, location, errors: attemptErrors };
+        stopBookingQueue(control, result);
+        return result;
+      }
+      // Errors after Submit stop above. Explicit, cleaned-up rejections are
+      // returned by book() and advance to the next candidate separately.
+      console.log(`[${request.label}] Preparation failed for ${location.name}: ${error.message}`);
     }
   }
-
-  return {
-    success: false,
-    request,
-    errors: attemptErrors,
-  };
+  return { success: false, outcome: 'failed', request, errors: attemptErrors };
 }
 
 async function buildBookingRequests(args) {
@@ -457,9 +488,10 @@ export async function main(rawArgs = process.argv.slice(2)) {
   }
 
   validateArgs(args);
+  const bookingPlan = args.loginOnly ? { stopOnFailure: true, requests: [] } : await buildBookingRequests(args);
+  validateBookingPlan(bookingPlan.requests);
   await ensureDirectoryExists(args.userDataDir);
   console.log(`Using persisted NAC browser profile: ${args.userDataDir}`);
-  const bookingPlan = args.loginOnly ? { stopOnFailure: true, requests: [] } : await buildBookingRequests(args);
 
   const browser = await launchPersistentBrowser(args);
 
@@ -473,56 +505,56 @@ export async function main(rawArgs = process.argv.slice(2)) {
       return;
     }
 
-    const results = [];
-    for (const request of bookingPlan.requests) {
-      console.log(
-        `Starting booking request "${request.label}" for ${formatDateForNac(request.date)} ${request.from}-${request.to}`
-      );
-      const result = await attemptPriorityBooking(page, request, args);
-      results.push(result);
-
-      if (result.success) {
-        console.log(
-          `Completed booking request "${request.label}" with ${result.location.name} (${result.location.location_id}).`
-        );
-      } else {
-        console.log(`Booking request "${request.label}" failed for all candidate locations.`);
-        if (bookingPlan.stopOnFailure) {
-          throw new Error(
-            `Stopping after failed booking request "${request.label}": ${result.errors.map((entry) => `${entry.locationName}: ${entry.error}`).join(' | ')}`
-          );
-        }
-      }
+    const pages = [page];
+    if (args.concurrency === 2 && bookingPlan.requests.length > 1) {
+      pages.push(null); // This worker opens its tab while the first worker books.
     }
-
-    console.log(
-      JSON.stringify(
-        {
-          results: results.map((result) =>
-            result.success
-              ? {
-                  label: result.request.label,
-                  success: true,
-                  date: result.request.date,
-                  from: result.request.from,
-                  to: result.request.to,
-                  locationName: result.location.name,
-                  locationId: result.location.location_id,
-                }
-              : {
-                  label: result.request.label,
-                  success: false,
-                  date: result.request.date,
-                  from: result.request.from,
-                  to: result.request.to,
-                  errors: result.errors,
-                }
-          ),
-        },
-        null,
-        2
-      )
-    );
+    const control = {
+      stopped: false,
+      onStop: (reason) => console.error(`Queue stopped by "${reason.label}" (${reason.outcome}): ${reason.error}`),
+    };
+    const limit = createLimiter(4);
+    const locationCache = new Map();
+    const resolve = (entry) => {
+      const key = JSON.stringify(entry);
+      if (!locationCache.has(key)) locationCache.set(key, resolveLocationRecord(entry));
+      return locationCache.get(key);
+    };
+    console.log(`Starting ${pages.length} booking worker(s) independently; at most 4 availability checks at once.`);
+    const started = Date.now();
+    const workerErrors = [];
+    const results = await runBookingQueue({
+      requests: bookingPlan.requests, pages, stopOnFailure: bookingPlan.stopOnFailure, control, workerErrors,
+      preparePage: async (workerPage, worker) => {
+        if (!workerPage) {
+          console.log(`[worker ${worker}] Opening booking tab.`);
+          workerPage = await browser.newPage();
+          await workerPage.goto(BUSKING_DETAILS_URL, { waitUntil: 'domcontentloaded', timeout: args.navigationTimeoutMs });
+          if (!workerPage.url().toLowerCase().includes('/busking/busker/details')) {
+            throw new Error('Additional booking tab did not inherit an authenticated NAC session.');
+          }
+          await waitForBookingControls(workerPage, args.navigationTimeoutMs);
+        }
+        console.log(`[worker ${worker}] Tab ready after ${Date.now() - started}ms.`);
+        return workerPage;
+      },
+      attempt: (workerPage, request, worker) => {
+        console.log(`[worker ${worker}] Starting "${request.label}" ${request.date} ${request.from}-${request.to}`);
+        return attemptPriorityBooking(workerPage, request, { control, limit, resolve });
+      },
+    });
+    const summary = summarizeBookingRun(results, {
+      durationMs: Date.now() - started, workerErrors, stopReason: control.stopReason,
+    });
+    console.log(JSON.stringify(summary, null, 2));
+    if (results.some((result) => !result.success || result.stopQueue)) {
+      const cause = control.stopReason
+        ? ` Queue stopped by "${control.stopReason.label}": ${control.stopReason.error}` : '';
+      throw new Error(
+        `Booking run needs review: ${summary.counts.confirmed} confirmed, ${summary.counts.failed} failed, ` +
+        `${summary.counts.skipped} skipped.${cause} Review per-booking outcomes before rerunning; do not resubmit confirmed bookings.`
+      );
+    }
   } finally {
     if (args.keepOpen) {
       await browser.disconnect();

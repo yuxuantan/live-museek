@@ -5,9 +5,10 @@ import {
   parseAvailabilityRows,
 } from './nac_common.js';
 
-export async function fetchLocationAvailability(locationId, dateInput) {
+export async function fetchLocationAvailability(locationId, dateInput, { timeoutMs = 15_000 } = {}) {
   const url = buildAvailabilityUrl(locationId, dateInput);
   const response = await fetch(url, {
+    signal: AbortSignal.timeout(timeoutMs),
     headers: {
       Accept: 'application/json',
     },
