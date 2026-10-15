@@ -1,6 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { loadSlotsForSelectedDate, selectBookingDate } from './nac_booking_browser.js';
+import { parseCliArgs } from './auto_book.js';
+
+test('submission waits default to unbounded and accept separate finite limits', () => {
+  const defaults = parseCliArgs([]);
+  assert.equal(defaults.confirmationTimeoutMs, 0);
+  assert.equal(defaults.submissionTimeoutMs, 0);
+  const custom = parseCliArgs(['--confirmation-timeout-ms=30000', '--submission-timeout-ms=120000']);
+  assert.equal(custom.confirmationTimeoutMs, 30_000);
+  assert.equal(custom.submissionTimeoutMs, 120_000);
+  for (const flag of ['--confirmation-timeout-ms', '--submission-timeout-ms']) {
+    for (const value of ['', '-1', '1.5', '12ms', '1=2', 'Infinity', '9007199254740992']) {
+      assert.throws(() => parseCliArgs([`${flag}=${value}`]), /non-negative integer/);
+    }
+  }
+});
 
 function createResponse({ ok = true, status = 200, statusText = 'OK' } = {}) {
   return {

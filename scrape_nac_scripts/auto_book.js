@@ -38,7 +38,7 @@ function parseBooleanFlag(rawArg) {
   return !['false', '0', 'no'].includes(String(rawValue).trim().toLowerCase());
 }
 
-function parseCliArgs(argv) {
+export function parseCliArgs(argv) {
   const args = {
     configFile: '',
     date: '',
@@ -53,12 +53,24 @@ function parseCliArgs(argv) {
     loginOnly: false,
     manualLoginTimeoutMs: DEFAULT_MANUAL_LOGIN_TIMEOUT_MS,
     navigationTimeoutMs: DEFAULT_NAVIGATION_TIMEOUT_MS,
+    confirmationTimeoutMs: 0,
+    submissionTimeoutMs: 0,
     userDataDir: DEFAULT_USER_DATA_DIR,
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || process.env.CHROME_PATH || '',
     help: false,
   };
 
   for (const rawArg of argv) {
+    if (rawArg.startsWith('--confirmation-timeout-ms=') || rawArg.startsWith('--submission-timeout-ms=')) {
+      const flag = rawArg.slice(0, rawArg.indexOf('='));
+      const rawValue = rawArg.slice(flag.length + 1);
+      const value = Number(rawValue);
+      if (!/^\d+$/.test(rawValue) || !Number.isSafeInteger(value)) {
+        throw new Error(`${flag} must be a non-negative integer; 0 waits indefinitely.`);
+      }
+      args[flag === '--confirmation-timeout-ms' ? 'confirmationTimeoutMs' : 'submissionTimeoutMs'] = value;
+      continue;
+    }
     if (rawArg === '--help' || rawArg === '-h') {
       args.help = true;
       continue;
@@ -217,6 +229,14 @@ Session / browser options:
 
   --manual-login-timeout-ms=<ms>
   --navigation-timeout-ms=<ms>
+
+  --confirmation-timeout-ms=<ms>
+      Maximum wait after Submit for a confirmation prompt or direct result.
+      Default: 0 (keep waiting, with progress logs every 15 seconds).
+
+  --submission-timeout-ms=<ms>
+      Separate maximum result wait after clicking Yes. Default: 0 (keep waiting).
+      A finite timeout leaves the outcome unknown and stops the queue for review.
 `.trim());
 }
 
@@ -394,8 +414,11 @@ async function runBookingFlow(page, location, request, control) {
 
   console.log(`[${request.label}] Prepared booking in ${Date.now() - started}ms.`);
   if (control.stopped) throw new BookingSubmissionError('Queue stopped before submission.', 'not-submitted');
-  const submitStarted = Date.now();
-  const submitResult = await submitBooking(page, { isStopped: () => control.stopped });
+  const submitResult = await submitBooking(page, {
+    ...control.submissionOptions,
+    logPrefix: `[${request.label} ${request.date}]`,
+    isStopped: () => control.stopped,
+  });
   if (submitResult.outcome === 'rejected') {
     return submitResult;
   }
@@ -404,11 +427,12 @@ async function runBookingFlow(page, location, request, control) {
       `Booking submit did not confirm success. Modal still open=${submitResult.modalStillOpen}. Page text: ${submitResult.textSnippet}`
     );
   }
-  console.log(`[${request.label}] Confirmed booking in ${Date.now() - submitStarted}ms.`);
+  console.log(`[${request.label}] Confirmed booking: feedback after ${submitResult.timings.feedbackMs}ms, popup cleanup ${submitResult.timings.popupCleanupMs}ms, total ${submitResult.timings.totalMs}ms.`);
 
   console.log(
     `Booking submitted for ${location.name} on ${formatDateForNac(request.date)} at ${request.from}-${request.to}.`
   );
+  return submitResult;
 }
 
 export async function attemptPriorityBooking(page, request, {
@@ -442,18 +466,21 @@ export async function attemptPriorityBooking(page, request, {
     try {
       const result = await book(page, location, request, control);
       if (result?.outcome === 'rejected') {
-        attemptErrors.push({ locationName: location.name, stage: 'submission-rejected', error: result.textSnippet });
+        attemptErrors.push({ locationName: location.name, stage: 'submission-rejected', error: result.textSnippet, timings: result.timings });
         console.log(`[${request.label}] NAC rejected ${location.name}: ${result.textSnippet}. Trying the next candidate.`);
         continue;
       }
-      return { success: true, outcome: 'confirmed', request, location };
+      return {
+        success: true, outcome: 'confirmed', request, location, timings: result?.timings,
+        ...(attemptErrors.length ? { errors: attemptErrors } : {}),
+      };
     } catch (error) {
-      attemptErrors.push({ locationName: location.name, stage: 'booking-flow', error: error.message });
+      attemptErrors.push({ locationName: location.name, stage: 'booking-flow', error: error.message, timings: error.timings });
       if (error.stopQueue) {
         if (error.outcome === 'not-submitted' && control.stopped) {
           return { success: false, request, outcome: 'not-submitted', skippedBecause: 'queue-stopped' };
         }
-        const result = { success: error.outcome === 'confirmed', stopQueue: true, outcome: error.outcome, request, location, errors: attemptErrors };
+        const result = { success: error.outcome === 'confirmed', stopQueue: true, outcome: error.outcome, request, location, errors: attemptErrors, timings: error.timings };
         stopBookingQueue(control, result);
         return result;
       }
@@ -511,6 +538,10 @@ export async function main(rawArgs = process.argv.slice(2)) {
     }
     const control = {
       stopped: false,
+      submissionOptions: {
+        confirmationTimeoutMs: args.confirmationTimeoutMs,
+        resultTimeoutMs: args.submissionTimeoutMs,
+      },
       onStop: (reason) => console.error(`Queue stopped by "${reason.label}" (${reason.outcome}): ${reason.error}`),
     };
     const limit = createLimiter(4);

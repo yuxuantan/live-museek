@@ -1,5 +1,6 @@
 import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
 import puppeteer from 'puppeteer';
 import { BookingSubmissionError, selectBookingDate, setBookingLocation, submitBooking, ensureAuthenticatedBuskingDetailsPage, installNacPageHelpers, selectBookingTimeRange } from './nac_booking_browser.js';
 import { attemptPriorityBooking } from './auto_book.js';
@@ -14,7 +15,7 @@ after(async () => { await browser?.close(); });
 
 async function fixture(t, mode) {
   const page = await browser.newPage();
-  t.after(() => page.close());
+  t.after(() => page.isClosed() ? undefined : page.close());
   // No NAC session, network navigation, or remote resources in these fixtures.
   await page.setRequestInterception(true);
   page.on('request', (request) => request.abort());
@@ -76,7 +77,7 @@ async function fixture(t, mode) {
       button.onclick = () => {
         if (mode === 'cleanup-failure') return;
         element.remove();
-        if (mode !== 'form-remains') booking.remove();
+        if (!['form-remains', 'delayed-success'].includes(mode)) booking.remove();
       };
     };
     const reject = () => {
@@ -96,6 +97,17 @@ async function fixture(t, mode) {
       window.counts.submit += 1;
       console.log('fixture-submit');
       if (mode.startsWith('swal-container') || ['immediate', 'cleanup-failure', 'alternate-wording', 'backdrop', 'form-remains'].includes(mode)) succeed();
+      else if (mode === 'delayed-success') setTimeout(succeed, 16_000);
+      else if (mode === 'delayed-confirmation') {
+        setTimeout(() => {
+          const { element, button } = popup('Are you sure you want to create a booking?', 'Yes');
+          button.onclick = () => {
+            window.counts.confirm += 1;
+            element.remove();
+            setTimeout(succeed, 800);
+          };
+        }, 800);
+      }
       else if (['confirmation', 'stop-before-confirmation', 'event-rejected-confirmation'].includes(mode)) {
         const { element, button } = popup('Are you sure you want to create a booking?', 'Yes');
         button.onclick = () => {
@@ -125,6 +137,201 @@ test('confirmation is clicked once and its subsequent explicit success is captur
   assert.equal((await submitBooking(page, { timeoutMs: 1_000 })).success, true);
   assert.deepEqual(await page.evaluate(() => window.counts), { submit: 1, confirm: 1 });
 });
+
+test('success after the former 15-second deadline resumes queued bookings without resubmitting', { timeout: 25_000 }, async (t) => {
+  const page = await fixture(t, 'delayed-success');
+  const control = {};
+  const attempted = [];
+  const notices = [];
+  const originalLog = console.log;
+  t.mock.method(console, 'log', (...args) => {
+    if (String(args[0]).includes('Booking outcome pending')) {
+      notices.push(String(args[0]));
+      assert.deepEqual(attempted, ['booking-1']);
+      assert.equal(Boolean(control.stopped), false);
+    } else originalLog(...args);
+  });
+  const requests = [1, 2].map((day) => ({
+    label: `booking-${day}`, date: `2026-11-0${day}`, from: '11:00', to: '14:00',
+    locationPriority: [{ name: 'first' }],
+  }));
+  const results = await runBookingQueue({
+    requests, pages: [page], control, stopOnFailure: false,
+    attempt: (page, request) => attemptPriorityBooking(page, request, {
+      control, limit: createLimiter(1), resolve: async (entry) => entry, precheck: async () => {},
+      book: async () => {
+        attempted.push(request.label);
+        if (request.label === 'booking-2') {
+          await page.evaluate(() => {
+            document.querySelector('#submit').onclick = () => { window.counts.submit += 1; window.succeed(); };
+          });
+        }
+        return submitBooking(page);
+      },
+    }),
+  });
+  assert.equal(results.every((result) => result.success), true);
+  assert.deepEqual(attempted, ['booking-1', 'booking-2']);
+  assert.equal(notices.length, 1);
+  assert.equal(await page.evaluate(() => window.counts.submit), 2);
+  assert.ok(results[0].timings.feedbackMs >= 15_000);
+  assert.ok(results[0].timings.totalMs >= results[0].timings.feedbackMs);
+});
+
+test('confirmation and result have independent configurable deadlines', async (t) => {
+  const page = await fixture(t, 'delayed-confirmation');
+  const result = await submitBooking(page, { confirmationTimeoutMs: 1_300, resultTimeoutMs: 1_300 });
+  assert.equal(result.outcome, 'confirmed');
+  assert.ok(result.timings.feedbackMs > 1_300);
+  assert.ok(result.timings.feedbackMs - result.timings.confirmationClickedMs >= 800);
+  assert.deepEqual(await page.evaluate(() => window.counts), { submit: 1, confirm: 1 });
+});
+
+test('an explicit result timeout preserves uncertainty and never retries the submission', async (t) => {
+  const page = await fixture(t, 'delayed-confirmation');
+  await assert.rejects(submitBooking(page, { confirmationTimeoutMs: 2_000, resultTimeoutMs: 100 }), (error) =>
+    error.outcome === 'unknown' && error.stopQueue && /Waiting for booking result/.test(error.message) &&
+    error.timings.confirmationClickedMs >= 0
+  );
+  assert.deepEqual(await page.evaluate(() => window.counts), { submit: 1, confirm: 1 });
+});
+
+test('late explicit rejection remains pending then advances to the next location', async (t) => {
+  const page = await fixture(t, 'stale');
+  const locations = [];
+  const control = {};
+  let pendingNotices = 0;
+  const originalLog = console.log;
+  t.mock.method(console, 'log', (...args) => {
+    if (String(args[0]).includes('Booking outcome pending')) {
+      pendingNotices += 1;
+      assert.deepEqual(locations, ['first']);
+      assert.equal(Boolean(control.stopped), false);
+    } else originalLog(...args);
+  });
+  const result = await attemptPriorityBooking(page, {
+    label: 'fixture', date: '2026-11-01', from: '11:00', to: '14:00',
+    locationPriority: [{ name: 'first' }, { name: 'second' }],
+  }, {
+    control, limit: createLimiter(1), resolve: async (entry) => entry, precheck: async () => {},
+    book: async (page, location) => {
+      locations.push(location.name);
+      await page.evaluate((first) => {
+        document.querySelector('#submit').onclick = () => {
+          window.counts.submit += 1;
+          if (!first) { window.succeed(); return; }
+          setTimeout(() => {
+            const panel = document.createElement('div');
+            panel.className = 'swal2-popup';
+            panel.innerHTML = 'Event creation not successful<button>OK</button>';
+            panel.querySelector('button').onclick = () => panel.remove();
+            document.body.append(panel);
+          }, 350);
+        };
+      }, location.name === 'first');
+      return submitBooking(page, { progressIntervalMs: 100 });
+    },
+  });
+  assert.equal(result.success, true);
+  assert.deepEqual(locations, ['first', 'second']);
+  assert.ok(pendingNotices > 0);
+  assert.equal(await page.evaluate(() => window.counts.submit), 2);
+  assert.equal(result.errors[0].stage, 'submission-rejected');
+  assert.ok(result.errors[0].timings.feedbackMs >= 350);
+});
+
+for (const loss of ['close', 'navigation']) {
+  test(`${loss} during an unbounded pending wait stops the queue with an unknown outcome`, async (t) => {
+    const page = await fixture(t, 'stale');
+    const control = {};
+    const requests = [1, 2].map((day) => ({
+      label: `booking-${day}`, date: `2026-11-0${day}`, from: '11:00', to: '14:00',
+      locationPriority: [{ name: 'first' }],
+    }));
+    const attempted = [];
+    const run = runBookingQueue({
+      requests, pages: [page], control, stopOnFailure: false,
+      attempt: (page, request) => attemptPriorityBooking(page, request, {
+        control, limit: createLimiter(1), resolve: async (entry) => entry, precheck: async () => {},
+        book: async () => { attempted.push(request.label); return submitBooking(page); },
+      }),
+    });
+    await page.waitForFunction(() => window.counts.submit === 1);
+    if (loss === 'close') await page.close();
+    else await page.goto('about:blank');
+    const results = await run;
+    assert.deepEqual(attempted, ['booking-1']);
+    assert.equal(results[0].outcome, 'unknown');
+    assert.equal(results[1].outcome, 'not-started');
+    assert.equal(control.stopReason.outcome, 'unknown');
+    assert.ok(results[0].timings.totalMs >= 0);
+  });
+}
+
+for (const status of [200, 401]) {
+  test(`HTTP ${status}: records headers/body timing without treating HTTP success as booking confirmation`, async (t) => {
+    const server = createServer((request, response) => {
+      if (request.method === 'POST') {
+        response.writeHead(status, { 'Content-Type': 'text/plain' });
+        response.write('fixture response');
+        setTimeout(() => response.end(), 200);
+      } else {
+        response.end('<div id="booking" role="dialog"><button id="submit">Submit</button></div>');
+      }
+    });
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+    t.after(() => new Promise((resolve) => { server.closeAllConnections(); server.close(resolve); }));
+    const origin = `http://127.0.0.1:${server.address().port}`;
+    const page = await browser.newPage();
+    t.after(() => page.close());
+    await page.setRequestInterception(true);
+    page.on('request', (request) => request.url().startsWith(`${origin}/`) ? request.continue() : request.abort());
+    await page.goto(`${origin}/Busking/busker/details`);
+    await page.evaluate(() => {
+      window.counts = { submit: 0 };
+      window.__liveMuseekNacHelpers = {
+        findBookingRoot: () => document.querySelector('#booking'),
+        clickBookingButton: () => { document.querySelector('#submit').click(); return true; },
+      };
+      document.querySelector('#submit').onclick = () => {
+        window.counts.submit += 1;
+        fetch('/Busking/bookings/create?private=omit-me', { method: 'POST' }).then((response) => {
+          if (!response.ok) return;
+          return response.text().then(() => setTimeout(() => {
+            const popup = document.createElement('div');
+            popup.className = 'swal2-popup';
+            popup.innerHTML = 'Booking created successfully.<button>OK</button>';
+            popup.querySelector('button').onclick = () => popup.remove();
+            document.body.append(popup);
+          }, 300));
+        });
+      };
+    });
+    const events = ['request', 'response', 'requestfinished', 'requestfailed', 'close', 'error', 'framenavigated'];
+    const listenerCounts = events.map((event) => page.listenerCount(event));
+    const disconnectedListeners = browser.listenerCount('disconnected');
+    let timings;
+    if (status === 200) {
+      const result = await submitBooking(page);
+      assert.equal(result.outcome, 'confirmed');
+      timings = result.timings;
+      assert.ok(timings.requests[0].finishedMs > timings.requests[0].headersMs);
+      assert.ok(timings.feedbackMs - timings.requests[0].finishedMs >= 250);
+    } else {
+      await assert.rejects(submitBooking(page), (error) => {
+        timings = error.timings;
+        return error.outcome === 'unknown' && error.stopQueue && /HTTP 401/.test(error.message);
+      });
+    }
+    assert.equal(timings.requests.length, 1);
+    assert.equal(timings.requests[0].status, status);
+    assert.equal(timings.requests[0].path, '/Busking/bookings/create');
+    assert.equal(JSON.stringify(timings).includes('omit-me'), false);
+    assert.equal(await page.evaluate(() => window.counts.submit), 1);
+    assert.deepEqual(events.map((event) => page.listenerCount(event)), listenerCounts);
+    assert.equal(browser.listenerCount('disconnected'), disconnectedListeners);
+  });
+}
 
 test('explicit alternate success wording is accepted', async (t) => {
   const page = await fixture(t, 'alternate-wording');

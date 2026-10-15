@@ -69,6 +69,7 @@ export function summarizeBookingRun(results, { durationMs, workerErrors, stopRea
       date: result.request.date, from: result.request.from, to: result.request.to,
       locationName: result.location?.name, locationId: result.location?.location_id,
       worker: result.worker, durationMs: result.durationMs, errors: result.errors,
+      timings: result.timings,
     })),
     skipped: skipped.map((result) => ({
       label: result.request.label, date: result.request.date,

@@ -2007,24 +2007,111 @@ export function observeBookingSubmission() {
   window.__liveMuseekSubmission = state;
 }
 
-export async function submitBooking(page, { timeoutMs = 15_000, cleanupTimeoutMs = 0, isStopped = () => false } = {}) {
+export async function submitBooking(page, {
+  // timeoutMs remains a shorthand for callers that explicitly want finite waits.
+  timeoutMs,
+  confirmationTimeoutMs = timeoutMs ?? 0,
+  resultTimeoutMs = timeoutMs ?? 0,
+  progressIntervalMs = 15_000,
+  cleanupTimeoutMs = 0,
+  logPrefix = '',
+  isStopped = () => false,
+} = {}) {
+  for (const value of [confirmationTimeoutMs, resultTimeoutMs, cleanupTimeoutMs, progressIntervalMs]) {
+    if (!Number.isSafeInteger(value) || value < 0) throw new Error('Submission wait durations must be non-negative integers.');
+  }
   await page.evaluate(observeBookingSubmission);
   let confirmed = false;
   let rejectionText = '';
   let cleanupNoticeTimer;
-  const deadline = Date.now() + timeoutMs;
+  let progressTimer;
+  let phase = 'confirmation prompt or booking result';
+  const started = Date.now();
+  const timings = { requests: [] };
+  const elapsed = () => Date.now() - started;
+  const log = (message) => console.log(`${logPrefix ? `${logPrefix} ` : ''}${message}`);
+  const snapshot = () => ({ ...timings, requests: timings.requests.map((request) => ({ ...request })), totalMs: elapsed() });
+  const pendingRequests = new Map();
+  const origin = new URL(page.url()).origin;
+  // Observe request timing only: no extra requests, response bodies, or URL queries.
+  const onRequest = (request) => {
+    const url = new URL(request.url());
+    if (url.origin !== origin || !/\/Busking\//i.test(url.pathname) ||
+        ['GET', 'HEAD', 'OPTIONS'].includes(request.method()) ||
+        !['xhr', 'fetch'].includes(request.resourceType())) return;
+    const timing = { method: request.method(), path: url.pathname, startedMs: elapsed() };
+    pendingRequests.set(request, timing);
+    timings.requests.push(timing);
+    log(`Booking-page request sent at +${timing.startedMs}ms: ${timing.method} ${timing.path}`);
+  };
+  const onResponse = (response) => {
+    const timing = pendingRequests.get(response.request());
+    if (!timing) return;
+    timing.headersMs = elapsed();
+    timing.status = response.status();
+    log(`Booking-page response headers at +${timing.headersMs}ms: HTTP ${timing.status} (${timing.headersMs - timing.startedMs}ms after request). Still waiting for explicit booking feedback.`);
+    if ([401, 403].includes(timing.status)) abort(`Booking request lost access to the session (HTTP ${timing.status}); inspect NAC before rerunning.`);
+  };
+  const onFinished = (request) => {
+    const timing = pendingRequests.get(request);
+    if (!timing) return;
+    timing.finishedMs = elapsed();
+    log(`Booking-page response body finished at +${timing.finishedMs}ms (${timing.finishedMs - timing.startedMs}ms after request).`);
+    pendingRequests.delete(request);
+  };
+  const onFailed = (request) => {
+    const timing = pendingRequests.get(request);
+    if (!timing) return;
+    timing.failedMs = elapsed();
+    timing.error = request.failure()?.errorText || 'Request failed';
+    log(`Booking-page request failed at +${timing.failedMs}ms: ${timing.error}. Outcome remains pending; waiting for explicit feedback without resubmitting.`);
+    pendingRequests.delete(request);
+  };
+  const controller = new AbortController();
+  const abort = (message) => controller.abort(new Error(message));
+  const onClose = () => abort('Booking page closed while waiting.');
+  const onCrash = () => abort('Booking page crashed while waiting.');
+  const onDisconnect = () => abort('Booking browser disconnected while waiting.');
+  const onNavigation = (frame) => {
+    if (frame === page.mainFrame()) abort('Booking page navigated while waiting; the original submission can no longer be observed.');
+  };
+  const browser = page.browser();
+  page.on('request', onRequest);
+  page.on('response', onResponse);
+  page.on('requestfinished', onFinished);
+  page.on('requestfailed', onFailed);
+  page.on('close', onClose);
+  page.on('error', onCrash);
+  page.on('framenavigated', onNavigation);
+  browser.on('disconnected', onDisconnect);
   try {
     if (isStopped()) throw new BookingSubmissionError('Queue stopped before submission.', 'not-submitted');
+    if (progressIntervalMs) {
+      progressTimer = setInterval(() => {
+        log(`Booking outcome pending after ${elapsed()}ms; waiting for ${phase}. Remaining bookings stay queued; Submit will not be retried.`);
+      }, progressIntervalMs);
+      progressTimer.unref?.();
+    }
+    timings.submitClickedMs = elapsed();
+    log(`Clicking booking Submit at +${timings.submitClickedMs}ms.`);
     await clickBookingModalButton(page, 'Submit');
     while (true) {
       const handle = await page.waitForFunction(() => {
         const state = window.__liveMuseekSubmission;
+        if (!state) throw new Error('Booking feedback observer was lost; the original submission can no longer be observed.');
         state?.scan();
         return state?.outcome ? { outcome: state.outcome, text: state.text } : false;
-      }, { timeout: Math.max(1, deadline - Date.now()), polling: 100 });
+      }, {
+        timeout: timings.confirmationClickedMs == null ? confirmationTimeoutMs : resultTimeoutMs,
+        polling: 100,
+        signal: controller.signal,
+      });
       const feedback = await handle.jsonValue();
       await handle.dispose();
       if (feedback.outcome === 'rejected') {
+        clearInterval(progressTimer);
+        timings.feedbackMs = elapsed();
+        log(`Explicit booking rejection detected at +${timings.feedbackMs}ms; clearing its popup.`);
         rejectionText = feedback.text;
         const dismissed = await page.evaluate(() => {
           const root = window.__liveMuseekSubmission?.element;
@@ -2040,19 +2127,25 @@ export async function submitBooking(page, { timeoutMs = 15_000, cleanupTimeoutMs
         await page.waitForFunction(() => {
           const state = window.__liveMuseekSubmission;
           return state ? !state.isVisible(state.element) : false;
-        }, { timeout: cleanupTimeoutMs, polling: 100 });
-        return { success: false, outcome: 'rejected', textSnippet: rejectionText };
+        }, { timeout: cleanupTimeoutMs, polling: 100, signal: controller.signal });
+        timings.popupCleanupMs = elapsed() - timings.feedbackMs;
+        log(`Rejection popup cleared in ${timings.popupCleanupMs}ms.`);
+        return { success: false, outcome: 'rejected', textSnippet: rejectionText, timings: snapshot() };
       }
       if (feedback.outcome === 'success') {
+        clearInterval(progressTimer);
+        timings.feedbackMs = elapsed();
         confirmed = true;
+        log(`Explicit booking success detected at +${timings.feedbackMs}ms; clearing its popup.`);
         cleanupNoticeTimer = setTimeout(() => {
-          console.log('Booking confirmed. Still waiting for its success popup to close; remaining bookings stay queued. You can dismiss the popup manually.');
+          log('Booking confirmed. Still waiting for its success popup to close; remaining bookings stay queued. You can dismiss the popup manually.');
         }, 5_000);
         cleanupNoticeTimer.unref?.();
         break;
       }
       // Mark handled before clicking; there is only one confirmation click per attempt.
       if (isStopped()) throw new BookingSubmissionError('Queue stopped before booking confirmation.', 'unknown');
+      timings.confirmationClickedMs = elapsed();
       const clicked = await page.evaluate(() => {
         const state = window.__liveMuseekSubmission;
         const root = state?.element;
@@ -2068,6 +2161,8 @@ export async function submitBooking(page, { timeoutMs = 15_000, cleanupTimeoutMs
         return true;
       });
       if (!clicked) throw new BookingSubmissionError('Unable to confirm the booking safely.');
+      phase = 'booking result';
+      log(`Booking confirmation clicked at +${timings.confirmationClickedMs}ms; starting a separate result wait.`);
     }
 
     const { textSnippet, dismissTarget, sweetAlert } = await page.evaluate(() => {
@@ -2124,7 +2219,7 @@ export async function submitBooking(page, { timeoutMs = 15_000, cleanupTimeoutMs
           container.click();
         }
         return !visible(panel) && !visible(container);
-      }, { timeout: cleanupTimeoutMs, polling: 100 });
+      }, { timeout: cleanupTimeoutMs, polling: 100, signal: controller.signal });
     }
     if (dismissTarget) await page.mouse.click(dismissTarget.x, dismissTarget.y);
     // Some dialogs disable backdrop dismissal. A scoped OK/Close remains safe
@@ -2141,15 +2236,22 @@ export async function submitBooking(page, { timeoutMs = 15_000, cleanupTimeoutMs
     await page.waitForFunction(() => {
       const state = window.__liveMuseekSubmission;
       return state ? !state.isVisible(state.element) : false;
-    }, { timeout: cleanupTimeoutMs, polling: 100 });
+    }, { timeout: cleanupTimeoutMs, polling: 100, signal: controller.signal });
     const modalStillOpen = await page.evaluate(() => Boolean(window.__liveMuseekNacHelpers?.findBookingRoot?.()));
-    return { success: true, outcome: 'confirmed', modalStillOpen, textSnippet };
+    timings.popupCleanupMs = elapsed() - timings.feedbackMs;
+    log(`Success popup cleared in ${timings.popupCleanupMs}ms; booking flow completed in ${elapsed()}ms.`);
+    return { success: true, outcome: 'confirmed', modalStillOpen, textSnippet, timings: snapshot() };
   } catch (error) {
-    if (error instanceof BookingSubmissionError) throw error;
+    if (error instanceof BookingSubmissionError) {
+      error.timings = snapshot();
+      throw error;
+    }
     if (rejectionText) {
-      throw new BookingSubmissionError(
+      const failure = new BookingSubmissionError(
         `NAC rejected the booking, but its popup could not be cleared: ${rejectionText}. ${error.message}`, 'rejected'
       );
+      failure.timings = snapshot();
+      throw failure;
     }
     const dismissalDetails = confirmed ? await page.evaluate(() => {
       const state = window.__liveMuseekSubmission;
@@ -2158,14 +2260,25 @@ export async function submitBooking(page, { timeoutMs = 15_000, cleanupTimeoutMs
       return panel ? `panel=${panel.tagName}.${String(panel.className)}; backdropClicks=${state.dismissal?.attempts ?? 0}; ` +
         `panelConnected=${panel.isConnected}; backdropConnected=${container?.isConnected ?? false}` : 'feedback state unavailable';
     }).catch(() => 'feedback page unavailable') : '';
-    throw new BookingSubmissionError(
+    const failure = new BookingSubmissionError(
       confirmed
         ? `Booking confirmed, but dismissing its success popup failed: ${error.message}. ${dismissalDetails}`
-        : `Booking outcome is unknown; inspect NAC before rerunning. ${error.message}`,
+        : `Booking outcome is unknown; inspect NAC before rerunning. Waiting for ${phase}: ${error.message}`,
       confirmed ? 'confirmed' : 'unknown'
     );
+    failure.timings = snapshot();
+    throw failure;
   } finally {
     clearTimeout(cleanupNoticeTimer);
+    clearInterval(progressTimer);
+    page.off('request', onRequest);
+    page.off('response', onResponse);
+    page.off('requestfinished', onFinished);
+    page.off('requestfailed', onFailed);
+    page.off('close', onClose);
+    page.off('error', onCrash);
+    page.off('framenavigated', onNavigation);
+    browser.off('disconnected', onDisconnect);
     await page.evaluate(() => {
       window.__liveMuseekSubmission?.observer?.disconnect();
       delete window.__liveMuseekSubmission;
