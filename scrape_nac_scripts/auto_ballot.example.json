@@ -1,0 +1,14 @@
+{
+  "stop_on_failure": false,
+  "ballots": [
+    {
+      "label": "Monday evening",
+      "date": "2026-11-16",
+      "time": "19:00-22:00",
+      "location_priority": [
+        { "location_name": "AMK HUB" },
+        { "location_name": "PAYA LEBAR SQUARE" }
+      ]
+    }
+  ]
+}

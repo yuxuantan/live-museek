@@ -1,5 +1,7 @@
 # NAC auto-booking
 
+For the separate radio-button balloting flow, see [NAC auto-balloting](README.auto-ballot.md).
+
 Run the configured bookings in one tab using the persisted NAC login:
 
 ```bash

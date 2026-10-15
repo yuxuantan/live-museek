@@ -70,6 +70,8 @@ export function summarizeBookingRun(results, { durationMs, workerErrors, stopRea
       locationName: result.location?.name, locationId: result.location?.location_id,
       worker: result.worker, durationMs: result.durationMs, errors: result.errors,
       timings: result.timings,
+      ...(result.status ? { status: result.status } : {}),
+      ...(result.pendingVerified != null ? { pendingVerified: result.pendingVerified } : {}),
     })),
     skipped: skipped.map((result) => ({
       label: result.request.label, date: result.request.date,

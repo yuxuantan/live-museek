@@ -192,7 +192,7 @@ export async function ensureAuthenticatedBuskingDetailsPage(browser, args) {
   }
   if (sessionState?.state === 'blocked') throw buildBlockedLoginError(sessionState.url);
   if (sessionState?.state === 'authenticated') {
-    await waitForBookingControls(sessionState.page, args.navigationTimeoutMs);
+    await waitForBookingControls(sessionState.page, args.navigationTimeoutMs, { mode: args.formMode });
     return sessionState.page;
   }
 
@@ -213,7 +213,7 @@ export async function ensureAuthenticatedBuskingDetailsPage(browser, args) {
 
   const authenticatedPage = await waitForAuthenticatedSession(browser, args);
   await authenticatedPage.bringToFront();
-  await waitForBookingControls(authenticatedPage, args.navigationTimeoutMs);
+  await waitForBookingControls(authenticatedPage, args.navigationTimeoutMs, { mode: args.formMode });
 
   sessionState = await detectPageSessionState(authenticatedPage);
   if (sessionState.state === 'blocked') {
@@ -226,17 +226,17 @@ export async function ensureAuthenticatedBuskingDetailsPage(browser, args) {
   return authenticatedPage;
 }
 
-export async function waitForBookingControls(page, timeout = DEFAULT_NAVIGATION_TIMEOUT_MS) {
-  await installNacPageHelpers(page);
-  await page.waitForFunction(() => {
+export async function waitForBookingControls(page, timeout = DEFAULT_NAVIGATION_TIMEOUT_MS, { mode = 'booking' } = {}) {
+  await installNacPageHelpers(page, { mode });
+  await page.waitForFunction((mode) => {
     if (!location.pathname.toLowerCase().includes('/busking/busker/details')) return false;
     const helpers = window.__liveMuseekNacHelpers;
     if (helpers?.findBookingRoot?.()) return true;
     return [...document.querySelectorAll('button, a, input, [role="button"]')].some((element) =>
-      /submit booking/i.test(element.innerText || element.value || element.textContent || '') &&
+      new RegExp(`submit ${mode}`, 'i').test(element.innerText || element.value || element.textContent || '') &&
       !element.disabled && element.getAttribute('aria-disabled') !== 'true' && helpers?.isVisible(element)
     );
-  }, { timeout, polling: 100 });
+  }, { timeout, polling: 100 }, mode);
 }
 
 export async function waitForVisibleText(page, expectedText, timeout = 30_000) {
@@ -342,9 +342,10 @@ export async function clickVisibleElementByText(page, expectedText, timeout = 30
   }
 }
 
-export async function installNacPageHelpers(page) {
-  await page.evaluate(() => {
-    if (window.__liveMuseekNacHelpers) {
+export async function installNacPageHelpers(page, { mode = 'booking' } = {}) {
+  if (!['booking', 'balloting'].includes(mode)) throw new Error(`Unsupported NAC form mode: ${mode}`);
+  await page.evaluate((mode) => {
+    if (window.__liveMuseekNacHelpers?.mode === mode) {
       return;
     }
 
@@ -376,6 +377,7 @@ export async function installNacPageHelpers(page) {
     };
 
     const helpers = {
+      mode,
       normalizeText(value) {
         return String(value ?? '').replace(/\s+/g, ' ').trim();
       },
@@ -385,11 +387,13 @@ export async function installNacPageHelpers(page) {
       },
 
       normalizeTimeLabel(value) {
-        const match = helpers.normalizeText(value).match(/\b(\d{1,2}):(\d{2})\b/);
+        const match = helpers.normalizeText(value).match(/\b(\d{1,2}):(\d{2})\b(?::?\s*(AM|PM)\b)?/i);
         if (!match) {
           return '';
         }
-        return `${String(Number(match[1])).padStart(2, '0')}:${match[2]}`;
+        let hours = Number(match[1]);
+        if (mode === 'balloting' && match[3]) hours = hours % 12 + (match[3].toUpperCase() === 'PM' ? 12 : 0);
+        return `${String(hours).padStart(2, '0')}:${match[2]}`;
       },
 
       buildTimeSlotKey(from, to) {
@@ -521,8 +525,12 @@ export async function installNacPageHelpers(page) {
           ),
         ]
           .filter((element) => helpers.isVisible(element))
-          .filter((element) => helpers.getText(element).toLowerCase().includes('create a booking'))
-          .sort((left, right) => helpers.getArea(right) - helpers.getArea(left));
+          .filter((element) => helpers.getText(element).toLowerCase().includes(`create a ${mode}`))
+          .filter((element) => mode === 'booking' || (element.querySelector('input') &&
+            [...element.querySelectorAll('button, a, input[type="button"]')].some((button) => /^load$/i.test(helpers.getText(button)))))
+          .sort((left, right) => mode === 'booking'
+            ? helpers.getArea(right) - helpers.getArea(left)
+            : helpers.getArea(left) - helpers.getArea(right));
 
         return candidates[0] ?? null;
       },
@@ -734,7 +742,7 @@ export async function installNacPageHelpers(page) {
 
         const normalizedTargetLabel = helpers.normalizeLocationKey(targetLabel);
         const tryNativeSelects = () => {
-          const selects = [...document.querySelectorAll('select')];
+          const selects = [...(mode === 'balloting' ? root : document).querySelectorAll('select')];
           for (const select of selects) {
             const option = [...select.options].find((candidate) => {
               const normalizedOptionText = helpers.normalizeLocationKey(candidate.textContent || candidate.label || '');
@@ -1548,7 +1556,7 @@ export async function installNacPageHelpers(page) {
         const slots = [];
 
         for (const row of tableRows) {
-          const checkbox = row.querySelector('input[type="checkbox"]');
+          const checkbox = row.querySelector(mode === 'balloting' ? 'input[type="radio"]' : 'input[type="checkbox"]');
           const cells = [...row.querySelectorAll('th, td')]
             .map((cell) => helpers.getText(cell))
             .filter(Boolean);
@@ -1586,6 +1594,9 @@ export async function installNacPageHelpers(page) {
           return { selectedKeys: [], unavailableKeys: [], missingKeys: [...slotKeys] };
         }
 
+        if (mode === 'balloting' && slotKeys.length !== 1) {
+          throw new Error('Balloting requires exactly one timeslot per submission.');
+        }
         const requestedKeys = new Set((slotKeys ?? []).map((slotKey) => helpers.normalizeText(slotKey)));
         const seenKeys = new Set();
         const selectedKeys = [];
@@ -1593,7 +1604,7 @@ export async function installNacPageHelpers(page) {
 
         const tableRows = [...root.querySelectorAll('tr')].filter((row) => helpers.isVisible(row));
         for (const row of tableRows) {
-          const checkbox = row.querySelector('input[type="checkbox"]');
+          const checkbox = row.querySelector(mode === 'balloting' ? 'input[type="radio"]' : 'input[type="checkbox"]');
           const cells = [...row.querySelectorAll('th, td')]
             .map((cell) => helpers.getText(cell))
             .filter(Boolean);
@@ -1605,7 +1616,7 @@ export async function installNacPageHelpers(page) {
           if (!requestedKeys.has(key)) {
             // A reused form can retain the previous time range. Remove those
             // selections so the next submission contains only its own slots.
-            if (checkbox?.checked && !checkbox.disabled && checkbox.getAttribute('aria-disabled') !== 'true') {
+            if (mode === 'booking' && checkbox?.checked && !checkbox.disabled && checkbox.getAttribute('aria-disabled') !== 'true') {
               checkbox.click();
             }
             continue;
@@ -1625,7 +1636,7 @@ export async function installNacPageHelpers(page) {
         }
 
         const missingKeys = [...requestedKeys].filter((slotKey) => !seenKeys.has(slotKey));
-        const unexpectedKeys = tableRows.filter((row) => row.querySelector('input[type="checkbox"]')?.checked)
+        const unexpectedKeys = tableRows.filter((row) => row.querySelector(mode === 'balloting' ? 'input[type="radio"]' : 'input[type="checkbox"]')?.checked)
           .map((row) => {
             const cells = [...row.querySelectorAll('th, td')].map((cell) => helpers.getText(cell)).filter(Boolean);
             return helpers.buildTimeSlotKey(cells[1], cells[2]);
@@ -1640,7 +1651,7 @@ export async function installNacPageHelpers(page) {
     };
 
     window.__liveMuseekNacHelpers = helpers;
-  });
+  }, mode);
 }
 
 export async function waitForBookingModal(page) {
@@ -2015,12 +2026,16 @@ export async function submitBooking(page, {
   progressIntervalMs = 15_000,
   cleanupTimeoutMs = 0,
   logPrefix = '',
+  observeFeedback = observeBookingSubmission,
+  activityName = 'Booking',
+  successDismissal = 'backdrop',
+  allowSuccessButtonFallback = true,
   isStopped = () => false,
 } = {}) {
   for (const value of [confirmationTimeoutMs, resultTimeoutMs, cleanupTimeoutMs, progressIntervalMs]) {
     if (!Number.isSafeInteger(value) || value < 0) throw new Error('Submission wait durations must be non-negative integers.');
   }
-  await page.evaluate(observeBookingSubmission);
+  await page.evaluate(observeFeedback);
   let confirmed = false;
   let rejectionText = '';
   let cleanupNoticeTimer;
@@ -2029,7 +2044,11 @@ export async function submitBooking(page, {
   const started = Date.now();
   const timings = { requests: [] };
   const elapsed = () => Date.now() - started;
-  const log = (message) => console.log(`${logPrefix ? `${logPrefix} ` : ''}${message}`);
+  const log = (message) => {
+    if (activityName !== 'Booking') message = message.replace(/bookings/gi, 'ballots')
+      .replace(/booking/gi, (word) => word[0] === 'B' ? activityName : activityName.toLowerCase());
+    console.log(`${logPrefix ? `${logPrefix} ` : ''}${message}`);
+  };
   const snapshot = () => ({ ...timings, requests: timings.requests.map((request) => ({ ...request })), totalMs: elapsed() });
   const pendingRequests = new Map();
   const origin = new URL(page.url()).origin;
@@ -2153,7 +2172,7 @@ export async function submitBooking(page, {
         state.confirmationHandled = true;
         state.outcome = null;
         const button = [...root.querySelectorAll('button, a, input[type="button"], input[type="submit"], [role="button"]')]
-          .find((element) => /^(yes|yes[,!]? (?:create|confirm)(?: booking)?)$/i.test(
+          .find((element) => /^(yes|yes[,!]? (?:create|confirm)(?: booking| balloting| ballot)?)$/i.test(
             String(element.value || element.innerText || element.textContent || '').trim()
           ) && element.getClientRects().length > 0 && !element.disabled);
         if (!button) return false;
@@ -2165,9 +2184,10 @@ export async function submitBooking(page, {
       log(`Booking confirmation clicked at +${timings.confirmationClickedMs}ms; starting a separate result wait.`);
     }
 
-    const { textSnippet, dismissTarget, sweetAlert } = await page.evaluate(() => {
+    const { textSnippet, dismissTarget, sweetAlert, noPopup } = await page.evaluate(() => {
       const state = window.__liveMuseekSubmission;
       const root = state.element;
+      if (!root) return { textSnippet: state.text, dismissTarget: null, sweetAlert: false, noPopup: true };
       const container = root.matches('.swal2-popup') ? root.closest('.swal2-container') : null;
       if (container) {
         state.dismissal = { panel: root, container, attempts: 0, lastAttempt: 0 };
@@ -2191,7 +2211,11 @@ export async function submitBooking(page, {
         : null;
       return { textSnippet: state.text, dismissTarget, sweetAlert: false };
     });
-    if (sweetAlert) {
+    if (noPopup) {
+      timings.popupCleanupMs = 0;
+      return { success: true, outcome: 'confirmed', textSnippet, timings: snapshot() };
+    }
+    if (sweetAlert && successDismissal === 'backdrop') {
       // NAC reloads the page when success isConfirmed (OK). Its loaded
       // SweetAlert handler dismisses only when event.target is the container.
       // Click that exact backdrop, after its handler is ready. A second scoped
@@ -2221,10 +2245,10 @@ export async function submitBooking(page, {
         return !visible(panel) && !visible(container);
       }, { timeout: cleanupTimeoutMs, polling: 100, signal: controller.signal });
     }
-    if (dismissTarget) await page.mouse.click(dismissTarget.x, dismissTarget.y);
+    if (dismissTarget && successDismissal === 'backdrop') await page.mouse.click(dismissTarget.x, dismissTarget.y);
     // Some dialogs disable backdrop dismissal. A scoped OK/Close remains safe
     // after positive confirmation; never click Submit or a generic page button.
-    if (!sweetAlert) await page.evaluate(() => {
+    if (allowSuccessButtonFallback && (!sweetAlert || successDismissal === 'confirm')) await page.evaluate(() => {
       const root = window.__liveMuseekSubmission?.element;
       if (!root?.isConnected || !root.getClientRects().length) return;
       const button = [...root.querySelectorAll('button, a, input[type="button"], input[type="submit"], [role="button"]')].find((element) =>

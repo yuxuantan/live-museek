@@ -1,0 +1,155 @@
+{
+  "stop_on_failure": false,
+  "ballots": [
+    {
+      "label": "Monday 2026-11-16 evening",
+      "date": "2026-11-16",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Tuesday 2026-11-17 evening",
+      "date": "2026-11-17",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Wednesday 2026-11-18 evening",
+      "date": "2026-11-18",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Thursday 2026-11-19 evening",
+      "date": "2026-11-19",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Friday 2026-11-20 evening",
+      "date": "2026-11-20",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Saturday 2026-11-21 evening",
+      "date": "2026-11-21",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Sunday 2026-11-22 evening",
+      "date": "2026-11-22",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Monday 2026-11-23 evening",
+      "date": "2026-11-23",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Tuesday 2026-11-24 evening",
+      "date": "2026-11-24",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Wednesday 2026-11-25 evening",
+      "date": "2026-11-25",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Thursday 2026-11-26 evening",
+      "date": "2026-11-26",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Friday 2026-11-27 evening",
+      "date": "2026-11-27",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Saturday 2026-11-28 evening",
+      "date": "2026-11-28",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Sunday 2026-11-29 evening",
+      "date": "2026-11-29",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    },
+    {
+      "label": "Monday 2026-11-30 evening",
+      "date": "2026-11-30",
+      "time": "18:00-22:00",
+      "location_priority": [
+        {
+          "location_name": "AMK HUB"
+        }
+      ]
+    }
+  ]
+}

@@ -308,7 +308,7 @@ function normalizeLocationPriorityEntry(entry) {
   };
 }
 
-function normalizeBookingRequest(rawRequest, index) {
+export function normalizeBookingRequest(rawRequest, index) {
   if (!rawRequest || typeof rawRequest !== 'object') {
     throw new Error(`Invalid booking entry at index ${index}. Expected an object.`);
   }

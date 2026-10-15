@@ -42,3 +42,6 @@ The events map uses Google Maps and loads only after **Show map** is clicked. Ad
 ## NAC auto-booking
 
 See [auto-booking usage and verification](scrape_nac_scripts/README.auto-book.md) for sequential booking, parallel availability checks, and confirmation handling.
+
+For separate hourly radio-button submissions and PENDING-tile verification, see
+[auto-balloting usage](scrape_nac_scripts/README.auto-ballot.md).
